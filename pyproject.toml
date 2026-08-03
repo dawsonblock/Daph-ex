@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "daph-exfusion"
+version = "3.1.4"
+description = "DAPH / ExFusion v3 — structured hybrid SSM + attention + LatentMoE with adaptive effort and architecture-aware merging"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "DAPH / ExFusion contributors" }]
+keywords = ["mamba", "ssm", "moe", "hybrid", "transformer", "model-merging", "dare", "ties"]
+dependencies = [
+    "torch>=2.1",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=7.0"]
+pretrained = ["transformers>=4.40"]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["daph*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
