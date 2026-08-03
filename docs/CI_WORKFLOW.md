@@ -19,7 +19,7 @@ flowchart LR
 
 ## Job 1: compatibility test matrix
 
-The complete pytest suite runs independently on Python 3.10, 3.11, and 3.12. Matrix failures do not cancel other versions, which preserves diagnostic evidence across supported runtimes. Dependencies are installed from `pyproject.toml` with the `dev` extra, and pip downloads are cached by Python version.
+The complete pytest suite runs independently on Python 3.10, 3.11, and 3.12. Matrix failures do not cancel other versions, which preserves diagnostic evidence across supported runtimes. Dependencies are installed from `pyproject.toml` with the `dev` extra, and pip downloads are cached by Python version. NumPy is an explicit runtime dependency because checkpoint and experiment provenance digest tensors through stable CPU byte representations.
 
 This job guards the legacy `DAPHHybridModelV3` path, canonical Qwen compatibility, training/counterfactual infrastructure, and all regression tests.
 
