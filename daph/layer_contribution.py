@@ -164,7 +164,17 @@ class LayerContributionProfiler:
             full_reference_adapter(self.model, None, self.config.objective, self.config.training_steps, self.config.seed)
             score_full = float(evaluate_fn(self.model))
             self.model.load_state_dict(base_state)
-        denominator = max(self.config.epsilon, float(score_full) - score_base)
+        reference_gain = float(score_full) - score_base
+        if not math.isfinite(reference_gain) or reference_gain <= self.config.epsilon:
+            self.model.load_state_dict(base_state)
+            for parameter, flag in zip(self.model.parameters(), base_flags):
+                parameter.requires_grad_(flag)
+            raise ValueError(
+                "Full-reference adaptation did not improve the baseline by more than epsilon; "
+                f"score_base={score_base}, score_full={score_full}, epsilon={self.config.epsilon}. "
+                "Layer contributions are not qualified for normalization or selection."
+            )
+        denominator = reference_gain
         results: List[LayerContributionResult] = []
         for layer_index in self.layers:
             self.model.load_state_dict(base_state)

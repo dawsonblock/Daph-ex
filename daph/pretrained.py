@@ -606,6 +606,22 @@ def save_adapted_checkpoint(
                 model.e3_region.to_dict() if getattr(model, "e3_region", None) is not None else None
             ),
         }
+    if getattr(model, "_verified_effort_policy", False):
+        controller = getattr(model, "effort_controller", None)
+        expected_digest = getattr(model, "_effort_policy_artifact_digest", None)
+        if controller is None or not expected_digest:
+            raise RuntimeError("Verified effort-policy metadata is incomplete")
+        from .policy_trainer import _state_dict_digest
+        controller_digest = _state_dict_digest(controller.state_dict())
+        if controller_digest != expected_digest:
+            raise RuntimeError(
+                "Effort-controller weights changed after verified policy installation; "
+                "re-verify and reinstall the policy before saving"
+            )
+        model_config["effort_policy"] = {
+            "status": "VERIFIED_FIT",
+            "state_dict_digest": controller_digest,
+        }
     payload: Dict[str, Any] = {"state_dict": model.state_dict(), "model_config": model_config}
     provenance = getattr(model, "parameter_provenance", None)
     if provenance is not None:

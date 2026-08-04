@@ -13,8 +13,10 @@ from daph.e3_training import E3StageConfig, configure_e3_training, e3_verified_o
 from daph.hard_case import E3HardCaseMiner, HardCaseMiningConfig
 from daph.layer_contribution import LayerContributionConfig, LayerContributionProfiler, profile_selection_payload
 from daph.policy_trainer import EffortPolicyArtifact, EffortPolicyTrainer, _state_dict_digest
+from daph.pretrained import save_adapted_checkpoint
 from daph.qwen_compat import QwenCompatModel
-from daph.qwen_exfusion import augment_qwen_compat_model, gate0b_exact_parity
+from daph.qwen_exfusion import augment_qwen_compat_model, gate0b_exact_parity, load_qwen_exfusion_checkpoint
+from daph.verifiers import ExactMatchVerifier, make_quality_fn
 
 
 def make_model(e3_config=None, layers=10):
@@ -132,6 +134,53 @@ def test_installed_verified_controller_dispatches_physical_e3():
     assert out["compute_stats"]["probe_compute_included"]
 
 
+def test_verified_controller_survives_checkpoint_round_trip(tmp_path):
+    _, model = make_model()
+    with torch.no_grad():
+        model.effort_controller.net[-1].weight.zero_()
+        model.effort_controller.net[-1].bias.fill_(-20)
+        model.effort_controller.net[-1].bias[3] = 20
+    state = {key: value.detach().clone() for key, value in model.effort_controller.state_dict().items()}
+    artifact = EffortPolicyArtifact(
+        policy_version="test", base_model_digest="base", train_dataset_digest="train",
+        validation_dataset_digest="val", split_manifest_digest="split", feature_dim=model.hidden_size,
+        feature_spec="hidden", temperature=0.1, training_seed=1, training_config_digest="cfg",
+        initial_state_dict_digest="init", metrics={}, state_dict_digest=_state_dict_digest(state),
+        training_status="VERIFIED_FIT",
+    )
+    model.install_effort_policy(artifact, state, base_model_digest="base")
+    path = tmp_path / "verified-policy.pt"
+    save_adapted_checkpoint(model, str(path))
+    loaded = load_qwen_exfusion_checkpoint(str(path))
+    out = loaded(torch.randint(0, 80, (1, 6)), effort_mode="adaptive", return_compute_receipt=True)
+    assert loaded.has_verified_effort_policy()
+    assert out["chosen_effort"] == 3
+    assert out["policy_logits"] is not None
+
+    tampered_payload = torch.load(path, map_location="cpu", weights_only=False)
+    controller_key = next(key for key in tampered_payload["state_dict"] if key.startswith("effort_controller."))
+    tampered_payload["state_dict"][controller_key].view(-1)[0].add_(1.0)
+    tampered_path = tmp_path / "tampered-policy.pt"
+    torch.save(tampered_payload, tampered_path)
+    with pytest.raises(ValueError, match="controller digest mismatch"):
+        load_qwen_exfusion_checkpoint(str(tampered_path))
+
+    with torch.no_grad():
+        model.effort_controller.net[-1].bias.add_(1.0)
+    with pytest.raises(RuntimeError, match="changed after verified policy installation"):
+        save_adapted_checkpoint(model, str(tmp_path / "stale-policy.pt"))
+
+
+def test_unverified_research_override_retains_policy_logits():
+    _, model = make_model()
+    out = model(
+        torch.randint(0, 80, (1, 6)), effort_mode="adaptive",
+        allow_unverified_policy=True, return_compute_receipt=True,
+    )
+    assert out["policy_logits"] is not None
+    assert out["policy_logits"].shape == (1, 4)
+
+
 def test_collector_uses_internal_probe_and_records_e3_metadata():
     _, model = make_model()
     calls = 0
@@ -192,6 +241,19 @@ def test_layer_profiler_contribution_negative_status_and_persistence(tmp_path):
     assert partial_report.profile_status == "PARTIAL_PROFILE"
 
 
+def test_layer_profiler_rejects_non_improving_full_reference():
+    model = DummyProfileModel()
+    original_flags = [parameter.requires_grad for parameter in model.parameters()]
+    profiler = LayerContributionProfiler(model, LayerContributionConfig(profile_mode="full"))
+
+    def adapt(candidate, layer, objective, steps, seed):
+        candidate.score = -0.1 if layer is None else 0.01
+
+    with pytest.raises(ValueError, match="did not improve"):
+        profiler.run(lambda candidate: candidate.score, adapt, full_reference_adapter=adapt)
+    assert [parameter.requires_grad for parameter in model.parameters()] == original_flags
+
+
 def test_rescue_regression_metrics_and_statistical_gate():
     pairs = [
         {"e2_correct": False, "e3_correct": True, "task_family": "math", "difficulty_bucket": "hard"},
@@ -217,6 +279,47 @@ def test_hard_case_miner_labels_and_configurable_curriculum():
     records = miner.mine(tasks)
     assert [record.category for record in records] == ["HARD_FAILURE", "EASY_CORRECT"]
     assert len(miner.sample(records, 4)) == 4
+
+
+def test_hard_case_miner_uses_model_device():
+    _, model = make_model(layers=4)
+    device = torch.device("mps" if torch.backends.mps.is_available() else "cuda" if torch.cuda.is_available() else "cpu")
+    model.to(device)
+    observed = []
+
+    def verify(output, task):
+        observed.append(output["logits"].device)
+        return {"correct": True}
+
+    miner = E3HardCaseMiner(model, verify, HardCaseMiningConfig())
+    miner.mine([{"task_id": "device", "input_ids": [1, 2, 3]}])
+    assert len(observed) == 1
+    assert observed[0].type == device.type
+
+
+def test_hard_case_miner_supports_project_verifier_contract_and_generation():
+    _, model = make_model(layers=4)
+
+    class FixedTokenizer:
+        def batch_decode(self, sequences, skip_special_tokens=True):
+            return ["42"] * sequences.size(0)
+
+    miner = E3HardCaseMiner(
+        model,
+        make_quality_fn(ExactMatchVerifier()),
+        HardCaseMiningConfig(max_new_tokens=1),
+        tokenizer=FixedTokenizer(),
+    )
+    records = miner.mine([{"task_id": "verified", "input_ids": [1, 2, 3], "expected": "42"}])
+    assert records[0].e2_correct
+    assert records[0].e2_verifier_reward == 1.0
+    assert records[0].e2_answer == "42"
+
+    without_tokenizer = E3HardCaseMiner(
+        model, make_quality_fn(ExactMatchVerifier()), HardCaseMiningConfig(max_new_tokens=1),
+    )
+    with pytest.raises(ValueError, match="requires a verifiable E2 result"):
+        without_tokenizer.mine([{"task_id": "unverifiable", "input_ids": [1, 2, 3], "expected": "42"}])
 
 
 def test_policy_fit_is_blocked_until_arm_and_oracle_gates_pass():

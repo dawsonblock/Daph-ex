@@ -93,7 +93,7 @@ print("J location ablation:", location_ablation_variants(steps=2))
 PY
 ```
 
-Use `run_variant_study(variants, evaluate_callback, output_dir)` to emit one compatible JSON/CSV schema. The callback must hold data, steps, optimizer, seed, and metric definition fixed. `configure_e3_training()` implements E3-A and controlled E3-B parameter opening; `E3HardCaseMiner` writes the hard-case mining manifest for G/H.
+Use `run_variant_study(variants, evaluate_callback, output_dir)` to emit one compatible JSON/CSV schema. The callback must hold data, steps, optimizer, seed, and metric definition fixed. `configure_e3_training()` implements E3-A and controlled E3-B parameter opening; `E3HardCaseMiner` writes the hard-case mining manifest for G/H. Pass the tokenizer to `E3HardCaseMiner(..., tokenizer=tokenizer)` when using the built-in text verifiers. Mining fails closed on `UNVERIFIABLE`, execution-error, or timeout statuses so those examples cannot be mislabeled as hard E2 failures.
 
 ## Staged multi-effort adaptation
 

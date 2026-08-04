@@ -8,7 +8,7 @@ import math
 import random
 from dataclasses import asdict, dataclass
 from pathlib import Path
-from typing import Any, Callable, Dict, Iterable, List, Mapping, Optional, Sequence
+from typing import Any, Callable, Dict, Iterable, List, Mapping, Optional, Sequence, Tuple, Union
 
 import torch
 import torch.nn.functional as F
@@ -21,6 +21,7 @@ class HardCaseMiningConfig:
     easy_correct_ratio: float = 0.20
     entropy_threshold: Optional[float] = None
     seed: int = 42
+    max_new_tokens: int = 16
 
     def validate(self) -> None:
         ratios = (self.hard_failure_ratio, self.hard_uncertain_ratio, self.easy_correct_ratio)
@@ -28,6 +29,8 @@ class HardCaseMiningConfig:
             raise ValueError("Hard-case sampling ratios must be non-negative")
         if abs(sum(ratios) - 1.0) > 1e-8:
             raise ValueError("Hard-case sampling ratios must sum to one")
+        if self.max_new_tokens < 1:
+            raise ValueError("max_new_tokens must be positive")
 
 
 @dataclass(frozen=True)
@@ -46,25 +49,91 @@ class HardCaseRecord:
     task_payload: Dict[str, Any]
 
 
-VerifierFn = Callable[[Mapping[str, Any], Mapping[str, Any]], Mapping[str, Any]]
+VerifierMapping = Mapping[str, Any]
+VerifierTuple = Tuple[float, str]
+VerifierFn = Callable[
+    [Mapping[str, Any], Mapping[str, Any]],
+    Union[VerifierMapping, VerifierTuple],
+]
 
 
 class E3HardCaseMiner:
-    def __init__(self, model: torch.nn.Module, verifier_fn: VerifierFn, config: HardCaseMiningConfig) -> None:
+    def __init__(
+        self,
+        model: torch.nn.Module,
+        verifier_fn: VerifierFn,
+        config: HardCaseMiningConfig,
+        *,
+        tokenizer: Optional[Any] = None,
+    ) -> None:
         config.validate()
         self.model = model
         self.verifier_fn = verifier_fn
         self.config = config
+        self.tokenizer = tokenizer
+
+    def _device(self) -> torch.device:
+        try:
+            return next(self.model.parameters()).device
+        except StopIteration:
+            return torch.device("cpu")
+
+    def _verification_output(
+        self,
+        ids: torch.Tensor,
+        mask: Optional[torch.Tensor],
+        forward_output: Mapping[str, Any],
+    ) -> Mapping[str, Any]:
+        if self.tokenizer is None:
+            return forward_output
+        if not hasattr(self.model, "generate"):
+            raise RuntimeError("Verifier-driven hard-case generation requires model.generate()")
+        generated = self.model.generate(
+            ids,
+            attention_mask=mask,
+            effort_mode="fixed_2",
+            max_new_tokens=self.config.max_new_tokens,
+            tokenizer=self.tokenizer,
+        )
+        return generated
+
+    @staticmethod
+    def _normalize_verdict(
+        raw: Union[VerifierMapping, VerifierTuple],
+        verification_output: Mapping[str, Any],
+    ) -> Tuple[bool, float, Optional[str]]:
+        if isinstance(raw, Mapping):
+            if "correct" not in raw:
+                raise ValueError("Mapping verifier results must contain 'correct'")
+            correct = bool(raw["correct"])
+            reward = float(raw.get("reward", correct))
+            answer = raw.get("answer")
+            return correct, reward, None if answer is None else str(answer)
+        if isinstance(raw, tuple) and len(raw) == 2:
+            reward, status = raw
+            if status not in {"CORRECT", "INCORRECT", "UNVERIFIABLE", "EXECUTION_ERROR", "TIMEOUT"}:
+                raise ValueError(f"Unknown verifier status: {status!r}")
+            if status not in {"CORRECT", "INCORRECT"}:
+                raise ValueError(
+                    "Hard-case mining requires a verifiable E2 result; "
+                    f"got status={status!r}. Supply a tokenizer for decoded generation "
+                    "or remove the task from the mining corpus."
+                )
+            texts = verification_output.get("generated_text")
+            answer = texts[0] if isinstance(texts, (list, tuple)) and texts else texts
+            return status == "CORRECT", float(reward), None if answer is None else str(answer)
+        raise TypeError("Verifier results must be a mapping or a (quality, status) tuple")
 
     @torch.no_grad()
     def mine(self, tasks: Iterable[Mapping[str, Any]]) -> List[HardCaseRecord]:
         records: List[HardCaseRecord] = []
+        device = self._device()
         for index, task in enumerate(tasks):
-            ids = torch.as_tensor(task["input_ids"], dtype=torch.long)
+            ids = torch.as_tensor(task["input_ids"], dtype=torch.long, device=device)
             if ids.dim() == 1:
                 ids = ids.unsqueeze(0)
             mask = task.get("attention_mask")
-            mask_tensor = torch.as_tensor(mask) if mask is not None else None
+            mask_tensor = torch.as_tensor(mask, device=device) if mask is not None else None
             if mask_tensor is not None and mask_tensor.dim() == 1:
                 mask_tensor = mask_tensor.unsqueeze(0)
             out = self.model(ids, attention_mask=mask_tensor, effort_mode="fixed_2")
@@ -81,9 +150,10 @@ class E3HardCaseMiner:
                     logits[:, :-1].reshape(-1, logits.size(-1)), labels[:, 1:].reshape(-1),
                     ignore_index=-100,
                 ).item())
-            verdict = dict(self.verifier_fn({"logits": logits}, task))
-            correct = bool(verdict["correct"])
-            reward = float(verdict.get("reward", correct))
+            forward_output = dict(out) if isinstance(out, Mapping) else {"logits": logits}
+            verification_output = self._verification_output(ids, mask_tensor, forward_output)
+            raw_verdict = self.verifier_fn(verification_output, task)
+            correct, reward, answer = self._normalize_verdict(raw_verdict, verification_output)
             uncertain = self.config.entropy_threshold is not None and entropy >= self.config.entropy_threshold
             category = "HARD_FAILURE" if not correct else (
                 "HARD_UNCERTAIN" if uncertain else "EASY_CORRECT"
@@ -94,7 +164,7 @@ class E3HardCaseMiner:
                 task_id=str(task.get("task_id", index)), category=category,
                 e2_correct=correct, e2_verifier_reward=reward, e2_entropy=entropy,
                 e2_confidence=confidence, e2_ce=e2_ce,
-                e2_answer=verdict.get("answer"), task_family=task.get("task_family"),
+                e2_answer=answer, task_family=task.get("task_family"),
                 difficulty=task.get("difficulty_bucket"), task_digest=digest,
                 task_payload=json.loads(json.dumps(dict(task), default=lambda value: value.tolist() if isinstance(value, torch.Tensor) else str(value))),
             ))

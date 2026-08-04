@@ -587,7 +587,6 @@ class QwenExFusionModel(nn.Module):
                     source_position="post_qwen_probe_research_override",
                     hidden_anchor=decision.hidden_anchor,
                 )
-                policy_logits = None
             levels = decision.levels
             if effort_levels_override is not None:
                 levels = torch.as_tensor(effort_levels_override, device=input_ids.device, dtype=torch.long)
@@ -976,6 +975,22 @@ def load_qwen_exfusion_checkpoint(path: str, *, map_location: str = "cpu") -> Qw
         e3_config=e3_config,
     )
     model.load_state_dict(state_dict)
+    policy_metadata = cfg.get("effort_policy")
+    if policy_metadata is not None:
+        if policy_metadata.get("status") != "VERIFIED_FIT":
+            raise ValueError(f"Unsupported effort-policy checkpoint status: {policy_metadata.get('status')!r}")
+        if model.effort_controller is None:
+            raise ValueError("Verified effort-policy metadata requires controller weights")
+        from .policy_trainer import _state_dict_digest
+        expected_digest = policy_metadata.get("state_dict_digest")
+        actual_digest = _state_dict_digest(model.effort_controller.state_dict())
+        if not expected_digest or actual_digest != expected_digest:
+            raise ValueError(
+                "Verified effort-policy controller digest mismatch: "
+                f"expected={expected_digest!r} actual={actual_digest!r}"
+            )
+        model._verified_effort_policy = True
+        model._effort_policy_artifact_digest = actual_digest
     p = payload.get("parameter_provenance")
     if p:
         model.parameter_provenance = ExFusionParameterProvenance(
