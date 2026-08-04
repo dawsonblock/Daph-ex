@@ -17,6 +17,7 @@ from daph.pretrained import save_adapted_checkpoint
 from daph.qwen_compat import QwenCompatModel
 from daph.qwen_exfusion import augment_qwen_compat_model, gate0b_exact_parity, load_qwen_exfusion_checkpoint
 from daph.verifiers import ExactMatchVerifier, make_quality_fn
+from scripts.run_e3_hardcase_ablation import _active_refinement_layer, _set_refinement_steps
 
 
 def make_model(e3_config=None, layers=10):
@@ -337,6 +338,18 @@ def test_dose_and_location_ablation_contracts_are_explicit():
     locations = location_ablation_variants()
     assert [item.name for item in locations] == ["EARLY", "MIDDLE", "LATE", "FINAL"]
     assert all(not item.strong_e2_distillation for item in locations)
+
+
+def test_real_ablation_harness_targets_active_location_and_step_count():
+    _, middle = make_model(E3RefinementConfig(e3_refinement_mode="middle_recurrent", e3_refine_steps=1))
+    _, final = make_model(E3RefinementConfig(e3_refinement_mode="final_refine", e3_refine_steps=1))
+    assert _active_refinement_layer(middle) == middle.e3_region.insertion_layer
+    assert _active_refinement_layer(final) == len(final.layers) - 1
+    assert _active_refinement_layer(middle) != _active_refinement_layer(final)
+    _set_refinement_steps(middle, 4)
+    out = middle(torch.randint(0, 80, (1, 5)), effort_mode="fixed_3", return_compute_receipt=True)
+    assert middle.e3_config.e3_refine_steps == 4
+    assert out["compute_receipt"].middle_refinement_steps == 4
 
 
 def test_e3_stage_a_freezes_e2_and_task_loss_is_primary():

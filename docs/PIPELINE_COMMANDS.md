@@ -77,10 +77,11 @@ python scripts/run_e3_hardcase_ablation.py \
   --selection runs/e3-hardcase-data/selection.jsonl \
   --test runs/e3-hardcase-data/test.jsonl \
   --output runs/e3-hardcase-ablation \
+  --e3-mode middle_recurrent \
   --latent-step-counts 1,2,4 --steps 200 --e3-scale 1e-3
 ```
 
-This keeps E2 frozen, trains only the configured E3 refiner and scale after Gate 0B, and evaluates exact numeric E2/E3 outcomes. New checkpoints default to middle refinement; historical checkpoints retain final refinement. The report includes rescues, regressions, net rescue rate, completion CE, hidden-state delta magnitude, and receipt-backed compute overhead. The supplied arithmetic generator is only a reproducible smoke curriculum; qualify a policy only after independent hard-task-family replication.
+This keeps E2 frozen, trains only the configured E3 refiner and scale after Gate 0B, and evaluates exact numeric E2/E3 outcomes. Use `--e3-mode final_refine` for the matched final-state control. Use `--e3-mode profiled_middle_recurrent --profile-dir artifacts/layer_profile/sparse` to bind the run to a measured profile; partial profiles remain labeled partial in the report. The report includes the actual refinement layer, selected region, rescues, regressions, net rescue rate, completion CE, hidden-state delta magnitude, and receipt-backed compute overhead. The supplied arithmetic generator is only a reproducible smoke curriculum; qualify a policy only after independent hard-task-family replication.
 
 ## E3 architecture, dose, and location contracts
 
