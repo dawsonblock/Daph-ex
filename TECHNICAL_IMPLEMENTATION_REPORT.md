@@ -9,6 +9,7 @@
 - `daph/counterfactual.py`: measured receipt-backed utility, E2-normalized canonical cost, and physical-order rejection.
 - `daph/pretrained.py`: canonical provenance in adapted checkpoints.
 - `tests/test_effort_compute_ordering.py`: physical graph, parity, branch, gradient, distillation, residual, and provenance gates.
+- `scripts/run_small_real_adaptation.py`: pinned, memory-bounded HF Qwen/WikiText adaptation and qualification harness.
 
 ## Training design
 
@@ -20,3 +21,9 @@
 - AttnRes remains disabled in the canonical experiment.
 - Deterministic compute units are calibrated proxies, not device-specific FLOP profiler output. Optional latency/memory fields require a benchmark harness.
 - Meaningful model-quality qualification still requires real adaptation data and an immutable evaluation corpus; synthetic tests prove plumbing and invariants only.
+
+## Real checkpoint verification
+
+`Qwen/Qwen2.5-0.5B` at immutable revision `060db6499f32faf8b98477b0a26969ef7d8b9987` was imported and evaluated on a deterministic WikiText-2 slice. Gate 0A achieved 100% source coverage and near-numerical logit parity. Gate 0B achieved exact E2 logits and exact backbone identity. Deterministic normalized compute was E0 `0.5070`, E1 `0.7570`, E2 `1.0000`, and E3 `2.2567`.
+
+The stable ten-step adaptation improved E0 CE by `0.0491` and E1 CE by `0.0189`, preserved E2 exactly, and worsened E3 CE by `0.8085`. Therefore this is an engineering pass but a quality-qualification failure. See `docs/REAL_MODEL_SMOKE_REPORT.md` for the complete result and next workflow.

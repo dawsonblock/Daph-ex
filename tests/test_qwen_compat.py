@@ -54,6 +54,17 @@ def test_gqa_shapes():
     print("GQA + RoPE cache OK")
 
 
+def test_qwen2_projection_bias_layout():
+    attn = CausalSelfAttention(
+        hidden_size=32, num_heads=4, num_key_value_heads=2,
+        bias=True, out_bias=False,
+    )
+    assert attn.q_proj.bias is not None
+    assert attn.k_proj.bias is not None
+    assert attn.v_proj.bias is not None
+    assert attn.out_proj.bias is None
+
+
 def test_shared_swiglu_map():
     cfg = DAPHConfigV3(
         hidden_size=64, latent_size=32, num_attention_heads=4, num_key_value_heads=2,

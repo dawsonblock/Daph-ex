@@ -67,6 +67,7 @@ class CausalSelfAttention(nn.Module):
         num_key_value_heads: Optional[int] = None,
         dropout: float = 0.0,
         bias: bool = False,
+        out_bias: Optional[bool] = None,
         use_rope: bool = False,
         rope_theta: float = 10000.0,
         max_position: int = 8192,
@@ -85,10 +86,11 @@ class CausalSelfAttention(nn.Module):
         self.head_dim = hidden_size // num_heads
         self.use_rope = use_rope
 
+        output_bias = bias if out_bias is None else out_bias
         self.q_proj = nn.Linear(hidden_size, self.num_heads * self.head_dim, bias=bias)
         self.k_proj = nn.Linear(hidden_size, self.num_key_value_heads * self.head_dim, bias=bias)
         self.v_proj = nn.Linear(hidden_size, self.num_key_value_heads * self.head_dim, bias=bias)
-        self.out_proj = nn.Linear(self.num_heads * self.head_dim, hidden_size, bias=bias)
+        self.out_proj = nn.Linear(self.num_heads * self.head_dim, hidden_size, bias=output_bias)
         self.dropout = nn.Dropout(dropout)
         self.attn_dropout = nn.Dropout(dropout)
 

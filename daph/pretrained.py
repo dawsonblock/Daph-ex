@@ -587,6 +587,7 @@ def save_adapted_checkpoint(
             "max_position": getattr(model, "max_position", None),
             "rms_eps": getattr(model, "rms_eps", None),
             "attention_bias": getattr(model, "attention_bias", None),
+            "attention_output_bias": getattr(model, "attention_output_bias", None),
             "tie_word_embeddings": getattr(model, "tie_word_embeddings", None),
             "depth_fractions": getattr(model, "depth_fractions", None),
             "layer_count_overrides": getattr(model, "layer_count_overrides", None),

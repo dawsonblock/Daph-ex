@@ -16,6 +16,22 @@ python scripts/run_phase0_retention.py \
 
 This writes `phase0b_gate_report.json` and `qwen_exfusion_gate0b.pt`.
 
+## Memory-bounded real-model smoke
+
+After reconstructing the deterministic WikiText-2 JSONL slices described in `REAL_MODEL_SMOKE_REPORT.md`:
+
+```bash
+python scripts/run_small_real_adaptation.py \
+  --model Qwen/Qwen2.5-0.5B \
+  --revision 060db6499f32faf8b98477b0a26969ef7d8b9987 \
+  --train runs/wikitext2-smoke/train.jsonl \
+  --validation runs/wikitext2-smoke/validation.jsonl \
+  --output runs/qwen2.5-0.5b-wikitext2-stable \
+  --steps 10 --seq-len 32 --eval-batches 2
+```
+
+The harness pins the tokenizer revision, cycles deterministically through E0/E1/E3, freezes imported E2 weights, rejects non-finite loss/gradients, skips large checkpoint serialization, and writes `experiment_report.json`.
+
 ## Staged multi-effort adaptation
 
 ```bash

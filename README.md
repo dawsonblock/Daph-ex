@@ -91,6 +91,12 @@ See [`docs/PIPELINE_COMMANDS.md`](docs/PIPELINE_COMMANDS.md) for executable exam
 
 GitHub Actions runs the complete Python compatibility matrix, exact architecture gates, synthetic Phase 0 evidence generation, and package build. See [`docs/CI_WORKFLOW.md`](docs/CI_WORKFLOW.md) for the job graph, artifact contract, and recommended branch protection.
 
+## Real-model smoke result
+
+The pinned `Qwen/Qwen2.5-0.5B` + WikiText-2 smoke experiment passed exact E2 retention and physical compute ordering on Apple M2 Pro/MPS. E0/E1 improved slightly over ten updates but remained far behind E2; E3 was more expensive and worse than E2. The engineering path is validated, but the effort hierarchy is **not quality-qualified**, so policy training remains gated off.
+
+See [`docs/REAL_MODEL_SMOKE_REPORT.md`](docs/REAL_MODEL_SMOKE_REPORT.md) for measurements, hardware, limitations, the reproduction command, and the detailed next workflow.
+
 ## Status
 
-The canonical Qwen path and legacy hybrid path coexist. AttnRes is deliberately disabled in the first canonical pretrained experiment until model-level cross-layer history is implemented.
+The canonical Qwen path and legacy hybrid path coexist. AttnRes is deliberately disabled in the first canonical pretrained experiment until model-level cross-layer history is implemented. The full local suite currently passes 96 tests.

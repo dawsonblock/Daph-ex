@@ -91,7 +91,9 @@ def test_train_adapt_jsonl():
         cfg = RealTrainConfig(
             steps=6, batch_size=2, seq_len=16, lr=1e-3, lr_pretrained=1e-4,
             warmup_steps=1, log_every=100, eval_every=1000, seed=0,
-            effort_mode="sample", data_path=data, output_dir=os.path.join(td, "out"),
+            effort_mode="sample",
+            effort_schedule=("fixed_0", "fixed_1", "fixed_3"),
+            data_path=data, output_dir=os.path.join(td, "out"),
             device="cpu",
         )
         mcfg = DAPHConfigV3(
@@ -103,6 +105,7 @@ def test_train_adapt_jsonl():
         model = DAPHHybridModelV3(mcfg)
         out = train_adapt(model, cfg)
         assert sum(out["effort_hist"].values()) == 6
+        assert out["effort_hist"] == {"fixed_0": 2, "fixed_1": 2, "fixed_3": 2}
         assert os.path.isfile(os.path.join(td, "out", "checkpoint_final.pt"))
         print(f"train_adapt jsonl OK hist={out['effort_hist']}")
 

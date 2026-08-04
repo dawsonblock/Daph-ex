@@ -41,6 +41,7 @@ class QwenCompatBlock(nn.Module):
         rms_eps: float = 1e-6,
         dropout: float = 0.0,
         attention_bias: bool = False,
+        attention_output_bias: Optional[bool] = None,
     ) -> None:
         super().__init__()
         self.input_layernorm = RMSNorm(hidden_size, eps=rms_eps)
@@ -50,6 +51,7 @@ class QwenCompatBlock(nn.Module):
             num_key_value_heads=num_key_value_heads,
             dropout=dropout,
             bias=attention_bias,
+            out_bias=attention_output_bias,
             use_rope=True,
             rope_theta=rope_theta,
             max_position=max_position,
@@ -102,6 +104,7 @@ class QwenCompatModel(nn.Module):
         rms_eps: float = 1e-6,
         tie_word_embeddings: bool = True,
         attention_bias: bool = False,
+        attention_output_bias: Optional[bool] = None,
     ) -> None:
         super().__init__()
         self.embed = nn.Embedding(vocab_size, hidden_size)
@@ -111,6 +114,7 @@ class QwenCompatModel(nn.Module):
                     hidden_size, num_heads, num_key_value_heads, intermediate_size,
                     rope_theta=rope_theta, max_position=max_position, rms_eps=rms_eps,
                     attention_bias=attention_bias,
+                    attention_output_bias=attention_output_bias,
                 )
                 for _ in range(num_layers)
             ]

@@ -224,17 +224,21 @@ def build_compat_from_hf(cfg_hf) -> QwenCompatModel:
     n_kv = int(getattr(cfg_hf, "num_key_value_heads", n_q) or n_q)
     V = int(cfg_hf.vocab_size)
     inter = int(getattr(cfg_hf, "intermediate_size", H * 2))
-    rope = float(getattr(cfg_hf, "rope_theta", 10000.0) or 10000.0)
+    rope_params = getattr(cfg_hf, "rope_parameters", None) or {}
+    rope = float(getattr(cfg_hf, "rope_theta", None) or rope_params.get("rope_theta", 10000.0))
     eps = float(getattr(cfg_hf, "rms_norm_eps", 1e-6) or 1e-6)
     max_pos = int(getattr(cfg_hf, "max_position_embeddings", 8192) or 8192)
     tie = bool(getattr(cfg_hf, "tie_word_embeddings", True))
-    attn_bias = bool(getattr(cfg_hf, "attention_bias", False))
+    model_type = str(getattr(cfg_hf, "model_type", ""))
+    # Qwen2/Qwen2.5 use Q/K/V bias and a bias-free O projection.
+    attn_bias = True if model_type == "qwen2" else bool(getattr(cfg_hf, "attention_bias", False))
+    attn_out_bias = False if model_type == "qwen2" else attn_bias
     unsupported = []
     sw = getattr(cfg_hf, "sliding_window", None)
     if sw not in (None, False, 0):
         unsupported.append(f"sliding_window={sw}")
     rs = getattr(cfg_hf, "rope_scaling", None)
-    if rs not in (None, {}, False):
+    if rs not in (None, {}, False) and rs.get("rope_type", "default") != "default":
         unsupported.append(f"rope_scaling={rs}")
     if unsupported:
         raise RuntimeError(
@@ -246,6 +250,7 @@ def build_compat_from_hf(cfg_hf) -> QwenCompatModel:
         num_key_value_heads=n_kv, intermediate_size=inter,
         rope_theta=rope, max_position=max_pos, rms_eps=eps,
         tie_word_embeddings=tie, attention_bias=attn_bias,
+        attention_output_bias=attn_out_bias,
     )
 
 
@@ -278,7 +283,11 @@ def _gate0b_report(compat: QwenCompatModel, exfusion, batches: list) -> Dict[str
     }
 
 
-def run_synthetic(output: Path, *, shallow_continuation: bool = False) -> dict:
+def run_synthetic(
+    output: Path, *, shallow_continuation: bool = False,
+    num_routed_experts: int = 2, top_k: int = 1,
+    latent_size: Optional[int] = None, save_checkpoint: bool = True,
+) -> dict:
     output.mkdir(parents=True, exist_ok=True)
     device = "cpu"
     H, L, V, I, n_q, n_kv = 64, 2, 128, 128, 4, 2
@@ -307,13 +316,15 @@ def run_synthetic(output: Path, *, shallow_continuation: bool = False) -> dict:
     loss_c, ntok = eval_lm_loss(compat, batches)
 
     exfusion = augment_qwen_compat_model(
-        compat, num_routed_experts=2, top_k=1,
+        compat, num_routed_experts=num_routed_experts, top_k=top_k,
+        latent_size=latent_size,
         use_shallow_continuation=shallow_continuation,
     ).to(device)
     loss_h, _ = eval_lm_loss(exfusion, batches, effort_mode="fixed_2")
     gate_report = _gate0b_report(compat, exfusion, batches)
     (output / "phase0b_gate_report.json").write_text(json.dumps(gate_report, indent=2))
-    save_adapted_checkpoint(exfusion, str(output / "qwen_exfusion_gate0b.pt"), extra={"gate0b_report": gate_report})
+    if save_checkpoint:
+        save_adapted_checkpoint(exfusion, str(output / "qwen_exfusion_gate0b.pt"), extra={"gate0b_report": gate_report})
 
     metrics = {
         "source_mode": "synthetic",
@@ -382,6 +393,10 @@ def run_hf(
     max_batches: int,
     seq_len: int,
     shallow_continuation: bool = False,
+    num_routed_experts: int = 2,
+    top_k: int = 1,
+    latent_size: Optional[int] = None,
+    save_checkpoint: bool = True,
 ) -> dict:
     from transformers import AutoConfig, AutoModelForCausalLM, AutoTokenizer
 
@@ -512,7 +527,9 @@ def run_hf(
             sd = {k: v.detach().cpu() for k, v in source.state_dict().items()}
             report = import_into_qwen_compat(compat, sd, source_name=model_id, source_revision=revision)
         exfusion = augment_qwen_compat_model(
-            compat, use_shallow_continuation=shallow_continuation
+            compat, use_shallow_continuation=shallow_continuation,
+            num_routed_experts=num_routed_experts, top_k=top_k,
+            latent_size=latent_size,
         ).to(device)
         loss_h, _ = eval_lm_loss(exfusion, batches, effort_mode="fixed_2")
         ppl_h = _ppl(loss_h)
@@ -520,7 +537,8 @@ def run_hf(
         delta_ppl_b = (ppl_h - base_ppl) / max(base_ppl, 1e-8)
         gate_report = _gate0b_report(compat, exfusion, batches)
         (output / "phase0b_gate_report.json").write_text(json.dumps(gate_report, indent=2))
-        save_adapted_checkpoint(exfusion, str(output / "qwen_exfusion_gate0b.pt"), extra={"gate0b_report": gate_report})
+        if save_checkpoint:
+            save_adapted_checkpoint(exfusion, str(output / "qwen_exfusion_gate0b.pt"), extra={"gate0b_report": gate_report})
         dec_b = gate_report["result"]
         metrics["phase0b"] = {
             "loss_exfusion_e2": loss_h,
@@ -607,11 +625,20 @@ def main():
     ap.add_argument("--max-batches", type=int, default=8)
     ap.add_argument("--seq-len", type=int, default=64)
     ap.add_argument("--shallow-continuation", action="store_true", help="include zero-residual E0/E1 continuation modules for Stage 1")
+    ap.add_argument("--num-routed-experts", type=int, default=2)
+    ap.add_argument("--top-k", type=int, default=1)
+    ap.add_argument("--latent-size", type=int, default=0, help="0 selects the model default")
+    ap.add_argument("--no-save-checkpoint", action="store_true", help="write reports without the potentially large ExFusion checkpoint")
     args = ap.parse_args()
     out = Path(args.output)
 
     if args.synthetic or not args.hf_model:
-        run_synthetic(out, shallow_continuation=args.shallow_continuation)
+        run_synthetic(
+            out, shallow_continuation=args.shallow_continuation,
+            num_routed_experts=args.num_routed_experts, top_k=args.top_k,
+            latent_size=args.latent_size or None,
+            save_checkpoint=not args.no_save_checkpoint,
+        )
         return
     if not args.hf_revision or args.hf_revision == "main":
         print("ERROR: --hf-revision must be an immutable commit SHA (not 'main').", file=sys.stderr)
@@ -621,6 +648,9 @@ def main():
         phase=args.phase, strong_0a=args.strong_0a, strong_0b=args.strong_0b,
         weak_0b=args.weak_0b, max_batches=args.max_batches, seq_len=args.seq_len,
         shallow_continuation=args.shallow_continuation,
+        num_routed_experts=args.num_routed_experts, top_k=args.top_k,
+        latent_size=args.latent_size or None,
+        save_checkpoint=not args.no_save_checkpoint,
     )
 
 

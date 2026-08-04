@@ -79,6 +79,7 @@ class QwenExFusionBlock(nn.Module):
         max_position: int = 8192,
         rms_eps: float = 1e-6,
         attention_bias: bool = False,
+        attention_output_bias: Optional[bool] = None,
         recurrent_type: str = "ssm",
         state_size: int = 16,
         latent_size: Optional[int] = None,
@@ -95,6 +96,7 @@ class QwenExFusionBlock(nn.Module):
             H, num_heads, num_key_value_heads, intermediate_size,
             rope_theta=rope_theta, max_position=max_position,
             rms_eps=rms_eps, attention_bias=attention_bias,
+            attention_output_bias=attention_output_bias,
         )
 
         # Recurrent augmentation (SSM or KDA)
@@ -219,6 +221,7 @@ class QwenExFusionModel(nn.Module):
         rms_eps: float = 1e-6,
         tie_word_embeddings: bool = True,
         attention_bias: bool = False,
+        attention_output_bias: Optional[bool] = None,
         recurrent_type: str = "ssm",
         state_size: int = 16,
         latent_size: Optional[int] = None,
@@ -244,6 +247,7 @@ class QwenExFusionModel(nn.Module):
                     hidden_size, num_heads, num_key_value_heads, intermediate_size,
                     rope_theta=rope_theta, max_position=max_position, rms_eps=rms_eps,
                     attention_bias=attention_bias, recurrent_type=recurrent_type,
+                    attention_output_bias=attention_output_bias,
                     state_size=state_size, latent_size=latent_size,
                     num_routed_experts=num_routed_experts, top_k=top_k,
                     use_attn_res=use_attn_res, dropout=dropout,
@@ -270,6 +274,7 @@ class QwenExFusionModel(nn.Module):
         self.max_position = max_position
         self.rms_eps = rms_eps
         self.attention_bias = attention_bias
+        self.attention_output_bias = attention_bias if attention_output_bias is None else attention_output_bias
         self.tie_word_embeddings = tie_word_embeddings
         self.continuation_bottleneck_size = continuation_bottleneck_size
         self.use_shallow_continuation = use_shallow_continuation
@@ -485,6 +490,7 @@ def augment_qwen_compat_model(
     max_pos = getattr(blk0.self_attn.rotary, "max_position", 8192) if blk0.self_attn.rotary else 8192
     rms_eps = blk0.input_layernorm.eps
     attn_bias = blk0.self_attn.q_proj.bias is not None
+    attn_out_bias = blk0.self_attn.out_proj.bias is not None
 
     model = QwenExFusionModel(
         vocab_size=V, hidden_size=H, num_layers=L, num_heads=n_heads,
@@ -492,6 +498,7 @@ def augment_qwen_compat_model(
         rope_theta=rope_theta, max_position=max_pos, rms_eps=rms_eps,
         tie_word_embeddings=compat.lm_head.weight.data_ptr() == compat.embed.weight.data_ptr(),
         attention_bias=attn_bias, recurrent_type=recurrent_type,
+        attention_output_bias=attn_out_bias,
         state_size=state_size, latent_size=latent_size,
         num_routed_experts=num_routed_experts, top_k=top_k,
         use_attn_res=use_attn_res, dropout=dropout,
@@ -575,6 +582,7 @@ def load_qwen_exfusion_checkpoint(path: str, *, map_location: str = "cpu") -> Qw
         max_position=int(cfg.get("max_position") or 8192),
         rms_eps=float(cfg.get("rms_eps") or 1e-6),
         attention_bias=bool(cfg.get("attention_bias", False)),
+        attention_output_bias=bool(cfg.get("attention_output_bias", False)),
         tie_word_embeddings=bool(cfg.get("tie_word_embeddings", True)),
         e0_depth_fraction=float(fractions[0]), e1_depth_fraction=float(fractions[1]),
         e0_layer_count=overrides[0], e1_layer_count=overrides[1],

@@ -67,6 +67,9 @@ class RealTrainConfig:
     device: str = "cpu"
     effort_mode: str = "sample"
     effort_probs: Tuple[float, float, float, float] = (0.2, 0.2, 0.3, 0.3)
+    # Optional deterministic micro-step schedule. When set, it takes precedence
+    # over effort_mode/effort_probs and cycles for the duration of training.
+    effort_schedule: Tuple[str, ...] = ()
     freeze_name_contains: Tuple[str, ...] = ()
     # parameter-name substrings treated as "pretrained" for lower LR
     pretrained_name_contains: Tuple[str, ...] = (
@@ -76,6 +79,7 @@ class RealTrainConfig:
     data_path: str = ""
     val_path: str = ""
     tokenizer_name: str = ""  # optional HF tokenizer id/path
+    tokenizer_revision: str = ""  # optional immutable HF revision
     output_dir: str = "runs/adapt"
     resume: str = ""
     distillation_temperature: float = 2.0
@@ -83,6 +87,10 @@ class RealTrainConfig:
     beta_e1: float = 1.0
     stages: Tuple[TrainingStageConfig, ...] = ()
     retention_kl_threshold: Optional[float] = None
+    save_periodic_checkpoints: bool = True
+    save_final_checkpoint: bool = True
+    save_model_artifact: bool = True
+    fail_on_nonfinite: bool = True
 
 
 def load_jsonl_texts(path: str) -> List[str]:
@@ -265,14 +273,17 @@ def distillation_loss(
     return total, {"ce": float(ce.detach()), "distill_kl": float(kl.detach())}
 
 
-def try_load_tokenizer(name: str) -> Any:
+def try_load_tokenizer(name: str, revision: str = "") -> Any:
     if not name:
         return None
     try:
         from transformers import AutoTokenizer  # type: ignore
     except ImportError as e:
         raise ImportError("pip install transformers to use tokenizer_name=") from e
-    return AutoTokenizer.from_pretrained(name, trust_remote_code=True)
+    kwargs: Dict[str, Any] = {"trust_remote_code": True}
+    if revision:
+        kwargs["revision"] = revision
+    return AutoTokenizer.from_pretrained(name, **kwargs)
 
 
 @torch.no_grad()
@@ -350,7 +361,11 @@ def train_adapt(
             p.requires_grad_(False)
     frozen = apply_freeze(model, cfg.freeze_name_contains)
 
-    tok = try_load_tokenizer(cfg.tokenizer_name) if cfg.tokenizer_name else None
+    tok = (
+        try_load_tokenizer(cfg.tokenizer_name, cfg.tokenizer_revision)
+        if cfg.tokenizer_name
+        else None
+    )
     if not cfg.data_path:
         raise ValueError("RealTrainConfig.data_path is required")
     texts = load_jsonl_texts(cfg.data_path)
@@ -422,11 +437,16 @@ def train_adapt(
             g["lr"] = g["base_lr"] * warm
 
         ids, labels, mask = next(batcher)
-        effort_probs = active_stage.effort_sampling if active_stage is not None else cfg.effort_probs
-        emode = sample_effort_mode(
-            type("T", (), {"effort_mode": cfg.effort_mode, "effort_probs": effort_probs})(),
-            gen,
-        )
+        if cfg.effort_schedule:
+            emode = cfg.effort_schedule[step % len(cfg.effort_schedule)]
+            if emode not in {"fixed_0", "fixed_1", "fixed_2", "fixed_3"}:
+                raise ValueError(f"Invalid effort_schedule entry: {emode!r}")
+        else:
+            effort_probs = active_stage.effort_sampling if active_stage is not None else cfg.effort_probs
+            emode = sample_effort_mode(
+                type("T", (), {"effort_mode": cfg.effort_mode, "effort_probs": effort_probs})(),
+                gen,
+            )
         effort_hist[emode] = effort_hist.get(emode, 0) + 1
         examples = int(ids.shape[0])
         valid_tokens = int((labels != -100).sum().item())
@@ -462,6 +482,10 @@ def train_adapt(
                 shift_logits.reshape(-1, shift_logits.size(-1)),
                 shift_labels.reshape(-1), ignore_index=-100,
             )
+        if cfg.fail_on_nonfinite and not bool(torch.isfinite(loss).item()):
+            raise FloatingPointError(
+                f"Non-finite loss at micro-step {step} for effort {emode}"
+            )
         (loss / cfg.grad_accum).backward()
         pending_microsteps += 1
 
@@ -469,6 +493,10 @@ def train_adapt(
             grad_norm = torch.nn.utils.clip_grad_norm_(
                 [p for p in model.parameters() if p.requires_grad], cfg.grad_clip
             )
+            if cfg.fail_on_nonfinite and not bool(torch.isfinite(grad_norm).item()):
+                raise FloatingPointError(
+                    f"Non-finite gradient norm at micro-step {step} for effort {emode}"
+                )
             opt.step()
             opt.zero_grad(set_to_none=True)
             optimizer_steps_completed += 1
@@ -509,7 +537,12 @@ def train_adapt(
                     f"E2 retention gate failed: KL {retention_kl:.6g} > {cfg.retention_kl_threshold}"
                 )
 
-        if step > 0 and step % max(cfg.eval_every, 1) == 0 and pending_microsteps == 0:
+        if (
+            cfg.save_periodic_checkpoints
+            and step > 0
+            and step % max(cfg.eval_every, 1) == 0
+            and pending_microsteps == 0
+        ):
             ckpt = {
                 "model": model.state_dict(),
                 "optimizer": opt.state_dict(),
@@ -530,6 +563,8 @@ def train_adapt(
         grad_norm = torch.nn.utils.clip_grad_norm_(
             [p for p in model.parameters() if p.requires_grad], cfg.grad_clip
         )
+        if cfg.fail_on_nonfinite and not bool(torch.isfinite(grad_norm).item()):
+            raise FloatingPointError("Non-finite gradient norm in final accumulation window")
         opt.step()
         opt.zero_grad(set_to_none=True)
         optimizer_steps_completed += 1
@@ -560,8 +595,9 @@ def train_adapt(
         "history_tail": history[-20:],
         "wall_time_s": time.time() - t0,
     }
-    torch.save(final, out_dir / "checkpoint_final.pt")
-    if isinstance(model, QwenExFusionModel):
+    if cfg.save_final_checkpoint:
+        torch.save(final, out_dir / "checkpoint_final.pt")
+    if isinstance(model, QwenExFusionModel) and cfg.save_model_artifact:
         from .pretrained import save_adapted_checkpoint
         save_adapted_checkpoint(
             model, str(out_dir / "model_final.pt"),
