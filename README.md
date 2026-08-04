@@ -93,10 +93,10 @@ GitHub Actions runs the complete Python compatibility matrix, exact architecture
 
 ## Real-model smoke result
 
-The pinned `Qwen/Qwen2.5-0.5B` + WikiText-2 smoke experiment passed exact E2 retention and physical compute ordering on Apple M2 Pro/MPS. E0/E1 improved slightly over ten updates but remained far behind E2; E3 was more expensive and worse than E2. The engineering path is validated, but the effort hierarchy is **not quality-qualified**, so policy training remains gated off.
+The initial pinned `Qwen/Qwen2.5-0.5B` + WikiText-2 smoke exposed weak exits and an unstable E3 graph. The corrected run keeps exact E2, improves E0/E1 CE by `1.468`/`0.668`, and changes E3 from a `2.257×` degrading path into a stable `1.009×` final refinement with a small positive CE delta. This is an engineering pass, not yet a router-quality claim.
 
-See [`docs/REAL_MODEL_SMOKE_REPORT.md`](docs/REAL_MODEL_SMOKE_REPORT.md) for measurements, hardware, limitations, the reproduction command, and the detailed next workflow.
+See [`docs/QUALITY_CORRECTION_REPORT.md`](docs/QUALITY_CORRECTION_REPORT.md) for the root-cause analysis, corrected measurements, limitations, and next workflow. The original failure is retained in [`docs/REAL_MODEL_SMOKE_REPORT.md`](docs/REAL_MODEL_SMOKE_REPORT.md).
 
 ## Status
 
-The canonical Qwen path and legacy hybrid path coexist. AttnRes is deliberately disabled in the first canonical pretrained experiment until model-level cross-layer history is implemented. The full local suite currently passes 96 tests.
+The canonical Qwen path and legacy hybrid path coexist. AttnRes is deliberately disabled in the first canonical pretrained experiment until model-level cross-layer history is implemented. The full local suite currently passes 97 tests.

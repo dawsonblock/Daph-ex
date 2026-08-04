@@ -57,7 +57,7 @@ def test_disabled_branches_are_not_called():
     model(ids, effort_mode="fixed_2")
     assert calls == {"rec": 0, "moe": 0, "latent": 0}
     model(ids, effort_mode="fixed_3")
-    assert calls["rec"] == 4 and calls["moe"] == 4 and calls["latent"] == 4
+    assert calls == {"rec": 0, "moe": 0, "latent": 1}
 
 
 def test_shallow_exit_backprop_and_distillation_are_finite():
@@ -88,7 +88,9 @@ def test_refinement_scales_delta_not_full_representation():
         x, use_recurrent=False, use_routed_moe=False,
         use_attn_res=False, latent_steps=1,
     )
-    assert torch.allclose(out, base + 1.0, atol=1e-6)
+    expected_scale = 0.01 * torch.tanh(torch.tensor(0.5 / 0.01))
+    assert torch.allclose(out, base + 2.0 * expected_scale, atol=1e-6)
+    assert float((out - base).detach().abs().max()) <= 0.020001
 
 
 def test_training_init_is_explicit_and_enables_augmentation_gradients():
@@ -97,8 +99,29 @@ def test_training_init_is_explicit_and_enables_augmentation_gradients():
     assert receipt.backbone_unchanged and receipt.changed_scale_names
     ids = torch.randint(0, 96, (2, 7))
     model(ids, effort_mode="fixed_3").sum().backward()
-    assert model.layers[0].latent_refine.fc2.weight.grad is not None
-    assert model.layers[0].latent_refine.fc2.weight.grad.abs().sum() > 0
+    assert receipt.changed_scale_names == ("layers.3.latent_scale",)
+    assert model.layers[-1].latent_refine.fc2.weight.grad is not None
+    assert model.layers[-1].latent_refine.fc2.weight.grad.abs().sum() > 0
+    assert model.layers[0].latent_refine.fc2.weight.grad is None
+
+
+def test_hidden_state_distillation_is_finite_and_backpropagates():
+    _, model = _model()
+    ids = torch.randint(0, 96, (2, 8))
+    labels = ids.clone()
+    student = model(ids, effort_mode="fixed_0", return_hidden_state=True)
+    with torch.no_grad():
+        teacher = model(ids, effort_mode="fixed_2", return_hidden_state=True)
+    loss, pieces = distillation_loss(
+        student["logits"], teacher["logits"], labels,
+        beta=0.7, temperature=2.0,
+        student_hidden=student["hidden_state"],
+        teacher_hidden=teacher["hidden_state"], hidden_weight=1.0,
+    )
+    assert torch.isfinite(loss)
+    assert pieces["hidden_mse"] > 0
+    loss.backward()
+    assert model.layers[0].base.mlp.down_proj.weight.grad is not None
 
 
 def test_parameter_provenance_is_exact_names():

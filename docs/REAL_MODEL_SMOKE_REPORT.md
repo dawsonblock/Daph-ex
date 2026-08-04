@@ -1,5 +1,7 @@
 # Qwen2.5-0.5B real-model smoke report
 
+> This report preserves the original failing smoke result. The failure analysis, corrected architecture, and replacement measurements are in [`QUALITY_CORRECTION_REPORT.md`](QUALITY_CORRECTION_REPORT.md).
+
 ## Decision
 
 **Engineering validation: PASS. Quality qualification: FAIL. Policy training: BLOCKED by design.**

@@ -30,18 +30,16 @@ def test_nonzero_scale_breaks_parity():
     compat = QwenCompatModel(64, 32, 1, 4, 2, 64)
     exf = augment_qwen_compat_model(compat, num_routed_experts=2, top_k=1)
     with torch.no_grad():
-        for layer in exf.layers:
-            layer.rec_scale.fill_(1.0)
+        exf.layers[-1].latent_scale.fill_(1.0)
     ids = torch.randint(0, 64, (2, 6))
     m = gate0b_exact_parity(compat, exf, ids)  # zeros scales again
     # gate0b zeros scales — so should still pass
     assert m["passed"]
     # without zeroing, parity should fail
     with torch.no_grad():
-        for layer in exf.layers:
-            layer.rec_scale.fill_(0.5)
+        exf.layers[-1].latent_scale.fill_(0.5)
     logits_c = compat(ids)
-    logits_e = exf(ids, effort_mode="fixed_3")  # enables recurrent
+    logits_e = exf(ids, effort_mode="fixed_3")
     assert not torch.allclose(logits_c, logits_e, atol=1e-5)
     print("nonzero scale changes logits OK")
 
@@ -49,9 +47,9 @@ def test_nonzero_scale_breaks_parity():
 def test_scales_init_zero():
     m = QwenExFusionModel(32, 32, 1, 4, 2, 64)
     for layer in m.layers:
-        assert float(layer.rec_scale) == 0.0
-        assert float(layer.moe_scale) == 0.0
-        assert float(layer.latent_scale) == 0.0
+        assert float(layer.rec_scale.detach()) == 0.0
+        assert float(layer.moe_scale.detach()) == 0.0
+        assert float(layer.latent_scale.detach()) == 0.0
     print("scales init zero OK")
 
 

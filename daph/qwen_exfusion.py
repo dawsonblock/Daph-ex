@@ -87,6 +87,7 @@ class QwenExFusionBlock(nn.Module):
         top_k: int = 2,
         use_attn_res: bool = False,
         dropout: float = 0.0,
+        latent_scale_limit: float = 0.01,
     ) -> None:
         super().__init__()
         H = hidden_size
@@ -123,6 +124,9 @@ class QwenExFusionBlock(nn.Module):
         self.use_attn_res = use_attn_res
         self.attn_res = BlockAttnRes(hidden_size=H) if use_attn_res else None
         self.latent_refine = LatentRefineBlock(H, expansion=2.0, dropout=dropout)
+        if latent_scale_limit <= 0:
+            raise ValueError("latent_scale_limit must be positive")
+        self.latent_scale_limit = float(latent_scale_limit)
 
         # Exact-zero residual scales (scalar)
         self.rec_scale = nn.Parameter(torch.zeros(()))
@@ -176,7 +180,12 @@ class QwenExFusionBlock(nn.Module):
             ref, _ = self.latent_refine(out, num_steps=int(latent_steps))
             # Refinement returns a representation containing its input.  Scale only
             # its learned delta so latent_scale=0 is a clean identity operation.
-            out = out + self.latent_scale * (ref - out)
+            # Bound the effective residual to prevent a raw scale update from
+            # overwhelming the preserved pretrained representation.
+            effective_scale = self.latent_scale_limit * torch.tanh(
+                self.latent_scale / self.latent_scale_limit
+            )
+            out = out + effective_scale * (ref - out)
 
         return out, pk, pv, new_rec_state
 
@@ -202,9 +211,9 @@ class QwenExFusionModel(nn.Module):
 
     Effort modes (initial semantics):
       E2: base only (all scales effectively zero at init) — Qwen-equivalent
-      E3: base + latent refinement steps
-      E1: base + routed moe (after training; at init == E2)
-      E0: recurrent-heavy path (after training; at init ≈ base if scales zero)
+      E3: full base + bounded final-layer latent refinement
+      E1: configurable intermediate-depth exit
+      E0: configurable shallow exit
     """
 
     def __init__(
@@ -238,6 +247,7 @@ class QwenExFusionModel(nn.Module):
         e1_layer_count: Optional[int] = None,
         use_shallow_continuation: bool = False,
         continuation_bottleneck_size: Optional[int] = None,
+        latent_scale_limit: float = 0.01,
     ) -> None:
         super().__init__()
         self.embed = nn.Embedding(vocab_size, hidden_size)
@@ -251,6 +261,7 @@ class QwenExFusionModel(nn.Module):
                     state_size=state_size, latent_size=latent_size,
                     num_routed_experts=num_routed_experts, top_k=top_k,
                     use_attn_res=use_attn_res, dropout=dropout,
+                    latent_scale_limit=latent_scale_limit,
                 )
                 for _ in range(num_layers)
             ]
@@ -278,6 +289,7 @@ class QwenExFusionModel(nn.Module):
         self.tie_word_embeddings = tie_word_embeddings
         self.continuation_bottleneck_size = continuation_bottleneck_size
         self.use_shallow_continuation = use_shallow_continuation
+        self.latent_scale_limit = float(latent_scale_limit)
         self.e0_continuation = CheapContinuation(hidden_size, continuation_bottleneck_size) if use_shallow_continuation else None
         self.e1_continuation = CheapContinuation(hidden_size, continuation_bottleneck_size) if use_shallow_continuation else None
         self.depth_fractions = (e0_depth_fraction, e1_depth_fraction, e2_depth_fraction, e3_depth_fraction)
@@ -308,9 +320,10 @@ class QwenExFusionModel(nn.Module):
         if effort_mode in ("fixed_2", "e2", "2"):
             return dict(use_recurrent=False, use_routed_moe=False, use_attn_res=False, latent_steps=0)
         if effort_mode in ("fixed_3", "e3", "3"):
-            # AttnRes is intentionally disabled in the canonical experiment until
-            # cross-layer history is wired at model scope.
-            return dict(use_recurrent=True, use_routed_moe=True, use_attn_res=False,
+            # The canonical E3 correction is a final-layer latent refinement.
+            # Per-layer recurrent/MoE branches were empirically unstable on the
+            # preserved Qwen anchor and are retained only as experimental modules.
+            return dict(use_recurrent=False, use_routed_moe=False, use_attn_res=False,
                         latent_steps=self.default_e3_steps)
         if effort_mode in ("fixed_1", "e1", "1"):
             return dict(use_recurrent=False, use_routed_moe=False, use_attn_res=False, latent_steps=0)
@@ -333,6 +346,7 @@ class QwenExFusionModel(nn.Module):
         *,
         max_layers: Optional[int] = None,
         return_compute_receipt: bool = False,
+        return_hidden_state: bool = False,
     ) -> Union[Tensor, Dict[str, Any]]:
         effort = self._effort_index(effort_mode)
         flags = self._effort_flags(effort_mode)
@@ -340,14 +354,19 @@ class QwenExFusionModel(nn.Module):
         if effort in (2, 3) and layer_count != len(self.layers):
             raise ValueError("E2/E3 cannot use a partial-depth override")
         h = self.embed(input_ids)
-        for layer in self.layers[:layer_count]:
+        for layer_index, layer in enumerate(self.layers[:layer_count]):
+            latent_steps = (
+                int(flags["latent_steps"])
+                if effort == 3 and layer_index == layer_count - 1
+                else 0
+            )
             h, _, _, _ = layer(
                 h,
                 attention_mask=attention_mask,
                 use_recurrent=bool(flags["use_recurrent"]),
                 use_routed_moe=bool(flags["use_routed_moe"]),
                 use_attn_res=bool(flags["use_attn_res"]),
-                latent_steps=int(flags["latent_steps"]),
+                latent_steps=latent_steps,
             )
         if effort == 0 and self.e0_continuation is not None:
             h = self.e0_continuation(h)
@@ -359,8 +378,13 @@ class QwenExFusionModel(nn.Module):
             effort_mode=f"fixed_{effort}", layer_count=layer_count,
             batch_size=input_ids.shape[0], sequence_length=input_ids.shape[1], flags=flags,
         )
-        if return_compute_receipt:
-            return {"logits": logits, "compute_receipt": receipt, "compute_stats": receipt.to_dict()}
+        if return_compute_receipt or return_hidden_state:
+            result: Dict[str, Any] = {"logits": logits}
+            if return_compute_receipt:
+                result.update(compute_receipt=receipt, compute_stats=receipt.to_dict())
+            if return_hidden_state:
+                result["hidden_state"] = h
+            return result
         return logits
 
     def _compute_receipt(
@@ -375,7 +399,7 @@ class QwenExFusionModel(nn.Module):
             ffn_calls=layer_count,
             recurrent_steps=(layer_count if flags["use_recurrent"] else 0)
             + (1 if self.use_shallow_continuation and effort_mode in ("fixed_0", "fixed_1") else 0),
-            latent_steps=layer_count * int(flags["latent_steps"]),
+            latent_steps=int(flags["latent_steps"]),
             routed_expert_calls=layer_count * self.layers[0].routed_moe.top_k if flags["use_routed_moe"] else 0,
             token_count=batch_size * sequence_length,
             depth_fraction=layer_count / len(self.layers),
@@ -471,6 +495,7 @@ def augment_qwen_compat_model(
     e1_layer_count: Optional[int] = None,
     use_shallow_continuation: bool = False,
     continuation_bottleneck_size: Optional[int] = None,
+    latent_scale_limit: float = 0.01,
 ) -> QwenExFusionModel:
     """
     Convert a loaded QwenCompatModel into QwenExFusionModel.
@@ -507,6 +532,7 @@ def augment_qwen_compat_model(
         e0_layer_count=e0_layer_count, e1_layer_count=e1_layer_count,
         use_shallow_continuation=use_shallow_continuation,
         continuation_bottleneck_size=continuation_bottleneck_size,
+        latent_scale_limit=latent_scale_limit,
     )
 
     # Copy embed / norm / lm_head
@@ -544,7 +570,7 @@ def prepare_exfusion_for_training(
     *,
     gate0b_passed: bool,
     epsilon: float = 1e-4,
-    enabled_scales: Tuple[str, ...] = ("rec_scale", "moe_scale", "latent_scale"),
+    enabled_scales: Optional[Tuple[str, ...]] = None,
 ) -> TrainingInitReceipt:
     """Explicitly transition exact-zero Gate-0B scales to trainable epsilon."""
     if not gate0b_passed:
@@ -553,9 +579,17 @@ def prepare_exfusion_for_training(
         raise ValueError("epsilon must be non-negative")
     before = {n: p.detach().clone() for n, p in model.named_parameters() if ".base." in n or n in {"embed.weight", "norm.weight", "lm_head.weight"}}
     changed: List[str] = []
+    # Canonical E3 activates only the final layer's latent refinement. Explicit
+    # suffixes retain the old experimental opt-in for other branches.
+    active_names = {f"layers.{len(model.layers) - 1}.latent_scale"}
     with torch.no_grad():
         for name, p in model.named_parameters():
-            if any(name.endswith(s) for s in enabled_scales) and float(p.detach()) == 0.0:
+            enabled = (
+                name in active_names
+                if enabled_scales is None
+                else any(name.endswith(s) for s in enabled_scales)
+            )
+            if enabled and float(p.detach()) == 0.0:
                 p.fill_(epsilon)
                 changed.append(name)
     unchanged = all(torch.equal(before[n], dict(model.named_parameters())[n].detach()) for n in before)
@@ -589,6 +623,7 @@ def load_qwen_exfusion_checkpoint(path: str, *, map_location: str = "cpu") -> Qw
         default_e3_steps=int(cfg.get("default_e3_steps") or 2),
         use_shallow_continuation=bool(cfg.get("use_shallow_continuation", False)),
         continuation_bottleneck_size=cfg.get("continuation_bottleneck_size"),
+        latent_scale_limit=float(cfg.get("latent_scale_limit") or 0.01),
     )
     model.load_state_dict(payload.get("state_dict", payload.get("model")))
     p = payload.get("parameter_provenance")

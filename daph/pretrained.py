@@ -594,6 +594,7 @@ def save_adapted_checkpoint(
             "default_e3_steps": getattr(model, "default_e3_steps", None),
             "use_shallow_continuation": getattr(model, "use_shallow_continuation", False),
             "continuation_bottleneck_size": getattr(model, "continuation_bottleneck_size", None),
+            "latent_scale_limit": getattr(model, "latent_scale_limit", None),
         }
     payload: Dict[str, Any] = {"state_dict": model.state_dict(), "model_config": model_config}
     provenance = getattr(model, "parameter_provenance", None)

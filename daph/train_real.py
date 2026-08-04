@@ -85,6 +85,7 @@ class RealTrainConfig:
     distillation_temperature: float = 2.0
     beta_e0: float = 1.0
     beta_e1: float = 1.0
+    hidden_distillation_weight: float = 0.0
     stages: Tuple[TrainingStageConfig, ...] = ()
     retention_kl_threshold: Optional[float] = None
     save_periodic_checkpoints: bool = True
@@ -254,8 +255,11 @@ def distillation_loss(
     *,
     beta: float,
     temperature: float,
+    student_hidden: Optional[Tensor] = None,
+    teacher_hidden: Optional[Tensor] = None,
+    hidden_weight: float = 0.0,
 ) -> Tuple[Tensor, Dict[str, float]]:
-    """Padding-aware causal CE plus temperature-scaled E2 teacher KL."""
+    """Padding-aware causal CE plus E2 logit and optional hidden distillation."""
     s = student_logits[:, :-1].contiguous()
     t = teacher_logits[:, :-1].detach().contiguous()
     y = labels[:, 1:].contiguous()
@@ -270,7 +274,16 @@ def distillation_loss(
         reduction="batchmean",
     ) * temp**2
     total = ce + float(beta) * kl
-    return total, {"ce": float(ce.detach()), "distill_kl": float(kl.detach())}
+    details = {"ce": float(ce.detach()), "distill_kl": float(kl.detach())}
+    if hidden_weight > 0.0:
+        if student_hidden is None or teacher_hidden is None:
+            raise ValueError("hidden states are required when hidden_weight > 0")
+        sh = student_hidden[:, :-1].reshape(-1, student_hidden.size(-1))[valid]
+        th = teacher_hidden[:, :-1].detach().reshape(-1, teacher_hidden.size(-1))[valid]
+        hidden_mse = F.mse_loss(sh.float(), th.float())
+        total = total + float(hidden_weight) * hidden_mse
+        details["hidden_mse"] = float(hidden_mse.detach())
+    return total, details
 
 
 def try_load_tokenizer(name: str, revision: str = "") -> Any:
@@ -455,27 +468,41 @@ def train_adapt(
         examples_by_effort[emode] = examples_by_effort.get(emode, 0) + examples
         tokens_by_effort[emode] = tokens_by_effort.get(emode, 0) + valid_tokens
         pending_efforts.add(emode)
-        kwargs = {"return_compute_receipt": True} if isinstance(model, QwenExFusionModel) else {}
-        out = model(ids, attention_mask=mask, effort_mode=emode, **kwargs)
-        logits = out["logits"] if isinstance(out, dict) else out
-        # next-token: logits[:-1] vs labels[1:], ignore pad (-100)
-        shift_logits = logits[:, :-1, :].contiguous()
-        shift_labels = labels[:, 1:].contiguous()
-        details: Dict[str, float] = {}
         effort_idx = int(emode[-1]) if emode.startswith("fixed_") else 2
         distill_enabled = effort_idx in (0, 1) and (
             active_stage is None
             or (effort_idx == 0 and active_stage.distill_e0)
             or (effort_idx == 1 and active_stage.distill_e1)
         )
+        kwargs = (
+            {
+                "return_compute_receipt": True,
+                "return_hidden_state": distill_enabled and cfg.hidden_distillation_weight > 0.0,
+            }
+            if isinstance(model, QwenExFusionModel)
+            else {}
+        )
+        out = model(ids, attention_mask=mask, effort_mode=emode, **kwargs)
+        logits = out["logits"] if isinstance(out, dict) else out
+        # next-token: logits[:-1] vs labels[1:], ignore pad (-100)
+        shift_logits = logits[:, :-1, :].contiguous()
+        shift_labels = labels[:, 1:].contiguous()
+        details: Dict[str, float] = {}
         if isinstance(model, QwenExFusionModel) and distill_enabled:
             with torch.no_grad():
                 teacher_mode = active_stage.teacher_mode if active_stage is not None else "fixed_2"
-                teacher = model(ids, attention_mask=mask, effort_mode=teacher_mode)
+                teacher = model(
+                    ids, attention_mask=mask, effort_mode=teacher_mode,
+                    return_hidden_state=cfg.hidden_distillation_weight > 0.0,
+                )
+            teacher_logits = teacher["logits"] if isinstance(teacher, dict) else teacher
             beta = cfg.beta_e0 if effort_idx == 0 else cfg.beta_e1
             loss, details = distillation_loss(
-                logits, teacher, labels, beta=beta,
+                logits, teacher_logits, labels, beta=beta,
                 temperature=cfg.distillation_temperature,
+                student_hidden=out.get("hidden_state") if isinstance(out, dict) else None,
+                teacher_hidden=teacher.get("hidden_state") if isinstance(teacher, dict) else None,
+                hidden_weight=cfg.hidden_distillation_weight,
             )
         else:
             loss = F.cross_entropy(
