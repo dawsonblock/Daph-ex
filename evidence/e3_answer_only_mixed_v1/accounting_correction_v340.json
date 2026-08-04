@@ -1,0 +1,26 @@
+{
+  "correction_version": "3.4.0",
+  "historical_artifact_unchanged": true,
+  "original_field": "mean_verified_utility_delta",
+  "correct_interpretation": "mean_binary_quality_delta",
+  "mean_quality_delta": 0.041666666666666664,
+  "quality_lcb95": 0.0,
+  "reported_aggregate_compute_delta": 0.03584771190340561,
+  "descriptive_aggregate_break_even_lambda": 1.1623243006120074,
+  "descriptive_lambda_point_estimates": [
+    {"lambda_compute": 0.0, "mean_delta_utility": 0.041666666666666664},
+    {"lambda_compute": 0.1, "mean_delta_utility": 0.0380818954763261},
+    {"lambda_compute": 0.25, "mean_delta_utility": 0.03270473869081526},
+    {"lambda_compute": 0.5, "mean_delta_utility": 0.02374281071496386},
+    {"lambda_compute": 1.0, "mean_delta_utility": 0.005818954763261053},
+    {"lambda_compute": 2.0, "mean_delta_utility": -0.03002875714014456}
+  ],
+  "qualification_status": "INSUFFICIENT_POWER",
+  "claim_strength": "MECHANISM_SIGNAL",
+  "policy_training_allowed": false,
+  "limitations": [
+    "The historical per-example rows did not contain execution receipts or template IDs.",
+    "The utility values above are descriptive reconstructions from one aggregate compute delta and are not canonical receipt-backed bootstrap evidence.",
+    "A zero quality lower bound precludes capability qualification regardless of lambda."
+  ]
+}
