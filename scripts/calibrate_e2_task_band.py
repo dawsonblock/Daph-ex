@@ -119,7 +119,7 @@ def main() -> None:
     manifest = {
         "experiment": "e2-mixed-success-task-calibration",
         "model": {"id": args.model, "revision": args.revision},
-        "e2_runtime": "pinned_hf_source_with_exact_phase0a_parity",
+        "e2_runtime": "pinned_hf_source_proxy_for_imported_e2",
         "environment": {"torch": torch.__version__, "platform": platform.platform(), "device": str(device)},
         "config": {
             "min_e2_accuracy": args.min_e2_accuracy,

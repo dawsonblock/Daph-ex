@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "daph-exfusion"
-version = "3.2.0"
+version = "3.2.1"
 description = "DAPH ExFusion — preserved Qwen with physical effort hierarchy and profiled middle-layer E3 research"
 readme = "README.md"
 requires-python = ">=3.10"
