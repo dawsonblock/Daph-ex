@@ -1,5 +1,7 @@
 # Answer-only mixed-E2 E3 location study
 
+> v3.4.0 accounting correction: this historical bootstrap measured binary quality change, despite an older field naming it verified utility. It did not subtract per-task E3 compute. The result is retained as `MECHANISM_SIGNAL`, not cost-aware qualification. New runs must pass separate E3-Q and E3-U gates using actual execution receipts; see `UTILITY_ACCOUNTING_REPORT.md`.
+
 ## Outcome
 
 This experiment fixes the two largest weaknesses of the earlier hard-case smoke run:
@@ -9,7 +11,7 @@ This experiment fixes the two largest weaknesses of the earlier hard-case smoke 
 
 The matched held-out comparison used four recurrent refinement steps for every location. The Qwen E2 backbone remained frozen and each arm had the same deterministic compute overhead.
 
-| E3 location | Zero-based layer | E2 accuracy | E3 accuracy | Rescues | Regressions | E3 CE delta | Compute overhead | 95% utility LCB |
+| E3 location | Zero-based layer | E2 accuracy | E3 accuracy | Rescues | Regressions | E3 CE delta | Compute overhead | 95% quality LCB |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|
 | final state | 23 | 50.00% | 50.00% | 0 | 0 | -0.06385 | 3.5848% | 0.0000 |
 | heuristic middle | 12 | 50.00% | 54.17% | 1 | 0 | -0.11999 | 3.5848% | 0.0000 |

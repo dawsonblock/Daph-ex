@@ -1,5 +1,18 @@
 # Changelog
 
+## 3.4.0 — receipt-backed E3 scientific accounting
+
+- Replaced the correctness-as-utility fallback with mandatory per-task quality and actual E2/E3 execution compute.
+- Split qualification into capability gate E3-Q and cost-aware gate E3-U, with explicit `FAIL_QUALITY`, `PASS_QUALITY_FAIL_UTILITY`, `PASS_QUALITY_AND_UTILITY`, and `INSUFFICIENT_POWER` states.
+- Added configurable lambda sweeps, aggregate/per-example break-even compute prices, grouped template bootstrap, seed/family/difficulty breakdowns, and immutable paired records.
+- Added distinct calibrated-sensitivity and untouched natural-test contracts plus nine deterministic verified task families.
+- Added profile tiers and stability metrics, data-driven placement promotion, effort-frontier/Pareto reporting, and an actual-compute oracle gate.
+- Added explicit answer-only, external verified-reward, and unimplemented-GRPO objective contracts; supervised CE is never labeled RLVR.
+- Added immutable artifact commit/version/test/source-tree metadata and a postprocessing CLI that emits separate quality and utility evidence.
+- Added a batch-size-one research step override that records the E3 refinement dose actually executed.
+
+The historical one-rescue result remains a mechanism signal, not statistical or cost-aware qualification. Router training remains blocked.
+
 ## 3.3.0 — standalone marginal-utility controller
 
 - Added the independent `daph_metareasoner` Stage 1 package around one frozen model and four actions: STOP, THINK, VERIFY, and DECOMPOSE.

@@ -14,6 +14,7 @@ import hashlib
 import json
 import platform
 import sys
+import time
 from dataclasses import asdict
 from pathlib import Path
 from typing import Any, Dict, List, Sequence
@@ -24,7 +25,7 @@ import torch.nn.functional as F
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from daph.e3_metrics import E3QualificationConfig, e3_pair_metrics, qualify_e3_pairs
+from daph.e3_metrics import E3QualificationConfig, e3_pair_metrics, lambda_sweep, qualify_e3_pairs
 from daph.e3_architecture import E3RefinementConfig
 from daph.e3_experiment import active_refinement_layer, numeric_answer_correct, set_refinement_steps
 from daph.pretrained import import_into_qwen_compat
@@ -45,7 +46,11 @@ def _load_tasks(path: Path) -> List[Dict[str, Any]]:
             raise ValueError(f"Task {index} in {path} must contain prompt and expected")
         row.setdefault("task_id", f"{path.stem}-{index}")
         row.setdefault("difficulty_bucket", "hard")
+        row.setdefault("difficulty", row["difficulty_bucket"])
         row.setdefault("task_family", "unspecified")
+        row.setdefault("template_id", f"{row['task_family']}:unspecified")
+        row.setdefault("generator_version", "unspecified")
+        row.setdefault("verifier_version", "numeric_answer_correct_v1")
     return rows
 
 
@@ -84,14 +89,35 @@ def _task_eval(model: Any, tokenizer: Any, tasks: Sequence[Dict[str, Any]], *, d
             store.append(float(F.cross_entropy(logits.reshape(-1, logits.size(-1)), target.reshape(-1), ignore_index=-100).item()))
         deltas.append(float((e3["hidden_state"] - e2["hidden_state"]).norm(dim=-1).mean().item()))
         costs.append(float(e3["compute_stats"]["normalized_compute_cost"] - e2["compute_stats"]["normalized_compute_cost"]))
-        generated, correct = {}, {}
+        generated, correct, generation_receipts = {}, {}, {}
         for mode in ("fixed_2", "fixed_3"):
+            started = time.perf_counter()
             generated_out = model.generate(prompt_ids, attention_mask=torch.ones_like(prompt_ids), effort_mode=mode, max_new_tokens=max_new_tokens)
+            latency_ms = (time.perf_counter() - started) * 1000.0
             completion = tokenizer.decode(generated_out["sequences"][0, prompt_ids.size(1):], skip_special_tokens=True)
             generated[mode], correct[mode] = completion, numeric_answer_correct(completion, task["expected"])
+            generation_receipts[mode] = dict(generated_out["compute_stats"])
+            generation_receipts[mode]["wall_clock_latency_ms"] = latency_ms
+        e2_raw = float(generation_receipts["fixed_2"]["raw_compute_units"])
+        e3_raw = float(generation_receipts["fixed_3"]["raw_compute_units"])
+        if e2_raw <= 0:
+            raise RuntimeError("E2 generation receipt must have positive raw compute")
+        compute_e2, compute_e3 = 1.0, e3_raw / e2_raw
         pairs.append({
-            "task_id": task["task_id"], "task_family": task["task_family"], "difficulty_bucket": task["difficulty_bucket"],
+            "task_id": task["task_id"], "task_family": task["task_family"],
+            "template_id": task["template_id"], "difficulty": task["difficulty"],
+            "difficulty_bucket": task["difficulty_bucket"],
+            "generator_version": task["generator_version"], "verifier_version": task["verifier_version"],
+            "seed": task.get("generation_seed"),
             "e2_correct": correct["fixed_2"], "e3_correct": correct["fixed_3"],
+            "quality_e2": float(correct["fixed_2"]), "quality_e3": float(correct["fixed_3"]),
+            "compute_e2": compute_e2, "compute_e3": compute_e3,
+            "compute_receipt_e2": generation_receipts["fixed_2"],
+            "compute_receipt_e3": generation_receipts["fixed_3"],
+            "latency_ms_e2": generation_receipts["fixed_2"]["wall_clock_latency_ms"],
+            "latency_ms_e3": generation_receipts["fixed_3"]["wall_clock_latency_ms"],
+            "delta_latency_ms": generation_receipts["fixed_3"]["wall_clock_latency_ms"] - generation_receipts["fixed_2"]["wall_clock_latency_ms"],
+            "compute_normalization": "paired_e2_generation_raw_compute",
             "e2_completion": generated["fixed_2"], "e3_completion": generated["fixed_3"],
             "refinement_steps": int(model.e3_config.e3_refine_steps),
             "profiled_region": f"{model.e3_region.region_start}-{model.e3_region.region_end}",
@@ -155,6 +181,7 @@ def main() -> None:
     parser.add_argument("--hard-train", required=True)
     parser.add_argument("--selection", required=True)
     parser.add_argument("--test", required=True)
+    parser.add_argument("--natural-test", help="Untouched natural-distribution test JSONL")
     parser.add_argument("--output", required=True)
     parser.add_argument("--latent-step-counts", default="1,2,4")
     parser.add_argument(
@@ -167,6 +194,7 @@ def main() -> None:
     parser.add_argument("--e3-scale", type=float, default=1e-3)
     parser.add_argument("--lr-refinement", type=float, default=1e-4)
     parser.add_argument("--lr-scale", type=float, default=1e-5)
+    parser.add_argument("--regression-guard-weight", type=float, default=0.01)
     parser.add_argument("--seq-len", type=int, default=96)
     parser.add_argument("--max-new-tokens", type=int, default=12)
     parser.add_argument("--latent-size", type=int, default=64)
@@ -175,6 +203,10 @@ def main() -> None:
     parser.add_argument("--max-e2-accuracy", type=float, default=0.70)
     parser.add_argument("--bootstrap-samples", type=int, default=2000)
     parser.add_argument("--confidence", type=float, default=0.95)
+    parser.add_argument("--lambda-compute", type=float, default=1.0)
+    parser.add_argument("--lambda-sweep", default="0,0.1,0.25,0.5,1,2")
+    parser.add_argument("--bootstrap-group-key", default="template_id")
+    parser.add_argument("--experiment-tier", choices=("SMOKE", "PILOT", "QUALIFICATION", "FINAL"), default="SMOKE")
     parser.add_argument("--heldout-steps", type=int, help="Force a common held-out dose across locations")
     parser.add_argument("--device", default="auto")
     args = parser.parse_args()
@@ -184,6 +216,7 @@ def main() -> None:
     )
     output.mkdir(parents=True, exist_ok=True)
     train_tasks, selection_tasks, test_tasks = _load_tasks(Path(args.hard_train)), _load_tasks(Path(args.selection)), _load_tasks(Path(args.test))
+    natural_tasks = _load_tasks(Path(args.natural_test)) if args.natural_test else None
     train_jsonl = output / "hard_train_answer_only.jsonl"
     _write_answer_only_training_data(train_tasks, train_jsonl)
     device = torch.device("mps" if args.device == "auto" and torch.backends.mps.is_available() else ("cpu" if args.device == "auto" else args.device))
@@ -227,6 +260,7 @@ def main() -> None:
             train_parameter_groups=("e3_refinement", "e3_scale"), freeze_parameter_groups=(),
             lr_new=args.lr_refinement, lr_scales=args.lr_scale, effort_sampling=(0.0, 0.0, 0.0, 1.0),
             distill_e0=False, distill_e1=False, train_e3=True,
+            e3_regression_guard_weight=args.regression_guard_weight,
         )
         cfg = RealTrainConfig(
             steps=args.steps, batch_size=1, seq_len=args.seq_len, grad_accum=1, warmup_steps=min(10, args.steps),
@@ -255,24 +289,47 @@ def main() -> None:
         active_layer.latent_scale.copy_(candidate_states[heldout_steps]["scale"])
     set_refinement_steps(model, heldout_steps)
     heldout = _task_eval(model, tokenizer, test_tasks, device=device, max_new_tokens=args.max_new_tokens)
+    natural_heldout = _task_eval(model, tokenizer, natural_tasks, device=device, max_new_tokens=args.max_new_tokens) if natural_tasks else None
+    lambda_values = [float(value) for value in args.lambda_sweep.split(",") if value.strip()]
     paired_qualification = qualify_e3_pairs(
         heldout["task_outcomes"],
         E3QualificationConfig(
+            lambda_compute=args.lambda_compute,
             bootstrap_samples=args.bootstrap_samples,
             confidence=args.confidence,
+            group_key=args.bootstrap_group_key,
             seed=args.seed,
         ),
     )
+    heldout_lambda_sweep = lambda_sweep(
+        heldout["task_outcomes"], lambda_values,
+        bootstrap_samples=args.bootstrap_samples, confidence=args.confidence,
+        group_key=args.bootstrap_group_key, seed=args.seed,
+    )
+    natural_qualification = qualify_e3_pairs(
+        natural_heldout["task_outcomes"],
+        E3QualificationConfig(
+            lambda_compute=args.lambda_compute, bootstrap_samples=args.bootstrap_samples,
+            confidence=args.confidence, group_key=args.bootstrap_group_key, seed=args.seed + 1000,
+        ),
+    ) if natural_heldout else None
     e2_band_passed = args.min_e2_accuracy <= heldout["e2_accuracy"] <= args.max_e2_accuracy
     e2_frozen = all(value["e2_anchor_unchanged"] for value in variants.values())
-    qualified = bool(e2_frozen and e2_band_passed and paired_qualification["qualified"])
+    qualified = bool(
+        e2_frozen and e2_band_passed and paired_qualification["qualified"]
+        and natural_qualification is not None and natural_qualification["qualified"]
+    )
     qualification = {
         **paired_qualification,
         "e2_frozen": e2_frozen,
         "e2_difficulty_band_passed": e2_band_passed,
         "e2_accuracy_band": [args.min_e2_accuracy, args.max_e2_accuracy],
         "qualified": qualified,
-        "policy_training_allowed": qualified,
+        "e3_arm_qualified": qualified,
+        "policy_training_allowed": False,
+        "requires_oracle_opportunity_gate": True,
+        "natural_test_required_for_promotion": True,
+        "natural_test_qualification": natural_qualification,
     }
     report = {
         "experiment": "frozen-e2-hardcase-e3-location-dose-ablation", "model": {"id": args.model, "revision": args.revision, "source_exact_coverage_percent": import_report.exact_coverage_percent},
@@ -285,14 +342,24 @@ def main() -> None:
             "source_profile_status": profile_status,
         },
         "environment": {"torch": torch.__version__, "platform": platform.platform(), "device": str(device)},
-        "datasets": {key: {"path": path, "sha256": _sha256(Path(path)), "tasks": len(tasks)} for key, path, tasks in (("train", args.hard_train, train_tasks), ("selection", args.selection, selection_tasks), ("test", args.test, test_tasks))},
+        "datasets": {
+            **{key: {"path": path, "sha256": _sha256(Path(path)), "tasks": len(tasks), "split_type": split_type} for key, path, tasks, split_type in (
+                ("train", args.hard_train, train_tasks, "TRAIN"),
+                ("selection", args.selection, selection_tasks, "SELECTION"),
+                ("calibrated_sensitivity_test", args.test, test_tasks, "CALIBRATED_SENSITIVITY"),
+            )},
+            **({"natural_heldout_test": {"path": args.natural_test, "sha256": _sha256(Path(args.natural_test)), "tasks": len(natural_tasks), "split_type": "NATURAL_HELDOUT", "e3_outcomes_used_for_selection": False}} if natural_tasks else {}),
+        },
         "phase0b": phase0b, "post_gate0b_initialization": asdict(init), "variants": variants,
         "selection_winner_steps": selection_winner,
         "selected_latent_steps": heldout_steps,
         "heldout_step_policy": "forced_matched" if args.heldout_steps is not None else "selection_winner",
         "heldout": heldout,
+        "natural_heldout": natural_heldout,
+        "lambda_sweep": heldout_lambda_sweep,
         "qualification": qualification,
-        "training_objective": {"name": "answer_token_only_causal_ce", "prompt_tokens_supervised": False},
+        "experiment_tier": args.experiment_tier,
+        "training_objective": {"name": "answer_token_only_causal_ce", "prompt_tokens_supervised": False, "uses_verified_reward": False, "is_rlvr": False},
         "limitations": ["This is a targeted task-loss ablation, not a general-language capability claim.", "Do not train or claim an effort router unless this result replicates on independent hard-task families."],
     }
     (output / "e3_hardcase_ablation_report.json").write_text(json.dumps(report, indent=2, default=str))

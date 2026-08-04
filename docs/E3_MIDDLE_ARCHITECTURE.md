@@ -18,4 +18,4 @@ Available modes are `none`, `final_refine`, `middle_recurrent`, `middle_repeat`,
 
 Unit tests establish graph placement, identity at zero scale, parameter sharing, gradients, and compute accounting. They do not establish task improvement. The earlier final-state real-model run remains the only bundled real checkpoint evidence and was scientifically negative/insufficient. A sparse exact-checkpoint profile and controlled V1–V5 hard-task study are still required.
 
-Promotion requires positive paired verified utility, a positive predeclared bootstrap lower confidence bound, and more rescues than regressions. If middle refinement does not outperform the final control, keep `final_refine` as the result and do not promote the hypothesis.
+Promotion requires separate positive grouped-bootstrap lower bounds for verified quality (E3-Q) and receipt-priced utility (E3-U), more rescues than regressions, cross-seed replication, and a natural-test pass. If profile rankings are unstable, the profiled placement cannot be promoted; the heuristic middle remains canonical. A qualified arm still requires a positive oracle-opportunity gate before router training.

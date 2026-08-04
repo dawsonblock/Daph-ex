@@ -588,7 +588,7 @@ def train_adapt(
         kwargs = (
             {
                 "return_compute_receipt": True,
-                "return_hidden_state": distill_enabled and cfg.hidden_distillation_weight > 0.0,
+                "return_hidden_state": (distill_enabled and cfg.hidden_distillation_weight > 0.0) or effort_idx == 3,
             }
             if isinstance(model, QwenExFusionModel)
             else {}
@@ -620,25 +620,42 @@ def train_adapt(
                 shift_logits.reshape(-1, shift_logits.size(-1)),
                 shift_labels.reshape(-1), ignore_index=-100,
             )
-            if (
-                isinstance(model, QwenExFusionModel)
-                and effort_idx == 3
-                and active_stage is not None
-                and active_stage.e3_regression_guard_weight > 0.0
-            ):
+            if isinstance(model, QwenExFusionModel) and effort_idx == 3:
+                details["e3_task_ce"] = float(loss.detach())
                 with torch.no_grad():
-                    anchor_logits = model(ids, attention_mask=mask, effort_mode="fixed_2")
-                valid = shift_labels.reshape(-1) != -100
-                e3_flat = shift_logits.reshape(-1, shift_logits.size(-1))[valid]
-                e2_flat = anchor_logits[:, :-1].reshape(-1, anchor_logits.size(-1))[valid]
-                regression_kl = F.kl_div(
-                    F.log_softmax(e3_flat.float(), dim=-1),
-                    F.softmax(e2_flat.float(), dim=-1),
-                    reduction="batchmean",
+                    anchor_output = model(
+                        ids, attention_mask=mask, effort_mode="fixed_2", return_hidden_state=True,
+                    )
+                details["e3_hidden_delta_l2"] = float(
+                    (out["hidden_state"] - anchor_output["hidden_state"]).norm(dim=-1).mean().detach()
                 )
-                loss = loss + active_stage.e3_regression_guard_weight * regression_kl
-                details["e3_task_ce"] = float((loss - active_stage.e3_regression_guard_weight * regression_kl).detach())
-                details["e3_regression_kl"] = float(regression_kl.detach())
+                guard_weight = float(active_stage.e3_regression_guard_weight) if active_stage is not None else 0.0
+                if guard_weight > 0.0:
+                    valid = shift_labels.reshape(-1) != -100
+                    e3_flat = shift_logits.reshape(-1, shift_logits.size(-1))[valid]
+                    e2_flat = anchor_output["logits"][:, :-1].reshape(-1, anchor_output["logits"].size(-1))[valid]
+                    regression_kl = F.kl_div(
+                        F.log_softmax(e3_flat.float(), dim=-1),
+                        F.softmax(e2_flat.float(), dim=-1),
+                        reduction="batchmean",
+                    )
+                    weighted_guard = guard_weight * regression_kl
+                    loss = loss + weighted_guard
+                    details["e3_regression_kl"] = float(regression_kl.detach())
+                    details["e3_weighted_regression_guard"] = float(weighted_guard.detach())
+                details["e3_regression_guard_weight"] = guard_weight
+                active_scales = [
+                    parameter.detach().float() for name, parameter in model.named_parameters()
+                    if name.endswith("latent_scale") and parameter.requires_grad
+                ]
+                if active_scales:
+                    details["e3_raw_refinement_scale_mean"] = float(torch.stack(active_scales).mean())
+                    details["e3_effective_refinement_scale_mean"] = float(
+                        torch.stack([
+                            model.latent_scale_limit * torch.tanh(value / model.latent_scale_limit)
+                            for value in active_scales
+                        ]).mean()
+                    )
         if cfg.fail_on_nonfinite and not bool(torch.isfinite(loss).item()):
             raise FloatingPointError(
                 f"Non-finite loss at micro-step {step} for effort {emode}"

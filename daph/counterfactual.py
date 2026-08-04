@@ -642,6 +642,7 @@ def qualify_effort_hierarchy(
     min_e3_quality_delta: float = 0.0,
     bootstrap_samples: int = 2000,
     confidence: float = 0.95,
+    lambda_compute: float = 1.0,
     seed: int = 42,
 ) -> Dict[str, Any]:
     """Qualify physical modes before any oracle/policy training is allowed."""
@@ -667,22 +668,28 @@ def qualify_effort_hierarchy(
     for record in records:
         if record.verifier_status[2] in ("CORRECT", "INCORRECT") and record.verifier_status[3] in ("CORRECT", "INCORRECT"):
             verified_pairs.append({
+                "task_id": record.task_id,
                 "e2_correct": record.verifier_status[2] == "CORRECT",
                 "e3_correct": record.verifier_status[3] == "CORRECT",
-                "verified_utility_e2": record.quality[2],
-                "verified_utility_e3": record.quality[3],
-                "task_family": record.task_family,
+                "quality_e2": record.quality[2],
+                "quality_e3": record.quality[3],
+                "compute_e2": record.compute[2],
+                "compute_e3": record.compute[3],
+                "task_family": record.task_family or "unspecified",
+                "template_id": record.template_id or record.task_family or record.task_id,
+                "difficulty": record.difficulty_bucket or "unspecified",
                 "difficulty_bucket": record.difficulty_bucket,
             })
     e3_report = qualify_e3_pairs(verified_pairs, E3QualificationConfig(
-        bootstrap_samples=bootstrap_samples, confidence=confidence,
-        min_verified_utility_delta=min_e3_quality_delta, seed=seed,
+        lambda_compute=lambda_compute, bootstrap_samples=bootstrap_samples,
+        confidence=confidence, min_quality_delta=min_e3_quality_delta, seed=seed,
     )) if verified_pairs else {
         "qualified": False, "policy_training_allowed": False,
         "reason": "NO_PAIRED_VERIFIED_E2_E3_OUTCOMES",
     }
-    e3_improves = bool(e3_report["qualified"])
-    qualified = physical and e0_useful and e3_improves and not dominated
+    e3_improves = bool(e3_report["quality_gate"]["passed"])
+    e3_cost_effective = bool(e3_report["utility_gate"]["passed"])
+    qualified = physical and e0_useful and e3_improves and e3_cost_effective and not dominated
     return {
         "qualified": qualified,
         "physical_compute_ordering": physical,
@@ -694,8 +701,10 @@ def qualify_effort_hierarchy(
         "dominated_efforts": [f"E{e}" for e in sorted(set(dominated))],
         "e0_useful": e0_useful,
         "e3_improves": e3_improves,
+        "e3_cost_effective": e3_cost_effective,
         "e3_verified_qualification": e3_report,
-        "policy_training_allowed": qualified,
+        "policy_training_allowed": False,
+        "requires_oracle_opportunity_gate": True,
         "recommended_action": (
             "DROP_OR_IMPROVE_DOMINATED_ARMS" if dominated else
             "IMPROVE_E3_BEFORE_POLICY" if not e3_improves else

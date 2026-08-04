@@ -1,4 +1,4 @@
-# DAPH / ExFusion v3.3.0
+# DAPH / ExFusion v3.4.0
 
 Pretrained-compatible adaptive computation with a physically ordered four-level effort hierarchy.
 
@@ -93,6 +93,8 @@ HF checkpoint → Gate 0A → QwenCompat → exact Gate 0B → layer profile →
 
 See [`docs/PIPELINE_COMMANDS.md`](docs/PIPELINE_COMMANDS.md) for executable examples for every stage.
 
+E3 scientific accounting is specified in [`docs/UTILITY_ACCOUNTING_REPORT.md`](docs/UTILITY_ACCOUNTING_REPORT.md), with the replicated protocol in [`docs/E3_EXPERIMENT_PROTOCOL_V340.md`](docs/E3_EXPERIMENT_PROTOCOL_V340.md) and immutable artifact contract in [`docs/EVIDENCE_SCHEMA_V340.md`](docs/EVIDENCE_SCHEMA_V340.md).
+
 ## Standalone marginal-utility controller
 
 `daph_metareasoner` is the smaller controller-first research path. It wraps one frozen model with `STOP`, `THINK`, `VERIFY`, and `DECOMPOSE`, collects isolated state/action outcomes, proves oracle conditional value before training, compares hidden-state probes with cheap shams, and permits on-path execution only after paired IID/OOD utility gates pass. It intentionally excludes latent workspaces, specialists, retrieval, and vector-speaking agents.
@@ -111,8 +113,8 @@ The subsequent frozen-E2 hard-case ablation found a teacher-forced E3 CE dose re
 
 A corrected checkpoint-specific sparse profile then selected layers 12–14. In a small matched-budget smoke comparison, refinement at the profiled middle layer produced a `0.02070` held-out CE gain versus `0.00543` at the final layer (approximately `3.81×` larger at equal compute), but both variants still produced zero exact-answer rescues. See [`docs/E3_PROFILED_MIDDLE_SMOKE_REPORT.md`](docs/E3_PROFILED_MIDDLE_SMOKE_REPORT.md).
 
-The answer-only follow-up calibrated every split to 50% E2 accuracy and compared final, heuristic-middle, and profiled-middle refinement at a matched four-step dose. Heuristic-middle produced the first held-out verified rescue (`1` rescue, `0` regressions) and the largest CE improvement, but its paired 95% bootstrap lower bound remained zero. E3 and policy training therefore remain unqualified. See [`docs/E3_ANSWER_ONLY_MIXED_RESULT.md`](docs/E3_ANSWER_ONLY_MIXED_RESULT.md).
+The answer-only follow-up calibrated every split to 50% E2 accuracy and compared final, heuristic-middle, and profiled-middle refinement at a matched four-step dose. Heuristic-middle produced the first held-out verified rescue (`1` rescue, `0` regressions) and the largest CE improvement, but its paired 95% quality lower bound remained zero. The historical report did not price per-task compute and is now explicitly a mechanism signal, not utility qualification. E3 and policy training remain unqualified. See [`docs/E3_ANSWER_ONLY_MIXED_RESULT.md`](docs/E3_ANSWER_ONLY_MIXED_RESULT.md).
 
 ## Status
 
-The canonical Qwen path, legacy hybrid path, and standalone marginal-utility research package coexist. Engineering acceptance is covered by 139 tests. A real but low-budget sparse profile, matched answer-only location study, and negative controller oracle smoke are bundled. Neither E3 task utility nor a learned controller is scientifically qualified.
+The canonical Qwen path, legacy hybrid path, and standalone marginal-utility research package coexist. Engineering acceptance is covered by 158 tests. A real but low-budget sparse profile, matched answer-only location study, and negative controller oracle smoke are bundled. Neither E3 task utility nor a learned controller is scientifically qualified.

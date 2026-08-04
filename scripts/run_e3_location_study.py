@@ -20,6 +20,7 @@ def main() -> None:
     parser.add_argument("--hard-train", required=True)
     parser.add_argument("--selection", required=True)
     parser.add_argument("--test", required=True)
+    parser.add_argument("--natural-test", help="Untouched natural-distribution test JSONL")
     parser.add_argument("--profile-dir", required=True)
     parser.add_argument("--output", required=True)
     parser.add_argument("--latent-step-counts", default="1,2,4")
@@ -27,6 +28,7 @@ def main() -> None:
     parser.add_argument("--e3-scale", type=float, default=1e-3)
     parser.add_argument("--lr-refinement", type=float, default=1e-4)
     parser.add_argument("--lr-scale", type=float, default=1e-5)
+    parser.add_argument("--regression-guard-weight", type=float, default=0.01)
     parser.add_argument("--seq-len", type=int, default=96)
     parser.add_argument("--max-new-tokens", type=int, default=6)
     parser.add_argument("--latent-size", type=int, default=64)
@@ -36,6 +38,10 @@ def main() -> None:
     parser.add_argument("--max-e2-accuracy", type=float, default=0.70)
     parser.add_argument("--bootstrap-samples", type=int, default=2000)
     parser.add_argument("--confidence", type=float, default=0.95)
+    parser.add_argument("--lambda-compute", type=float, default=1.0)
+    parser.add_argument("--lambda-sweep", default="0,0.1,0.25,0.5,1,2")
+    parser.add_argument("--bootstrap-group-key", default="template_id")
+    parser.add_argument("--experiment-tier", choices=("SMOKE", "PILOT", "QUALIFICATION", "FINAL"), default="SMOKE")
     parser.add_argument("--heldout-steps", type=int, default=4)
     args = parser.parse_args()
     output = Path(args.output)
@@ -60,6 +66,7 @@ def main() -> None:
             "--e3-scale", str(args.e3_scale),
             "--lr-refinement", str(args.lr_refinement),
             "--lr-scale", str(args.lr_scale),
+            "--regression-guard-weight", str(args.regression_guard_weight),
             "--seq-len", str(args.seq_len),
             "--max-new-tokens", str(args.max_new_tokens),
             "--latent-size", str(args.latent_size),
@@ -69,8 +76,14 @@ def main() -> None:
             "--max-e2-accuracy", str(args.max_e2_accuracy),
             "--bootstrap-samples", str(args.bootstrap_samples),
             "--confidence", str(args.confidence),
+            "--lambda-compute", str(args.lambda_compute),
+            "--lambda-sweep", args.lambda_sweep,
+            "--bootstrap-group-key", args.bootstrap_group_key,
+            "--experiment-tier", args.experiment_tier,
             "--heldout-steps", str(args.heldout_steps),
         ]
+        if args.natural_test:
+            command.extend(("--natural-test", args.natural_test))
         if mode == "profiled_middle_recurrent":
             command.extend(("--profile-dir", args.profile_dir))
         # Keep the evidence portable: record a repository-relative command while
@@ -94,7 +107,9 @@ def main() -> None:
             "net_rescue_rate": heldout["net_rescue_rate"],
             "e3_ce_delta_vs_e2": heldout["e3_ce_delta_vs_e2"],
             "compute_overhead": heldout["e3_compute_overhead"],
-            "quality_delta_lcb": report["qualification"]["quality_delta_lcb"],
+            "quality_lcb95": report["qualification"]["quality_lcb95"],
+            "utility_lcb95": report["qualification"]["utility_lcb95"],
+            "qualification_status": report["qualification"]["qualification_status"],
             "qualified": report["qualification"]["qualified"],
         })
     best = max(
@@ -105,7 +120,8 @@ def main() -> None:
         ),
     )
     matched_selected_dose = len(set(selected_steps.values())) == 1
-    policy_allowed = bool(matched_selected_dose and best["qualified"])
+    e3_arm_qualified = bool(matched_selected_dose and best["qualified"])
+    policy_allowed = False
     study = {
         "experiment": "matched-e3-final-heuristic-profiled-location-study",
         "model": {"id": args.model, "revision": args.revision},
@@ -115,9 +131,13 @@ def main() -> None:
         "heldout_results": heldout_rows,
         "best_mode": best["mode"],
         "qualification": {
-            "qualified": policy_allowed,
+            "qualified": e3_arm_qualified,
+            "e3_arm_qualified": e3_arm_qualified,
             "policy_training_allowed": policy_allowed,
-            "reason": "QUALIFIED" if policy_allowed else "NO_LOCATION_PASSED_PAIRED_VERIFIED_GATE",
+            "reason": (
+                "E3_ARM_QUALIFIED_ORACLE_GATE_REQUIRED" if e3_arm_qualified
+                else "NO_LOCATION_PASSED_QUALITY_AND_UTILITY_GATES"
+            ),
         },
     }
     (output / "location_study_report.json").write_text(json.dumps(study, indent=2))

@@ -71,6 +71,10 @@ For verified reward/GRPO, call `LayerContributionProfiler.run()` with a `LayerAd
 First construct disjoint candidates and calibrate each split to a non-degenerate E2 accuracy band using the pinned source checkpoint:
 
 ```bash
+python scripts/make_e3_multifamily_tasks.py \
+  --output runs/e3-multifamily --count-per-family 200 \
+  --natural-count 500 --seed 20260901
+
 python scripts/make_e3_calibration_pool.py \
   --output runs/e3-calibration/candidates
 
@@ -83,6 +87,8 @@ python scripts/calibrate_e2_task_band.py \
   --target-e2-accuracy 0.50
 ```
 
+For the new multi-family pool use `--candidates runs/e3-multifamily/calibration_candidates.jsonl` instead of `--candidate-dir`. The untouched `runs/e3-multifamily/natural_test.jsonl` is created before either arm is evaluated and remains disjoint.
+
 Then run the three locations with identical training, evaluation, and held-out refinement dose:
 
 ```bash
@@ -92,13 +98,15 @@ python scripts/run_e3_location_study.py \
   --hard-train runs/e3-calibration/calibrated/train.jsonl \
   --selection runs/e3-calibration/calibrated/selection.jsonl \
   --test runs/e3-calibration/calibrated/test.jsonl \
+  --natural-test runs/e3-calibration/natural_test.jsonl \
   --profile-dir artifacts/layer_profile/sparse \
   --output runs/e3-location-study \
   --latent-step-counts 1,2,4 --heldout-steps 4 \
-  --steps 200 --e3-scale 1e-3
+  --steps 200 --e3-scale 1e-3 \
+  --lambda-compute 1.0 --lambda-sweep 0,0.1,0.25,0.5,1,2
 ```
 
-This path uses answer-token-only causal loss and a paired bootstrap qualification gate. The consolidated report keeps `policy_training_allowed=false` unless a location has a strictly positive verified-utility lower confidence bound.
+This path uses answer-token-only causal loss and separate grouped-bootstrap capability (E3-Q) and cost-aware utility (E3-U) gates. Compute comes from actual per-task generation receipts. The consolidated report keeps `policy_training_allowed=false` unless both calibrated and natural tests pass; a later oracle gate is still required before fitting a router.
 
 For an individual arm:
 
@@ -109,13 +117,55 @@ python scripts/run_e3_hardcase_ablation.py \
   --hard-train runs/e3-calibration/calibrated/train.jsonl \
   --selection runs/e3-calibration/calibrated/selection.jsonl \
   --test runs/e3-calibration/calibrated/test.jsonl \
+  --natural-test runs/e3-calibration/natural_test.jsonl \
   --output runs/e3-location-study/middle_recurrent \
   --e3-mode middle_recurrent \
   --latent-step-counts 1,2,4 --heldout-steps 4 \
-  --steps 200 --e3-scale 1e-3
+  --steps 200 --e3-scale 1e-3 \
+  --lambda-compute 1.0
 ```
 
-This keeps E2 frozen, trains only the configured E3 refiner and scale after Gate 0B, masks prompt and padding tokens from the task loss, and evaluates exact numeric E2/E3 outcomes. Use `--e3-mode final_refine` for the matched final-state control. Use `--e3-mode profiled_middle_recurrent --profile-dir artifacts/layer_profile/sparse` to bind the run to a measured profile; partial profiles remain labeled partial in the report. The report includes the actual refinement layer, selected region, rescues, regressions, net rescue rate, completion CE, hidden-state delta magnitude, receipt-backed compute overhead, and paired confidence bound. The supplied arithmetic calibration pool is only a reproducible smoke curriculum; qualify a policy only after independent hard-task-family replication.
+This keeps E2 frozen, trains only the configured E3 refiner and scale after Gate 0B, masks prompt and padding tokens from the task loss, and evaluates exact numeric E2/E3 outcomes. Use `--e3-mode final_refine` for the matched final-state control. Use `--e3-mode profiled_middle_recurrent --profile-dir artifacts/layer_profile/sparse` to bind the run to a measured profile; partial profiles remain labeled partial in the report. The report includes the actual refinement layer, selected region, rescues, regressions, net rescue rate, completion CE, hidden-state delta magnitude, receipt-backed compute, both confidence gates, and the lambda sweep. The supplied arithmetic calibration pool is only a reproducible smoke curriculum; qualification requires multi-family replication and an untouched natural test.
+
+Postprocess paired calibrated and natural JSONL results into separate quality/utility evidence and a lambda sweep:
+
+```bash
+python scripts/qualify_e3_results.py \
+  --calibrated-results runs/e3/pairs_calibrated.jsonl \
+  --natural-results runs/e3/pairs_natural.jsonl \
+  --output evidence/e3_run_001 \
+  --lambda-compute 1.0 --lambda-sweep 0,0.1,0.25,0.5,1,2 \
+  --group-key template_id --bootstrap-samples 10000 \
+  --test-count 158 --pytest-output runs/e3/pytest_output.txt \
+  --model-id Qwen/Qwen2.5-0.5B \
+  --model-revision 060db6499f32faf8b98477b0a26969ef7d8b9987
+```
+
+Build the full effort frontier and run the actual-compute oracle gate:
+
+```bash
+python scripts/qualify_effort_frontier.py \
+  --per-task-results runs/e3/per_task_e0_e3.jsonl \
+  --output evidence/e3_run_001 \
+  --qualified-arms E3 --lambda-compute 1.0 \
+  --lambda-sweep 0,0.1,0.25,0.5,1,2 \
+  --group-key template_id --bootstrap-samples 10000
+```
+
+The equivalent library API is:
+
+```python
+from daph import build_effort_frontier, qualify_oracle_opportunity, write_effort_frontier
+
+frontier = build_effort_frontier(per_task_effort_records, lambdas=[0, .1, .25, .5, 1, 2], qualified_arms=["E3"])
+write_effort_frontier(frontier, "evidence/e3_run_001")
+oracle = qualify_oracle_opportunity(
+    per_task_effort_records, lambda_compute=1.0,
+    qualified_non_e2_arms=["E3"], group_key="template_id",
+    bootstrap_samples=10000,
+)
+assert oracle["policy_training_allowed"]  # only then authorize policy fitting
+```
 
 ## E3 architecture, dose, and location contracts
 

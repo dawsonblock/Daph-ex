@@ -473,10 +473,13 @@ class QwenExFusionModel(nn.Module):
     def _run_layers(
         self, hidden: Tensor, attention_mask: Optional[Tensor], effort: int,
         *, start_layer: int = 0, layer_count: Optional[int] = None,
+        e3_refinement_steps_override: Optional[int] = None,
     ) -> Tensor:
         """Execute a fixed arm, optionally reusing a completed shared probe."""
         count = self._layer_count(effort) if layer_count is None else layer_count
         flags = self._effort_flags(f"fixed_{effort}")
+        if e3_refinement_steps_override is not None:
+            flags = {**flags, "latent_steps": int(e3_refinement_steps_override)}
         mode = self.e3_config.e3_refinement_mode
         insertion_layer = self.e3_region.insertion_layer
         for layer_index in range(start_layer, count):
@@ -560,10 +563,18 @@ class QwenExFusionModel(nn.Module):
         return_compute_receipt: bool = False,
         return_hidden_state: bool = False,
         effort_levels_override: Optional[Tensor] = None,
+        e3_refinement_steps_override: Optional[int] = None,
         allow_unverified_policy: bool = False,
         precomputed_probe: Optional[EffortProbeResult] = None,
     ) -> Union[Tensor, Dict[str, Any]]:
         mode = str(effort_mode).lower()
+        if e3_refinement_steps_override is not None:
+            if mode not in {"fixed_3", "e3", "3"} or effort_levels_override is not None:
+                raise ValueError("E3 step override is a fixed-E3 research interface")
+            if input_ids.size(0) != 1:
+                raise ValueError("Per-example E3 step override currently requires batch_size=1")
+            if not 1 <= int(e3_refinement_steps_override) <= self.e3_config.e3_max_refine_steps:
+                raise ValueError("E3 step override is outside the configured refinement range")
         if mode == "adaptive" or effort_levels_override is not None:
             if max_layers is not None:
                 raise ValueError("max_layers is incompatible with adaptive effort dispatch")
@@ -653,17 +664,22 @@ class QwenExFusionModel(nn.Module):
                 if mode not in {"none", "final_refine"} and earliest_extra < self.effort_probe_layer_count:
                     raise ValueError("E3 extra computation occurs inside the probe prefix and cannot be reused")
             start_layer = precomputed_probe.executed_layers
-        h = self._run_layers(h, attention_mask, effort, start_layer=start_layer, layer_count=layer_count)
+        h = self._run_layers(
+            h, attention_mask, effort, start_layer=start_layer, layer_count=layer_count,
+            e3_refinement_steps_override=e3_refinement_steps_override,
+        )
         h = self.norm(h)
         logits = self.lm_head(h)
         receipt = self._compute_receipt(
             effort_mode=f"fixed_{effort}", layer_count=layer_count,
-            batch_size=input_ids.shape[0], sequence_length=input_ids.shape[1], flags=flags,
+            batch_size=input_ids.shape[0], sequence_length=input_ids.shape[1],
+            flags=({**flags, "latent_steps": int(e3_refinement_steps_override)} if e3_refinement_steps_override is not None else flags),
         )
         if return_compute_receipt or return_hidden_state:
             result: Dict[str, Any] = {"logits": logits}
             if return_compute_receipt:
                 result.update(compute_receipt=receipt, compute_stats=receipt.to_dict())
+                result["compute_stats"]["research_step_override"] = e3_refinement_steps_override is not None
             if return_hidden_state:
                 result["hidden_state"] = h
             return result
@@ -742,6 +758,7 @@ class QwenExFusionModel(nn.Module):
         ids = input_ids
         mask = attention_mask if attention_mask is not None else torch.ones_like(ids)
         total_raw = 0.0
+        total_normalized = 0.0
         last_logits: Optional[Tensor] = None
         last_receipt: Optional[EffortComputeReceipt] = None
         last_stats: Optional[Dict[str, Any]] = None
@@ -753,6 +770,7 @@ class QwenExFusionModel(nn.Module):
             last_receipt = raw_receipt if isinstance(raw_receipt, EffortComputeReceipt) else None
             last_stats = dict(out["compute_stats"])
             total_raw += float(last_stats["raw_compute_units"])
+            total_normalized += float(last_stats["normalized_compute_cost"])
             token = last_logits[:, -1].argmax(dim=-1, keepdim=True)
             ids = torch.cat((ids, token), dim=1)
             mask = torch.cat((mask, torch.ones_like(token)), dim=1)
@@ -767,6 +785,8 @@ class QwenExFusionModel(nn.Module):
         stats = dict(last_stats or last_receipt.to_dict())
         stats["raw_compute_units"] = total_raw
         stats["estimated_compute_units"] = total_raw
+        stats["normalized_compute_cost"] = total_normalized
+        stats["compute_normalization"] = "sum_of_per_decode_step_e2_equivalents"
         stats["generated_tokens"] = generated
         result: Dict[str, Any] = {"sequences": ids, "logits": last_logits, "compute_stats": stats}
         if tokenizer is not None:

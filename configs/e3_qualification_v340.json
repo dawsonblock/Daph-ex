@@ -1,0 +1,47 @@
+{
+  "protocol_version": "e3_qualification_v340",
+  "claim_target": "PILOT_EVIDENCE",
+  "model": {
+    "id": "Qwen/Qwen2.5-0.5B",
+    "revision": "060db6499f32faf8b98477b0a26969ef7d8b9987"
+  },
+  "training_seeds": [20260803, 20260817, 20260831],
+  "evaluation_seed": 20260901,
+  "placements": ["final_refine", "middle_recurrent", "profiled_middle_recurrent"],
+  "refinement_steps": [1, 2, 4],
+  "training_steps": 200,
+  "answer_only_loss": true,
+  "e2_backbone_frozen": true,
+  "hard_case_mix": {
+    "HARD_FAILURE": 0.6,
+    "HARD_UNCERTAIN": 0.2,
+    "EASY_CORRECT_REGRESSION_GUARD": 0.2
+  },
+  "evaluation": {
+    "calibrated_sensitivity_count": 500,
+    "natural_heldout_count": 500,
+    "grouped_bootstrap_key": "template_id",
+    "bootstrap_samples": 10000,
+    "confidence": 0.95,
+    "families_minimum": 5
+  },
+  "lambda_compute": 1.0,
+  "lambda_sweep": [0.0, 0.1, 0.25, 0.5, 1.0, 2.0],
+  "profile": {
+    "tier": "PROFILE_PILOT",
+    "seeds": [20260803, 20260817, 20260831],
+    "training_examples_minimum": 200,
+    "validation_examples_minimum": 200,
+    "training_steps_minimum": 20,
+    "verified_task_score_preferred": true
+  },
+  "promotion": {
+    "require_quality_lcb95_positive": true,
+    "require_utility_lcb95_positive": true,
+    "require_rescues_gt_regressions": true,
+    "require_cross_seed_replication": true,
+    "require_natural_test_pass": true
+  },
+  "policy_training_allowed": false,
+  "larger_model_followup": "Qwen 1.5B-1.7B only after the small-model pilot passes"
+}

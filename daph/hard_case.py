@@ -22,6 +22,8 @@ class HardCaseMiningConfig:
     entropy_threshold: Optional[float] = None
     seed: int = 42
     max_new_tokens: int = 16
+    strict_category_availability: bool = True
+    require_mixed_e2_outcomes: bool = True
 
     def validate(self) -> None:
         ratios = (self.hard_failure_ratio, self.hard_uncertain_ratio, self.easy_correct_ratio)
@@ -171,6 +173,15 @@ class E3HardCaseMiner:
         return records
 
     def sample(self, records: Sequence[HardCaseRecord], count: int) -> List[HardCaseRecord]:
+        sampled, _ = self.sample_with_manifest(records, count)
+        return sampled
+
+    def sample_with_manifest(
+        self, records: Sequence[HardCaseRecord], count: int,
+    ) -> Tuple[List[HardCaseRecord], Dict[str, Any]]:
+        """Sample the declared curriculum and report requested versus realized mix."""
+        if count < 1:
+            raise ValueError("Hard-case sample count must be positive")
         rng = random.Random(self.config.seed)
         buckets: Dict[str, List[HardCaseRecord]] = {key: [] for key in ("HARD_FAILURE", "HARD_UNCERTAIN", "EASY_CORRECT")}
         for record in records:
@@ -184,6 +195,16 @@ class E3HardCaseMiner:
         quotas = {category: math.floor(value) for category, value in exact.items()}
         for category in sorted(exact, key=lambda key: (-(exact[key] - quotas[key]), key))[:count - sum(quotas.values())]:
             quotas[category] += 1
+        missing = [category for category, quota in quotas.items() if quota and not buckets[category]]
+        if missing and self.config.strict_category_availability:
+            raise ValueError(
+                "Hard-case curriculum cannot satisfy configured mix; missing categories: "
+                + ", ".join(missing)
+            )
+        if self.config.require_mixed_e2_outcomes and count > 1:
+            available_correctness = {record.e2_correct for record in records}
+            if len(available_correctness) < 2:
+                raise ValueError("Hard-case curriculum is degenerate: E2 outcomes are all correct or all incorrect")
         sampled: List[HardCaseRecord] = []
         for category in desired:
             take = quotas[category]
@@ -194,7 +215,23 @@ class E3HardCaseMiner:
         while len(sampled) < count and all_records:
             sampled.append(rng.choice(all_records))
         rng.shuffle(sampled)
-        return sampled[:count]
+        sampled = sampled[:count]
+        realized = {
+            category: sum(record.category == category for record in sampled)
+            for category in desired
+        }
+        manifest = {
+            "config": asdict(self.config),
+            "source_record_count": len(records),
+            "source_task_ids": [record.task_id for record in records],
+            "requested_count": count,
+            "requested_quotas": quotas,
+            "realized_counts": realized,
+            "realized_ratios": {category: value / max(len(sampled), 1) for category, value in realized.items()},
+            "e2_successes": sum(record.e2_correct for record in sampled),
+            "e2_failures": sum(not record.e2_correct for record in sampled),
+        }
+        return sampled, manifest
 
     def save(self, records: Sequence[HardCaseRecord], output_dir: str) -> None:
         output = Path(output_dir)
@@ -205,7 +242,18 @@ class E3HardCaseMiner:
         (output / "mining_manifest.json").write_text(json.dumps({
             "config": asdict(self.config),
             "records": len(records),
+            "source_task_ids": [record.task_id for record in records],
             "counts": {category: sum(r.category == category for r in records) for category in (
                 "HARD_FAILURE", "HARD_UNCERTAIN", "EASY_CORRECT"
             )},
         }, indent=2))
+
+    def save_sample(self, records: Sequence[HardCaseRecord], count: int, output_dir: str) -> None:
+        """Persist an exact curriculum sample and its requested/realized receipt."""
+        sampled, manifest = self.sample_with_manifest(records, count)
+        output = Path(output_dir)
+        output.mkdir(parents=True, exist_ok=True)
+        with (output / "hardcase_sample.jsonl").open("w") as handle:
+            for record in sampled:
+                handle.write(json.dumps(asdict(record), sort_keys=True) + "\n")
+        (output / "hardcase_manifest.json").write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n")

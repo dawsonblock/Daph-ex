@@ -65,7 +65,9 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--model", default="Qwen/Qwen2.5-0.5B")
     parser.add_argument("--revision", required=True)
-    parser.add_argument("--candidate-dir", required=True)
+    source_group = parser.add_mutually_exclusive_group(required=True)
+    source_group.add_argument("--candidate-dir")
+    source_group.add_argument("--candidates", help="Single multi-family pool split disjointly after E2 evaluation")
     parser.add_argument("--output", required=True)
     parser.add_argument("--train-count", type=int, default=64)
     parser.add_argument("--selection-count", type=int, default=24)
@@ -85,19 +87,28 @@ def main() -> None:
     model = AutoModelForCausalLM.from_pretrained(
         args.model, revision=args.revision, dtype=torch.float32,
     ).to(device).eval()
-    candidate_dir, output = Path(args.candidate_dir), Path(args.output)
+    candidate_dir, output = Path(args.candidate_dir) if args.candidate_dir else None, Path(args.output)
     output.mkdir(parents=True, exist_ok=True)
     reports: Dict[str, Any] = {}
+    shared_tasks = load_tasks(Path(args.candidates)) if args.candidates else None
+    shared_outcomes = evaluate_e2(
+        model, tokenizer, shared_tasks, device=device, max_new_tokens=args.max_new_tokens,
+    ) if shared_tasks is not None else None
+    remaining_ids = {str(task["task_id"]) for task in shared_tasks} if shared_tasks is not None else None
     for offset, (split, count) in enumerate((
         ("train", args.train_count),
         ("selection", args.selection_count),
         ("test", args.test_count),
     )):
-        source = candidate_dir / f"{split}_candidates.jsonl"
-        tasks = load_tasks(source)
-        outcomes = evaluate_e2(
-            model, tokenizer, tasks, device=device, max_new_tokens=args.max_new_tokens,
-        )
+        source = Path(args.candidates) if args.candidates else candidate_dir / f"{split}_candidates.jsonl"
+        if shared_tasks is not None:
+            tasks = [task for task in shared_tasks if str(task["task_id"]) in remaining_ids]
+            outcomes = [row for row in shared_outcomes if str(row["task_id"]) in remaining_ids]
+        else:
+            tasks = load_tasks(source)
+            outcomes = evaluate_e2(
+                model, tokenizer, tasks, device=device, max_new_tokens=args.max_new_tokens,
+            )
         config = E2DifficultyBandConfig(
             target_size=count,
             min_accuracy=args.min_e2_accuracy,
@@ -106,6 +117,8 @@ def main() -> None:
             seed=args.seed + offset,
         )
         selected, report = select_mixed_success_tasks(tasks, outcomes, config)
+        if remaining_ids is not None:
+            remaining_ids -= {str(task["task_id"]) for task in selected}
         destination = output / f"{split}.jsonl"
         destination.write_text("".join(json.dumps(row, sort_keys=True) + "\n" for row in selected))
         reports[split] = {

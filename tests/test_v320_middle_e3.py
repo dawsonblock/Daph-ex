@@ -264,14 +264,14 @@ def test_layer_profiler_rejects_non_improving_full_reference():
 
 def test_rescue_regression_metrics_and_statistical_gate():
     pairs = [
-        {"e2_correct": False, "e3_correct": True, "task_family": "math", "difficulty_bucket": "hard"},
-        {"e2_correct": False, "e3_correct": True, "task_family": "math", "difficulty_bucket": "hard"},
-        {"e2_correct": True, "e3_correct": True, "task_family": "code", "difficulty_bucket": "easy"},
+        {"task_id": "a", "e2_correct": False, "e3_correct": True, "quality_e2": 0.0, "quality_e3": 1.0, "compute_e2": 1.0, "compute_e3": 1.0, "task_family": "math", "template_id": "math-a", "difficulty_bucket": "hard"},
+        {"task_id": "b", "e2_correct": False, "e3_correct": True, "quality_e2": 0.0, "quality_e3": 1.0, "compute_e2": 1.0, "compute_e3": 1.0, "task_family": "math", "template_id": "math-b", "difficulty_bucket": "hard"},
+        {"task_id": "c", "e2_correct": False, "e3_correct": True, "quality_e2": 0.0, "quality_e3": 1.0, "compute_e2": 1.0, "compute_e3": 1.0, "task_family": "code", "template_id": "code-a", "difficulty_bucket": "easy"},
     ]
     metrics = e3_pair_metrics(pairs)
-    assert metrics["rescue_count"] == 2 and metrics["regression_count"] == 0
+    assert metrics["rescue_count"] == 3 and metrics["regression_count"] == 0
     qualified = qualify_e3_pairs(pairs, E3QualificationConfig(bootstrap_samples=100, seed=1))
-    assert qualified["qualified"] and qualified["quality_delta_lcb"] > 0
+    assert qualified["qualified"] and qualified["quality_lcb95"] > 0
 
 
 def test_hard_case_miner_labels_and_configurable_curriculum():
@@ -357,6 +357,19 @@ def test_real_ablation_harness_targets_active_location_and_step_count():
     out = middle(torch.randint(0, 80, (1, 5)), effort_mode="fixed_3", return_compute_receipt=True)
     assert middle.e3_config.e3_refine_steps == 4
     assert out["compute_receipt"].middle_refinement_steps == 4
+
+
+def test_per_example_research_step_override_records_actual_steps():
+    _, middle = make_model(E3RefinementConfig(e3_refinement_mode="middle_recurrent", e3_refine_steps=1))
+    ids = torch.randint(0, 80, (1, 5))
+    out = middle(
+        ids, effort_mode="fixed_3", e3_refinement_steps_override=4,
+        return_compute_receipt=True,
+    )
+    assert out["compute_receipt"].middle_refinement_steps == 4
+    assert out["compute_stats"]["research_step_override"]
+    with pytest.raises(ValueError, match="batch_size=1"):
+        middle(ids.repeat(2, 1), effort_mode="fixed_3", e3_refinement_steps_override=2)
 
 
 def test_answer_only_batcher_masks_every_prompt_and_padding_token(tmp_path):

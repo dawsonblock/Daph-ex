@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Any, Callable, Dict, Mapping, Optional, Tuple
 
@@ -31,6 +32,82 @@ class E3StageConfig:
 
 
 VerifiedTaskLossFn = Callable[[Mapping[str, Any], Mapping[str, Any]], Tensor]
+
+
+class VerifiedSequenceObjective(ABC):
+    """Explicit sequence-objective interface; implementations must name evidence strength."""
+
+    name: str
+    kind: str
+    uses_verified_reward: bool
+
+    @abstractmethod
+    def loss(self, output: Mapping[str, Any], task: Mapping[str, Any]) -> Tensor:
+        raise NotImplementedError
+
+    def manifest(self) -> Dict[str, Any]:
+        return {
+            "name": self.name,
+            "kind": self.kind,
+            "uses_verified_reward": self.uses_verified_reward,
+        }
+
+
+class AnswerOnlyCEObjective(VerifiedSequenceObjective):
+    """Teacher-forced answer-token CE. This is supervised learning, not RLVR."""
+
+    name = "answer_token_only_causal_ce"
+    kind = "answer_only_ce"
+    uses_verified_reward = False
+
+    def loss(self, output: Mapping[str, Any], task: Mapping[str, Any]) -> Tensor:
+        labels = task.get("labels")
+        if labels is None:
+            raise ValueError("AnswerOnlyCEObjective requires labels with prompt positions masked to -100")
+        logits = output["logits"]
+        labels_tensor = torch.as_tensor(labels, dtype=torch.long, device=logits.device)
+        if labels_tensor.dim() == 1:
+            labels_tensor = labels_tensor.unsqueeze(0)
+        if labels_tensor.shape[:2] != logits.shape[:2]:
+            raise ValueError("Answer-only labels must match the logits batch and sequence dimensions")
+        return F.cross_entropy(
+            logits[:, :-1].contiguous().reshape(-1, logits.size(-1)),
+            labels_tensor[:, 1:].contiguous().reshape(-1),
+            ignore_index=-100,
+        )
+
+
+class ExternalVerifiedRewardObjective(VerifiedSequenceObjective):
+    """Adapter for a real differentiable sequence-level verified-reward trainer."""
+
+    kind = "external_verified_reward"
+    uses_verified_reward = True
+
+    def __init__(self, name: str, callback: VerifiedTaskLossFn) -> None:
+        if not name or callback is None:
+            raise ValueError("External verified objectives require a name and callback")
+        self.name = name
+        self.callback = callback
+
+    def loss(self, output: Mapping[str, Any], task: Mapping[str, Any]) -> Tensor:
+        result = self.callback(output, task)
+        if not isinstance(result, Tensor) or not result.requires_grad:
+            raise ValueError("External verified-reward callback must return a differentiable tensor")
+        return result
+
+
+class GRPOObjectiveAdapter(VerifiedSequenceObjective):
+    """Declared hook only; DAPH does not ship a fake GRPO implementation."""
+
+    name = "grpo_adapter_not_implemented"
+    kind = "grpo"
+    uses_verified_reward = True
+
+    def loss(self, output: Mapping[str, Any], task: Mapping[str, Any]) -> Tensor:
+        raise NotImplementedError(
+            "GRPO is not implemented in this repository. Install a real verified-reward "
+            "trainer through ExternalVerifiedRewardObjective."
+        )
 
 
 def configure_e3_training(
@@ -84,4 +161,6 @@ def e3_verified_objective(
         "verified_task_loss": float(task_loss.detach()),
         "regression_guard_kl": float(guard.detach()),
         "regression_guard_weight": float(regression_guard_weight),
+        "weighted_regression_guard": float((float(regression_guard_weight) * guard).detach()),
+        "total_loss": float(total.detach()),
     }

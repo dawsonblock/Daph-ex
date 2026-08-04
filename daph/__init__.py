@@ -47,7 +47,11 @@ from .e3_experiment import (
     E3ExperimentVariant, canonical_variant_matrix, dose_response_variants,
     location_ablation_variants, run_variant_study,
 )
-from .e3_training import E3StageConfig, configure_e3_training, e3_verified_objective
+from .e3_training import (
+    E3StageConfig, configure_e3_training, e3_verified_objective,
+    VerifiedSequenceObjective, AnswerOnlyCEObjective,
+    ExternalVerifiedRewardObjective, GRPOObjectiveAdapter,
+)
 from .compute import EffortComputeReceipt, estimate_compute
 from .effort_decision import EffortDecision, ComputeStats, decide_from_probs
 from .policy_trainer import (
@@ -69,7 +73,19 @@ from .train_real import (
     eval_per_effort, distillation_loss, apply_training_stage,
 )
 from .verifiers import ExactMatchVerifier, FinalAnswerVerifier, NumericVerifier, make_quality_fn
-from .e3_metrics import E3QualificationConfig, e3_pair_metrics, qualify_e3_pairs
+from .e3_metrics import (
+    E3QualificationConfig, e3_pair_metrics, qualify_e3_pairs,
+    grouped_bootstrap, lambda_sweep, materialize_utility_record,
+)
+from .effort_frontier import build_effort_frontier, qualify_oracle_opportunity, write_effort_frontier
+from .e3_protocol import (
+    ExperimentTier, ProfileTier, ClaimStrength, ExperimentScale,
+    EvidenceMetadata, profile_stability, promote_e3_placement,
+    write_evidence_metadata, validate_profile_tier,
+)
+from .verified_tasks import (
+    generate_verified_tasks, natural_heldout_split, calibrated_sensitivity_split,
+)
 from .counterfactual import (
     EffortCounterfactual,
     CounterfactualCollector,
@@ -109,7 +125,7 @@ from .merge import (
     is_ssm_core_param,
 )
 
-__version__ = "3.3.0"
+__version__ = "3.4.0"
 __all__ = [
     "DAPHConfigV3",
     "LatentMoE",
@@ -163,6 +179,10 @@ __all__ = [
     "E3StageConfig",
     "configure_e3_training",
     "e3_verified_objective",
+    "VerifiedSequenceObjective",
+    "AnswerOnlyCEObjective",
+    "ExternalVerifiedRewardObjective",
+    "GRPOObjectiveAdapter",
     "EffortComputeReceipt",
     "estimate_compute",
     "EffortDecision",
@@ -181,6 +201,24 @@ __all__ = [
     "e3_pair_metrics",
     "E3QualificationConfig",
     "qualify_e3_pairs",
+    "grouped_bootstrap",
+    "lambda_sweep",
+    "materialize_utility_record",
+    "build_effort_frontier",
+    "qualify_oracle_opportunity",
+    "write_effort_frontier",
+    "ExperimentTier",
+    "ProfileTier",
+    "ClaimStrength",
+    "ExperimentScale",
+    "EvidenceMetadata",
+    "profile_stability",
+    "promote_e3_placement",
+    "write_evidence_metadata",
+    "validate_profile_tier",
+    "generate_verified_tasks",
+    "natural_heldout_split",
+    "calibrated_sensitivity_split",
     "PretrainedImportReport",
     "import_state_dict",
     "load_pretrained_into_exfusion",
