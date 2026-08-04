@@ -1,0 +1,71 @@
+{
+  "experiment": "standalone-marginal-utility-controller-stage1",
+  "base_model": {
+    "id": "Qwen/Qwen2.5-0.5B-Instruct",
+    "revision": "7ae557604adf67be50417f59c2c2f167def9a775",
+    "frozen": true,
+    "capture_depths_percent": [25, 50, 75, 100],
+    "pool_last_tokens": 4
+  },
+  "actions": ["STOP", "THINK", "VERIFY", "DECOMPOSE"],
+  "utility": {
+    "correct_reward": 1.0,
+    "incorrect_reward": 0.0,
+    "abstention_reward": -0.1,
+    "action_cost": {
+      "STOP": 0.0,
+      "THINK": 0.02,
+      "VERIFY": 0.04,
+      "DECOMPOSE": 0.03
+    }
+  },
+  "data": {
+    "experience_tasks": 5000,
+    "validation_tasks": 1000,
+    "immutable_test_tasks": 1000,
+    "immutable_ood_tasks": 1000,
+    "counterfactual_depth": 1,
+    "split_by": ["task_id", "template_id", "generator_seed", "family_id"]
+  },
+  "probe_gate": {
+    "minimum_hidden_auroc": 0.65,
+    "minimum_margin_over_cheap_proxy": 0.03
+  },
+  "oracle_gate": {
+    "minimum_gain_over_best_fixed": 0.02,
+    "bootstrap_samples": 2000,
+    "confidence": 0.95
+  },
+  "controller": {
+    "hidden_dimensions": [512, 256],
+    "ensemble_size": 5,
+    "uncertainty_beta": 1.0,
+    "mse_weight": 1.0,
+    "ranking_weight": 0.25,
+    "correctness_weight": 0.25
+  },
+  "policy_gate": {
+    "require_positive_lcb_vs": [
+      "best_fixed",
+      "cheap_sham",
+      "selected_heuristic",
+      "family_lookup",
+      "frequency_matched_random"
+    ],
+    "minimum_oracle_capture": 0.25,
+    "require_ood_pass": true
+  },
+  "runtime_limits": {
+    "max_steps": 4,
+    "max_tokens": 512,
+    "max_latency_ms": 30000,
+    "max_cost": 0.2,
+    "action_repeat_limit": 2,
+    "unchanged_answer_limit": 2,
+    "recurrence_cosine_threshold": 0.995
+  },
+  "program_stop_rule": {
+    "maximum_properly_powered_generations": 3,
+    "condition": "Stop if learned policy lacks stable positive held-out utility LCB over sham and heuristic controls"
+  }
+}

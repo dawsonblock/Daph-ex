@@ -1,4 +1,4 @@
-# DAPH / ExFusion v3.2.1
+# DAPH / ExFusion v3.3.0
 
 Pretrained-compatible adaptive computation with a physically ordered four-level effort hierarchy.
 
@@ -93,6 +93,12 @@ HF checkpoint → Gate 0A → QwenCompat → exact Gate 0B → layer profile →
 
 See [`docs/PIPELINE_COMMANDS.md`](docs/PIPELINE_COMMANDS.md) for executable examples for every stage.
 
+## Standalone marginal-utility controller
+
+`daph_metareasoner` is the smaller controller-first research path. It wraps one frozen model with `STOP`, `THINK`, `VERIFY`, and `DECOMPOSE`, collects isolated state/action outcomes, proves oracle conditional value before training, compares hidden-state probes with cheap shams, and permits on-path execution only after paired IID/OOD utility gates pass. It intentionally excludes latent workspaces, specialists, retrieval, and vector-speaking agents.
+
+The first pinned 0.5B-Instruct engineering smoke failed the oracle opportunity gate, so no value controller was trained. See [`docs/MARGINAL_UTILITY_CONTROLLER.md`](docs/MARGINAL_UTILITY_CONTROLLER.md) for the architecture, commands, stop criteria, and negative evidence.
+
 GitHub Actions runs the complete Python compatibility matrix, exact architecture gates, synthetic Phase 0 evidence generation, and package build. See [`docs/CI_WORKFLOW.md`](docs/CI_WORKFLOW.md) for the job graph, artifact contract, and recommended branch protection.
 
 ## Real-model smoke result
@@ -109,4 +115,4 @@ The answer-only follow-up calibrated every split to 50% E2 accuracy and compared
 
 ## Status
 
-The canonical Qwen path and legacy hybrid path coexist. Engineering acceptance is covered by 124 tests. A real but low-budget sparse profile and matched answer-only location study are bundled. The middle-layer mechanism signal is encouraging, but E3 task utility and the policy remain scientifically unqualified.
+The canonical Qwen path, legacy hybrid path, and standalone marginal-utility research package coexist. Engineering acceptance is covered by 138 tests. A real but low-budget sparse profile, matched answer-only location study, and negative controller oracle smoke are bundled. Neither E3 task utility nor a learned controller is scientifically qualified.

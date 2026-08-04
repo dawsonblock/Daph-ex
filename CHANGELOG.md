@@ -1,5 +1,17 @@
 # Changelog
 
+## 3.3.0 — standalone marginal-utility controller
+
+- Added the independent `daph_metareasoner` Stage 1 package around one frozen model and four actions: STOP, THINK, VERIFY, and DECOMPOSE.
+- Added isolated counterfactual state/action collection with explicit gross quality change, action cost, net VOC, hidden-state features, immutable digests, and execution receipts.
+- Added a mandatory oracle opportunity gate, cheap and hidden binary probes, hidden and sham action-value ensembles, ensemble uncertainty, paired confidence gates, and oracle-capture reporting.
+- Added fixed, confidence, entropy, stability, length, family, and action-frequency-matched random controls.
+- Added verified-only on-path execution with hard budget and loop guards; unchosen actions are never executed.
+- Added leakage-resistant experience/validation/test/OOD task generation and reproducible CLI workflows.
+- Preserved the first pinned real-model smoke as a negative result: oracle opportunity did not clear the predeclared threshold, so controller training was correctly blocked.
+
+No learned-controller or value-of-computation hypothesis is claimed as validated by this release.
+
 ## 3.2.0 — middle-layer E3 research build
 
 - Made bounded middle-layer recurrent refinement the canonical E3 experiment while retaining final-state refinement as a control.

@@ -556,7 +556,7 @@ class EffortPolicyTrainer:
         env = {
             "python": sys.version.split()[0],
             "torch": torch.__version__,
-            "daph_version": "3.2.1",
+            "daph_version": "3.3.0",
             "device": self.device,
             "source_digest": src,
         }
