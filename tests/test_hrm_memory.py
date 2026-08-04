@@ -245,6 +245,32 @@ def test_counterfactual_collector_isolates_state_and_uses_executed_utility():
     assert retrieve.delta_utility_vs_reference == pytest.approx(0.8)
 
 
+def test_counterfactual_records_all_action_cost_dimensions():
+    collector = CounterfactualCollector({
+        Action.STOP: lambda _state: ActionOutcome(Action.STOP, 0.0),
+        Action.RETRIEVE: lambda _state: ActionOutcome(
+            Action.RETRIEVE,
+            1.0,
+            compute_cost=0.1,
+            latency_cost=0.2,
+            token_cost=0.3,
+            retrieval_cost=0.4,
+            verification_cost=0.5,
+        ),
+    }, lambda_compute=1.0, lambda_latency=2.0, lambda_tokens=3.0,
+       lambda_retrieval=4.0, lambda_verification=5.0)
+    record = next(row for row in collector.collect(DecisionState("task", 0, (0.0,), ""))
+                  if row.action == Action.RETRIEVE)
+    assert record.gross_quality == 1.0
+    assert record.quality == 1.0
+    assert record.retrieval_cost == 0.4
+    assert record.compute_cost == 0.1
+    assert record.latency_cost == 0.2
+    assert record.token_cost == 0.3
+    assert record.verification_cost == 0.5
+    assert record.utility == pytest.approx(-4.5)
+
+
 def test_counterfactual_reference_must_be_in_requested_actions():
     collector = CounterfactualCollector({
         Action.STOP: lambda _state: ActionOutcome(Action.STOP, 0.0),

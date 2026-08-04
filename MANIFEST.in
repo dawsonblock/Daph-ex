@@ -11,3 +11,4 @@ recursive-include scripts *.py
 recursive-include tests *.py
 recursive-include third_party *.json
 recursive-include deploy *.yml
+recursive-include data *.json *.jsonl *.md

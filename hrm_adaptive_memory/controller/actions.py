@@ -20,10 +20,20 @@ class ActionOutcome:
     compute_cost: float = 0.0
     latency_cost: float = 0.0
     token_cost: float = 0.0
+    retrieval_cost: float = 0.0
+    verification_cost: float = 0.0
 
     def utility(self, *, lambda_compute: float = 1.0, lambda_latency: float = 0.0,
-                lambda_tokens: float = 0.0) -> float:
-        return self.quality - lambda_compute * self.compute_cost - lambda_latency * self.latency_cost - lambda_tokens * self.token_cost
+                lambda_tokens: float = 0.0, lambda_retrieval: float = 0.0,
+                lambda_verification: float = 0.0) -> float:
+        return (
+            self.quality
+            - lambda_retrieval * self.retrieval_cost
+            - lambda_compute * self.compute_cost
+            - lambda_latency * self.latency_cost
+            - lambda_tokens * self.token_cost
+            - lambda_verification * self.verification_cost
+        )
 
 
 def action_utilities(outcomes: Iterable[ActionOutcome], **weights: float) -> dict[Action, float]:

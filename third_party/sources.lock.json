@@ -16,6 +16,16 @@
       "runtime_enabled": false
     },
     {
+      "name": "TurboVec",
+      "upstream": "https://github.com/RyanCodrai/turbovec",
+      "archive_sha256": "3eba4445ed152392ad572a3c85f903f80091d95e52908521e72ec22d043ee341",
+      "source_revision": "22341e963e6fc8667d1289c44ffe5cb6760b4958",
+      "observed_version": "python-0.8.0__rust-0.9.0",
+      "license": "MIT",
+      "role": "compressed_dense_retrieval_experimental_backend_after_gate_a",
+      "runtime_enabled": false
+    },
+    {
       "name": "Graphiti",
       "upstream": "https://github.com/getzep/graphiti",
       "archive_sha256": "82a036f3b64717b31d6e1861613df1efc48745a958c00e4c7c9a442f8f13c0bf",

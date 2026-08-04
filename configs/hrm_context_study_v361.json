@@ -1,0 +1,56 @@
+{
+  "protocol_version": "hrm-context-study-v2",
+  "model": {
+    "id": "sapientinc/HRM-Text-1B",
+    "revision": "9f082d68b8cd0ebc56e33f1c88c45609174c272c",
+    "prompt_condition": "synth,cot",
+    "prefix_lm": true
+  },
+  "dataset": {
+    "id": "controlled-gate-a-v1",
+    "path": "data/hrm/controlled_gate_a_v1",
+    "claim_strength": "CONTROLLED_SYNTHETIC_BENCHMARK_ONLY",
+    "natural_memory_claim_allowed": false
+  },
+  "experiment": {
+    "tier": "QUALIFICATION",
+    "tasks": 500,
+    "minimum_groups": 5,
+    "evaluation_mode": "CAPABILITY_USE",
+    "hard_distractor_control": true,
+    "conditions": [
+      "B0_NO_CONTEXT",
+      "B1_RANDOM_CONTEXT",
+      "B1B_HARD_DISTRACTOR",
+      "B2_NAIVE_RETRIEVAL",
+      "B3_ORACLE_EVIDENCE"
+    ],
+    "bootstrap_samples": 10000,
+    "bootstrap_seed": 42,
+    "minimum_mean_quality_gain": 0.05,
+    "clustered_bootstrap_keys": [
+      "template_id",
+      "family",
+      "source_cluster_id"
+    ]
+  },
+  "retrieval": {
+    "backend": "bm25",
+    "k": 10,
+    "turbovec_enabled": false,
+    "ruvector_enabled": false,
+    "graphiti_enabled": false
+  },
+  "context_budget": {
+    "total": 4096,
+    "task": 500,
+    "evidence": 2200,
+    "state": 400,
+    "generation": 996
+  },
+  "promotion": {
+    "retrieval_expansion_allowed": false,
+    "graphiti_integration_allowed": false,
+    "controller_training_allowed": false
+  }
+}

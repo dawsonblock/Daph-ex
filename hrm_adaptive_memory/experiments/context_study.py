@@ -23,8 +23,24 @@ from ..contracts import (
 class StudyCondition(str, Enum):
     B0_NO_CONTEXT = "B0_NO_CONTEXT"
     B1_RANDOM_CONTEXT = "B1_RANDOM_CONTEXT"
+    B1_HARD_DISTRACTOR = "B1B_HARD_DISTRACTOR"
     B2_NAIVE_RETRIEVAL = "B2_NAIVE_RETRIEVAL"
     B3_ORACLE_EVIDENCE = "B3_ORACLE_EVIDENCE"
+
+
+PRIMARY_STUDY_CONDITIONS = (
+    StudyCondition.B0_NO_CONTEXT,
+    StudyCondition.B1_RANDOM_CONTEXT,
+    StudyCondition.B2_NAIVE_RETRIEVAL,
+    StudyCondition.B3_ORACLE_EVIDENCE,
+)
+
+
+class EvaluationMode(str, Enum):
+    """Keep capability use and evidence-grounded abstention as separate claims."""
+
+    CAPABILITY_USE = "CAPABILITY_USE"
+    EVIDENCE_GROUNDED = "EVIDENCE_GROUNDED"
 
 
 class ExperimentTier(str, Enum):
@@ -49,13 +65,19 @@ class OracleTask:
     oracle_evidence_ids: tuple[str, ...]
     family: str
     template_id: str
+    source_cluster_id: str
     split: str
     verifier: str = "exact"
     metadata: Mapping[str, Any] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
-        if not all((self.task_id, self.question.strip(), self.answer.strip(), self.family, self.template_id, self.split)):
-            raise ValueError("Oracle tasks require identifiers, content, family, template, and split")
+        if not all((
+            self.task_id, self.question.strip(), self.answer.strip(), self.family,
+            self.template_id, self.source_cluster_id, self.split,
+        )):
+            raise ValueError(
+                "Oracle tasks require identifiers, content, family, template, source cluster, and split"
+            )
         if not self.required_evidence_ids or not self.oracle_evidence_ids:
             raise ValueError("Oracle tasks require independently labeled evidence")
         if not set(self.required_evidence_ids).issubset(self.oracle_evidence_ids):
@@ -129,6 +151,19 @@ class ContextStudyConfig:
     seed: int = 42
     budget: ContextBudget = field(default_factory=ContextBudget)
     lambda_evidence_tokens: float = 0.0
+    evaluation_mode: EvaluationMode = EvaluationMode.CAPABILITY_USE
+    include_hard_distractor: bool = False
+
+    def conditions(self) -> tuple[StudyCondition, ...]:
+        if self.include_hard_distractor:
+            return (
+                StudyCondition.B0_NO_CONTEXT,
+                StudyCondition.B1_RANDOM_CONTEXT,
+                StudyCondition.B1_HARD_DISTRACTOR,
+                StudyCondition.B2_NAIVE_RETRIEVAL,
+                StudyCondition.B3_ORACLE_EVIDENCE,
+            )
+        return PRIMARY_STUDY_CONDITIONS
 
     def validate(self, tasks: Sequence[OracleTask]) -> None:
         requirement = TIER_REQUIREMENTS[self.tier]
@@ -142,6 +177,8 @@ class ContextStudyConfig:
             raise ValueError(f"{self.tier.value} requires at least {requirement['groups']} groups")
         if self.retrieval_k < 1 or self.lambda_evidence_tokens < 0:
             raise ValueError("Invalid retrieval or utility configuration")
+        if not isinstance(self.evaluation_mode, EvaluationMode):
+            raise ValueError("Context study requires an explicit EvaluationMode")
 
 
 @dataclass(frozen=True)
@@ -160,7 +197,9 @@ class ContextStudyReceipt:
     condition: StudyCondition
     family: str
     template_id: str
+    source_cluster_id: str
     split: str
+    evaluation_mode: EvaluationMode
     evidence_ids: tuple[str, ...]
     source_ids: tuple[str, ...]
     retrieval_scores: tuple[Mapping[str, float | None], ...]
@@ -185,6 +224,7 @@ class ContextStudyReceipt:
     def to_dict(self) -> dict[str, Any]:
         row = asdict(self)
         row["condition"] = self.condition.value
+        row["evaluation_mode"] = self.evaluation_mode.value
         return row
 
 
@@ -222,19 +262,27 @@ class ContextConstructor:
             "reranker": row.reranker_score,
         }
 
-    def _direct(self, record: IndexRecord, backend_id: str, rank: int) -> RetrievedEvidence:
-        return RetrievedEvidence.from_index(record, backend_id=backend_id, rank=rank)
+    def _direct(
+        self, record: IndexRecord, backend_id: str, rank: int,
+        *, lexical_score: float | None = None,
+    ) -> RetrievedEvidence:
+        return RetrievedEvidence.from_index(
+            record, backend_id=backend_id, rank=rank, lexical_score=lexical_score,
+        )
 
-    def _matched_irrelevant(self, task: OracleTask) -> tuple[RetrievedEvidence, ...]:
-        target = sum(self.token_codec.count(self.corpus.records[value].content) for value in task.oracle_evidence_ids)
-        excluded = set(task.required_evidence_ids) | set(task.oracle_evidence_ids)
-        candidates = [row for key, row in self.corpus.records.items() if key not in excluded]
-        candidates.sort(key=lambda row: hashlib.sha256(
-            f"{self.config.seed}\0{task.task_id}\0{row.evidence_id}".encode()
-        ).hexdigest())
+    def _take_matched_evidence(
+        self, task: OracleTask, candidates: Sequence[tuple[IndexRecord, float | None]], *,
+        backend_id: str, suffix: str,
+    ) -> tuple[RetrievedEvidence, ...]:
+        """Truncate a deterministic candidate sequence to B3's exact token budget."""
+
+        target = sum(
+            self.token_codec.count(self.corpus.records[value].content)
+            for value in task.oracle_evidence_ids
+        )
         selected: list[RetrievedEvidence] = []
         remaining = target
-        for record in candidates:
+        for record, score in candidates:
             if remaining <= 0:
                 break
             take = min(remaining, self.token_codec.count(record.content))
@@ -242,31 +290,94 @@ class ContextConstructor:
             if not content:
                 continue
             derived = IndexRecord(
-                evidence_id=f"{record.evidence_id}#b1:{take}",
+                evidence_id=f"{record.evidence_id}#{suffix}:{take}",
                 source_id=record.source_id,
                 content=content,
                 token_count=self.token_codec.count(content),
                 source_type=record.source_type,
-                metadata={**record.metadata, "matched_irrelevant_from": record.evidence_id},
+                metadata={**record.metadata, "matched_control_from": record.evidence_id},
             )
-            selected.append(self._direct(derived, "matched-irrelevant", len(selected) + 1))
+            selected.append(self._direct(
+                derived, backend_id, len(selected) + 1, lexical_score=score,
+            ))
             remaining -= derived.token_count
         if remaining != 0:
-            raise ValueError(f"Insufficient irrelevant evidence to match B3 for task {task.task_id}")
+            raise ValueError(
+                f"Insufficient non-oracle evidence to token-match B3 for task {task.task_id}"
+            )
         return tuple(selected)
 
-    def _compose(self, task: OracleTask, condition: StudyCondition, evidence: Sequence[RetrievedEvidence]) -> str:
-        parts = ["[OBJECTIVE]", task.question, "[CONTEXT CONDITION]", condition.value, "[EVIDENCE]"]
+    def _matched_irrelevant(self, task: OracleTask) -> tuple[RetrievedEvidence, ...]:
+        excluded = set(task.required_evidence_ids) | set(task.oracle_evidence_ids)
+        candidates = [row for key, row in self.corpus.records.items() if key not in excluded]
+        candidates.sort(key=lambda row: hashlib.sha256(
+            f"{self.config.seed}\0{task.task_id}\0{row.evidence_id}".encode()
+        ).hexdigest())
+        return self._take_matched_evidence(
+            task, [(row, None) for row in candidates], backend_id="matched-random", suffix="b1",
+        )
+
+    def _hard_distractors(self, task: OracleTask) -> tuple[RetrievedEvidence, ...]:
+        """Select answer-free lexical distractors without exposing an arm label to HRM."""
+
+        excluded = set(task.required_evidence_ids) | set(task.oracle_evidence_ids)
+        answer_terms = tuple(re.findall(r"\w+", _normalize(task.answer)))
+        query_terms = set(re.findall(r"\w+", _normalize(task.question)))
+        oracle_source_types = {
+            self.corpus.records[value].source_type for value in task.oracle_evidence_ids
+        }
+
+        def candidate_score(record: IndexRecord) -> tuple[int, int, str]:
+            content_terms = set(re.findall(r"\w+", _normalize(record.content)))
+            overlap = len(query_terms & content_terms)
+            source_match = int(record.source_type in oracle_source_types)
+            tie_break = hashlib.sha256(
+                f"{self.config.seed}\0{task.task_id}\0{record.evidence_id}".encode()
+            ).hexdigest()
+            return source_match, overlap, tie_break
+
+        def leaks_answer(record: IndexRecord) -> bool:
+            content_terms = tuple(re.findall(r"\w+", _normalize(record.content)))
+            width = len(answer_terms)
+            return bool(width) and any(
+                content_terms[index:index + width] == answer_terms
+                for index in range(len(content_terms) - width + 1)
+            )
+
+        candidates = [
+            row for key, row in self.corpus.records.items()
+            if key not in excluded and not leaks_answer(row)
+        ]
+        candidates.sort(
+            key=lambda row: (-candidate_score(row)[0], -candidate_score(row)[1], candidate_score(row)[2])
+        )
+        return self._take_matched_evidence(
+            task,
+            [(row, float(candidate_score(row)[1])) for row in candidates],
+            backend_id="hard-distractor",
+            suffix="b1b",
+        )
+
+    def _response_requirement(self) -> str:
+        if self.config.evaluation_mode == EvaluationMode.CAPABILITY_USE:
+            return "Return only the answer. Use supplied evidence when helpful, but answer the task regardless."
+        return (
+            "Return only the answer when the supplied evidence supports it; "
+            "otherwise return INSUFFICIENT_EVIDENCE."
+        )
+
+    def _compose(self, task: OracleTask, evidence: Sequence[RetrievedEvidence]) -> str:
+        parts = ["[OBJECTIVE]", task.question, "[EVIDENCE]"]
         if not evidence:
             parts.append("[NO EXTERNAL EVIDENCE]")
         for index, row in enumerate(evidence, 1):
             parts.extend([
-                f"[E{index}] evidence_id={row.evidence_id} source_id={row.source_id}",
+                f"[E{index}]",
                 row.content,
             ])
         parts.extend([
             "[RESPONSE REQUIREMENT]",
-            "Return only the answer. If the supplied evidence is insufficient, return INSUFFICIENT_EVIDENCE.",
+            self._response_requirement(),
         ])
         return "\n".join(parts)
 
@@ -277,6 +388,8 @@ class ContextConstructor:
             evidence: tuple[RetrievedEvidence, ...] = ()
         elif condition == StudyCondition.B1_RANDOM_CONTEXT:
             evidence = self._matched_irrelevant(task)
+        elif condition == StudyCondition.B1_HARD_DISTRACTOR:
+            evidence = self._hard_distractors(task)
         elif condition == StudyCondition.B2_NAIVE_RETRIEVAL:
             result = await self.retrieval_backend.search(task.question, k=self.config.retrieval_k)
             evidence, retrieval_receipt = result.evidence, result.receipt
@@ -290,7 +403,7 @@ class ContextConstructor:
         evidence_tokens = sum(self.token_codec.count(row.content) for row in evidence)
         if evidence_tokens > self.config.budget.evidence:
             raise ValueError(f"Evidence exceeds configured budget for {task.task_id}/{condition.value}")
-        prompt = self._compose(task, condition, evidence)
+        prompt = self._compose(task, evidence)
         if self.token_codec.count(task.question) > self.config.budget.task:
             raise ValueError("Task exceeds configured task budget")
         if self.token_codec.count(prompt) > self.config.budget.total - self.config.budget.generation:
@@ -324,11 +437,11 @@ class ContextStudyRunner:
         for task in tasks:
             contexts = {
                 condition: await self.constructor.construct(task, condition)
-                for condition in StudyCondition
+                for condition in self.config.conditions()
             }
             if contexts[StudyCondition.B0_NO_CONTEXT].prompt_sha256 == contexts[StudyCondition.B3_ORACLE_EVIDENCE].prompt_sha256:
                 raise RuntimeError("B0/B3 prompt digests must differ when B3 has evidence")
-            for condition in StudyCondition:
+            for condition in self.config.conditions():
                 context = contexts[condition]
                 output = await self.executor.generate(context.prompt)
                 quality, exact = verify_answer(task, output.text)
@@ -339,7 +452,9 @@ class ContextStudyRunner:
                     condition=condition,
                     family=task.family,
                     template_id=task.template_id,
+                    source_cluster_id=task.source_cluster_id,
                     split=task.split,
+                    evaluation_mode=self.config.evaluation_mode,
                     evidence_ids=tuple(row.evidence_id for row in context.evidence),
                     source_ids=tuple(row.source_id for row in context.evidence),
                     retrieval_scores=tuple(ContextConstructor._score(row) for row in context.evidence),

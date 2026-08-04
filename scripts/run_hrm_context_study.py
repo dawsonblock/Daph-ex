@@ -27,6 +27,7 @@ from hrm_adaptive_memory.contracts import IndexRecord
 from hrm_adaptive_memory.experiments.context_study import (
     ContextStudyConfig,
     ContextStudyRunner,
+    EvaluationMode,
     EvidenceCorpus,
     ExperimentTier,
     ModelOutput,
@@ -110,6 +111,8 @@ async def _run(args: argparse.Namespace) -> None:
         retrieval_k=args.retrieval_k,
         seed=args.seed,
         lambda_evidence_tokens=args.lambda_evidence_tokens,
+        evaluation_mode=EvaluationMode(args.evaluation_mode),
+        include_hard_distractor=args.include_hard_distractor,
     )
     config.validate(tasks)
 
@@ -176,11 +179,13 @@ async def _run(args: argparse.Namespace) -> None:
         ["git", "rev-parse", "HEAD"], cwd=ROOT, check=True, capture_output=True, text=True,
     ).stdout.strip()
     manifest = {
-        "protocol_version": "hrm-context-study-v1",
+        "protocol_version": "hrm-context-study-v2",
         "tier": config.tier.value,
         "task_count": len(tasks),
         "receipt_count": len(receipts),
-        "conditions_per_task": 4,
+        "conditions_per_task": len(config.conditions()),
+        "evaluation_mode": config.evaluation_mode.value,
+        "hard_distractor_control": config.include_hard_distractor,
         "model_id": executor.model_id,
         "model_revision": executor.model_revision,
         "prompt_condition": args.prompt_condition,
@@ -245,6 +250,15 @@ def main() -> None:
     parser.add_argument("--device-map", default="auto")
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--lambda-evidence-tokens", type=float, default=0.0)
+    parser.add_argument(
+        "--evaluation-mode", choices=[value.value for value in EvaluationMode],
+        default=EvaluationMode.CAPABILITY_USE.value,
+        help="Capability-use and evidence-grounded studies are deliberately separate.",
+    )
+    parser.add_argument(
+        "--include-hard-distractor", action="store_true",
+        help="Add the optional answer-free B1b lexical hard-distractor control.",
+    )
     parser.add_argument("--gate-a-report")
     parser.add_argument("--ruvector-url")
     parser.add_argument("--ruvector-version")

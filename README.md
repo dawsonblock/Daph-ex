@@ -1,4 +1,4 @@
-# DAPH / ExFusion v3.6.0
+# DAPH / ExFusion v3.6.1
 
 Pretrained-compatible adaptive computation with a physically ordered four-level effort hierarchy.
 
@@ -127,11 +127,11 @@ metrics, redundancy-aware evidence packing, the mandatory oracle-context gate,
 cycle tracing, and isolated counterfactual action utilities. Adaptive execution
 fails closed until a controller is marked `VERIFIED_FIT`.
 
-Release 3.6 adds backend-neutral asynchronous contracts, five logical memory
-kinds over three operational layers, immutable source locks and derivation
-receipts, a true paired B0/B1/B2/B3 runner, and grouped Gate A qualification.
-The old `hrm_memory` imports are deprecated compatibility aliases for this
-release only.
+Release 3.6.1 removes model-visible context-arm labels, separates capability-use
+from grounded-abstention studies, adds an optional hard-distractor control and
+conservative template/family/source-cluster inference, and registers TurboVec
+as a disabled compressed-dense retrieval candidate. The old `hrm_memory`
+imports are deprecated compatibility aliases for this release only.
 
 The current code is an engineering foundation, not evidence that HRM benefits
 from RAG or extra recurrence. See
@@ -140,4 +140,4 @@ for the staged protocol and commands.
 
 ## Status
 
-The canonical Qwen path, legacy hybrid path, standalone marginal-utility package, and HRM adaptive-memory control plane coexist. The complete suite has 204 tests. Gate A has not been run on a real paired qualification set, so RuVector expansion, Graphiti integration, recurrence control, and executive training remain blocked. Neither E3 task utility, HRM external-memory gains, nor a learned controller is scientifically qualified.
+The canonical Qwen path, legacy hybrid path, standalone marginal-utility package, and HRM adaptive-memory control plane coexist. Gate A has not been run on a real paired qualification set, so TurboVec/RuVector expansion, Graphiti integration, recurrence control, and executive training remain blocked. Neither E3 task utility, HRM external-memory gains, nor a learned controller is scientifically qualified.

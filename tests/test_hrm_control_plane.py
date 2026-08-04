@@ -27,12 +27,14 @@ from hrm_adaptive_memory.evaluation import GateAConfig, qualify_gate_a
 from hrm_adaptive_memory.experiments.context_study import (
     ContextStudyConfig,
     ContextStudyRunner,
+    EvaluationMode,
     EvidenceCorpus,
     ExperimentTier,
     ModelOutput,
     OracleTask,
     StudyCondition,
 )
+from hrm_adaptive_memory.experiments.controlled_dataset import build_controlled_gate_a_corpus
 from hrm_adaptive_memory.memory import MemoryLifecycle, MemoryRecord, MemoryStatus, MemoryType
 from hrm_adaptive_memory.source_lock import SourceLock
 
@@ -129,7 +131,8 @@ def tasks(count=24):
     return [OracleTask(
         task_id=f"t{index}", question=f"question {index}", answer="42",
         required_evidence_ids=(f"e{index}",), oracle_evidence_ids=(f"e{index}",),
-        family=f"family-{index % 2}", template_id=f"template-{index % 2}", split="test",
+        family=f"family-{index % 2}", template_id=f"template-{index % 2}",
+        source_cluster_id=f"source-cluster-{index % 2}", split="test",
     ) for index in range(count)]
 
 
@@ -236,9 +239,14 @@ def test_context_runner_constructs_true_paired_arms_and_matched_b1():
         by_task.setdefault(receipt.task_id, {})[receipt.condition] = receipt
     for task in tasks():
         arms = by_task[task.task_id]
-        assert set(arms) == set(StudyCondition)
+        assert set(arms) == set(ContextStudyConfig(tier=ExperimentTier.SMOKE).conditions())
         assert arms[StudyCondition.B0_NO_CONTEXT].final_prompt_sha256 != arms[StudyCondition.B3_ORACLE_EVIDENCE].final_prompt_sha256
         assert arms[StudyCondition.B3_ORACLE_EVIDENCE].final_prompt
+        assert "[CONTEXT CONDITION]" not in arms[StudyCondition.B3_ORACLE_EVIDENCE].final_prompt
+        assert StudyCondition.B3_ORACLE_EVIDENCE.value not in arms[StudyCondition.B3_ORACLE_EVIDENCE].final_prompt
+        assert "evidence_id=" not in arms[StudyCondition.B3_ORACLE_EVIDENCE].final_prompt
+        assert "source_id=" not in arms[StudyCondition.B3_ORACLE_EVIDENCE].final_prompt
+        assert arms[StudyCondition.B3_ORACLE_EVIDENCE].evaluation_mode == EvaluationMode.CAPABILITY_USE
         assert arms[StudyCondition.B1_RANDOM_CONTEXT].evidence_tokens == arms[StudyCondition.B3_ORACLE_EVIDENCE].evidence_tokens
         origins = {value.split("#b1:", 1)[0] for value in arms[StudyCondition.B1_RANDOM_CONTEXT].evidence_ids}
         assert not origins & set(task.oracle_evidence_ids)
@@ -260,12 +268,34 @@ def test_fake_context_results_cannot_qualify():
         ))
 
 
+def test_optional_hard_distractor_is_answer_free_and_token_matched():
+    source = records()
+    receipts = run(ContextStudyRunner(
+        corpus=EvidenceCorpus(source),
+        retrieval_backend=LocalControlBackend(LocalRetrievalMode.BM25, source),
+        executor=FakeExecutor(),
+        config=ContextStudyConfig(tier=ExperimentTier.SMOKE, include_hard_distractor=True),
+    ).run(tasks()))
+    by_task = {}
+    for receipt in receipts:
+        by_task.setdefault(receipt.task_id, {})[receipt.condition] = receipt
+    for task in tasks():
+        b1b = by_task[task.task_id][StudyCondition.B1_HARD_DISTRACTOR]
+        b3 = by_task[task.task_id][StudyCondition.B3_ORACLE_EVIDENCE]
+        assert b1b.evidence_tokens == b3.evidence_tokens
+        assert "42" not in b1b.final_prompt
+        assert "#b1b:" not in b1b.final_prompt
+        origins = {value.split("#b1b:", 1)[0] for value in b1b.evidence_ids}
+        assert not origins & set(task.oracle_evidence_ids)
+
+
 def gate_fixture(count: int):
     task_rows = [OracleTask(
         task_id=f"q{index}", question=f"q {index}", answer="a",
         required_evidence_ids=(f"oracle-{index}",),
         oracle_evidence_ids=(f"oracle-{index}",),
-        family=f"family-{index % 5}", template_id=f"template-{index % 5}", split="test",
+        family=f"family-{index % 5}", template_id=f"template-{index % 5}",
+        source_cluster_id=f"source-cluster-{index % 5}", split="test",
     ) for index in range(count)]
     rows = []
     for task in task_rows:
@@ -277,9 +307,11 @@ def gate_fixture(count: int):
         ):
             rows.append({
                 "task_id": task.task_id, "condition": condition.value,
-                "family": task.family, "template_id": task.template_id, "split": "test",
+                "family": task.family, "template_id": task.template_id,
+                "source_cluster_id": task.source_cluster_id, "split": "test",
+                "evaluation_mode": EvaluationMode.CAPABILITY_USE.value,
                 "evidence_ids": evidence, "source_ids": evidence, "retrieval_scores": (),
-                "final_prompt": f"prompt {task.task_id} {condition.value}",
+                "final_prompt": f"prompt {task.task_id} evidence",
                 "final_prompt_sha256": f"{task.task_id}-{condition.value}",
                 "prompt_tokens": 10, "evidence_tokens": 1 if evidence else 0,
                 "completion_tokens": 1, "output": "a" if quality else "wrong",
@@ -307,16 +339,100 @@ def test_gate_a_qualification_is_paired_grouped_and_fail_closed():
         tier=ExperimentTier.QUALIFICATION, bootstrap_samples=100,
     ))
     assert report["status"] == "PASS_HRM_CAN_USE_ORACLE_EVIDENCE"
-    assert report["quality_bootstrap"]["group_count"] == 5
+    assert report["quality_bootstrap_by_group"]["template_id"]["group_count"] == 5
+    assert report["quality_bootstrap_by_group"]["family"]["group_count"] == 5
+    assert report["quality_bootstrap_by_group"]["source_cluster_id"]["group_count"] == 5
     assert report["retrieval_expansion_allowed"] is True
     assert report["graphiti_integration_allowed"] is False
     assert report["controller_training_allowed"] is False
+
+
+def test_evidence_grounded_study_is_reported_but_cannot_promote_retrieval():
+    task_rows, rows = gate_fixture(500)
+    for row in rows:
+        row["evaluation_mode"] = EvaluationMode.EVIDENCE_GROUNDED.value
+    report = qualify_gate_a(rows, task_rows, GateAConfig(
+        tier=ExperimentTier.QUALIFICATION,
+        evaluation_mode=EvaluationMode.EVIDENCE_GROUNDED,
+        bootstrap_samples=100,
+    ))
+    assert report["status"] == "EVIDENCE_GROUNDED_NONPROMOTABLE"
+    assert report["retrieval_expansion_allowed"] is False
+    assert report["next_stage"] == "GROUNDING_DIAGNOSTIC_ONLY"
+
+
+def test_gate_a_rejects_model_visible_arm_labels_and_requires_full_prompt_receipts():
+    task_rows, rows = gate_fixture(2)
+    rows[0]["final_prompt"] = "[CONTEXT CONDITION] B0_NO_CONTEXT"
+    with pytest.raises(ValueError, match="model-visible"):
+        qualify_gate_a(rows, task_rows, GateAConfig(
+            tier=ExperimentTier.SMOKE, bootstrap_samples=20,
+        ))
+    rows[0]["final_prompt"] = "[E1] evidence_id=required-record"
+    with pytest.raises(ValueError, match="Control/provenance"):
+        qualify_gate_a(rows, task_rows, GateAConfig(
+            tier=ExperimentTier.SMOKE, bootstrap_samples=20,
+        ))
+    rows[0]["final_prompt"] = None
+    with pytest.raises(ValueError, match="final prompt"):
+        qualify_gate_a(rows, task_rows, GateAConfig(
+            tier=ExperimentTier.SMOKE, bootstrap_samples=20,
+        ))
 
 
 def test_source_lock_keeps_every_external_runtime_disabled():
     payload = json.loads(Path("third_party/sources.lock.json").read_text())
     lock = SourceLock(payload)
     assert lock.bundle["committed"] is False
-    assert len(lock.sources) == 8
+    assert len(lock.sources) == 9
+    assert lock.sources["TurboVec"].runtime_enabled is False
+    assert lock.sources["TurboVec"].archive_sha256 == (
+        "3eba4445ed152392ad572a3c85f903f80091d95e52908521e72ec22d043ee341"
+    )
     with pytest.raises(RuntimeError, match="gate-blocked"):
         lock.require_runtime("RuVector")
+    with pytest.raises(RuntimeError, match="gate-blocked"):
+        lock.require_runtime("TurboVec")
+
+
+def test_controlled_gate_a_corpus_is_reproducible_and_has_independent_evidence_ids():
+    first = build_controlled_gate_a_corpus(seed=7, tasks_per_family=5)
+    second = build_controlled_gate_a_corpus(seed=7, tasks_per_family=5)
+    assert first.manifest == second.manifest
+    assert first.manifest["task_count"] == 25
+    assert len({row["task_id"] for row in first.tasks}) == 25
+    evidence_ids = {row["evidence_id"] for row in first.evidence}
+    source_clusters = {row["source_cluster_id"] for row in first.tasks}
+    assert len(source_clusters) >= 5
+    for row in first.tasks:
+        task = OracleTask.from_dict(row)
+        assert set(task.required_evidence_ids).issubset(evidence_ids)
+        assert task.verifier == "numeric"
+    ContextStudyConfig(tier=ExperimentTier.SMOKE).validate(
+        [OracleTask.from_dict(row) for row in first.tasks]
+    )
+
+
+def test_committed_controlled_corpus_has_the_predeclared_qualification_shape():
+    root = Path("data/hrm/controlled_gate_a_v1")
+    manifest = json.loads((root / "dataset_manifest.json").read_text())
+    task_rows = [json.loads(line) for line in (root / "oracle_tasks.jsonl").read_text().splitlines()]
+    evidence_rows = [json.loads(line) for line in (root / "evidence.jsonl").read_text().splitlines()]
+    tasks = [OracleTask.from_dict(row) for row in task_rows]
+    evidence = EvidenceCorpus([
+        IndexRecord(
+            evidence_id=row["evidence_id"], source_id=row["source_id"],
+            content=row["content"], token_count=max(1, len(row["content"].split())),
+            source_type=row["source_type"], metadata=row["metadata"],
+        )
+        for row in evidence_rows
+    ])
+    assert manifest["claim_strength"] == "CONTROLLED_SYNTHETIC_BENCHMARK_ONLY"
+    assert manifest["natural_memory_claim_allowed"] is False
+    assert len(tasks) == manifest["task_count"] == 500
+    assert len(evidence_rows) == manifest["evidence_count"] == 1200
+    ContextStudyConfig(
+        tier=ExperimentTier.QUALIFICATION, include_hard_distractor=True,
+    ).validate(tasks)
+    for task in tasks:
+        evidence.validate_task(task)

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "daph-exfusion"
-version = "3.6.0"
+version = "3.6.1"
 description = "DAPH ExFusion, value-of-computation, and HRM external-memory research"
 readme = "README.md"
 requires-python = ">=3.10"

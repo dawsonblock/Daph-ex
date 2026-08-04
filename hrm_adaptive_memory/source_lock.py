@@ -18,6 +18,7 @@ class LockedSource:
     role: str
     runtime_enabled: bool
     runtime_digest: str | None = None
+    source_revision: str | None = None
 
 
 class SourceLock:
@@ -34,6 +35,8 @@ class SourceLock:
         for source in self.sources.values():
             if len(source.archive_sha256) != 64:
                 raise ValueError(f"Invalid archive digest for {source.name}")
+            if source.source_revision is not None and len(source.source_revision) < 7:
+                raise ValueError(f"Invalid source revision for {source.name}")
             if source.runtime_enabled and not source.runtime_digest:
                 raise ValueError(f"Enabled runtime {source.name} needs an immutable runtime digest")
 

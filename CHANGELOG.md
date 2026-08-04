@@ -1,5 +1,16 @@
 # Changelog
 
+## 3.6.1 — Gate A confound controls
+
+- Remove model-visible B0/B1/B2/B3 labels from study prompts and retain condition identity only in immutable receipts.
+- Split `CAPABILITY_USE` from non-promotable `EVIDENCE_GROUNDED` studies so abstention framing cannot be reported as oracle-evidence capability.
+- Add an optional answer-free, token-matched B1b hard-distractor control and require it uniformly when selected.
+- Require explicit source-cluster labels and report grouped bootstrap results for template, family, and source cluster; Gate A uses the most conservative result and requires every declared cluster view to pass.
+- Record gross quality plus retrieval, compute, latency, token, and verification costs in counterfactual receipts.
+- Lock the supplied TurboVec snapshot (`3eba4445…ee341`, Python 0.8.0 / Rust 0.9.0) as a disabled compressed-dense experimental backend; no TurboVec runtime or adapter is enabled.
+
+No real Gate A experiment is included. Retrieval expansion remains blocked.
+
 ## 3.6.0 — HRM adaptive-memory control plane
 
 - Rename the canonical research namespace to `hrm_adaptive_memory` while retaining one-release `hrm_memory` compatibility aliases.
