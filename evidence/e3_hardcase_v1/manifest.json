@@ -1,0 +1,20 @@
+{
+  "experiment": "frozen-e2-hardcase-e3-latent-step-ablation",
+  "model": "Qwen/Qwen2.5-0.5B",
+  "revision": "060db6499f32faf8b98477b0a26969ef7d8b9987",
+  "raw_report": {
+    "path": "runs/e3-hardcase-v1/ablation/e3_hardcase_ablation_report.json",
+    "sha256": "1f493f08dec05e87a8dbceeaa435c86d57920a224384c0e243d1ed6fbb0e17c8"
+  },
+  "task_manifests": {
+    "train": {"tasks": 128, "sha256": "c6a4c205e05e8883b0b55a143bb9f387405bfc76cecce80208cf7864aa7b23bc"},
+    "selection": {"tasks": 32, "sha256": "1733b6e634db176becee4a4559d1d5d9a5910e1d14703190f3b791e4839f7f8a"},
+    "test": {"tasks": 32, "sha256": "93808114a5d929872acb21f679a79fbf11f8ea4202bfe4cdfcc5075f8e29a3ca"}
+  },
+  "qualification": {
+    "e2_frozen": true,
+    "positive_heldout_net_rescue": false,
+    "heldout_e3_accuracy_above_e2": false,
+    "qualified": false
+  }
+}

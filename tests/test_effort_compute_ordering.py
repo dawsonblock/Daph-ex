@@ -18,7 +18,7 @@ from daph.pretrained import save_adapted_checkpoint
 from daph.counterfactual import CounterfactualCollector, _tensor_raw_bytes, full_state_dict_digest
 from daph.train_real import (
     RealTrainConfig, TrainingStageConfig, apply_training_stage,
-    distillation_loss, train_adapt,
+    distillation_loss, finite_and_clip_gradients, train_adapt,
 )
 
 
@@ -133,6 +133,8 @@ def test_parameter_provenance_is_exact_names():
     assert set(provenance.imported_parameter_names).isdisjoint(provenance.new_parameter_names)
     assert set(provenance.imported_parameter_names) | set(provenance.new_parameter_names) == names
     assert all(name.endswith("_scale") for name in provenance.scale_parameter_names)
+    assert provenance.e3_scale_parameter_names == ("layers.3.latent_scale",)
+    assert all(name.startswith("layers.3.latent_refine.") for name in provenance.e3_refinement_parameter_names)
     with tempfile.TemporaryDirectory() as td:
         path = os.path.join(td, "canonical.pt")
         save_adapted_checkpoint(model, path)
@@ -241,3 +243,13 @@ def test_explicit_stage_groups_and_gradient_remainder_resume():
         )
         assert resumed["optimizer_steps_completed"] == 2
         assert resumed["next_micro_step"] == 3
+
+
+def test_stable_gradient_clip_checks_values_not_reduction_overflow():
+    parameter = torch.nn.Parameter(torch.ones(2))
+    parameter.grad = torch.tensor([3.0, 4.0])
+    norm = finite_and_clip_gradients([parameter], max_norm=1.0)
+    assert norm == 5.0
+    assert torch.allclose(parameter.grad, torch.tensor([0.6, 0.8]))
+    parameter.grad = torch.tensor([float("nan"), 0.0])
+    assert not torch.isfinite(torch.tensor(finite_and_clip_gradients([parameter], max_norm=1.0)))

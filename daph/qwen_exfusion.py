@@ -39,6 +39,8 @@ class ExFusionParameterProvenance:
     augmentation_parameter_names: Tuple[str, ...]
     scale_parameter_names: Tuple[str, ...]
     continuation_parameter_names: Tuple[str, ...] = ()
+    e3_refinement_parameter_names: Tuple[str, ...] = ()
+    e3_scale_parameter_names: Tuple[str, ...] = ()
 
     @staticmethod
     def _digest(names: Tuple[str, ...]) -> str:
@@ -689,12 +691,25 @@ def augment_qwen_compat_model(
     scales = {n for n in all_names if n.endswith("_scale")}
     augmentation = all_names - imported
     continuation = {n for n in all_names if "_continuation." in n}
+    final_layer = len(model.layers) - 1
+    # Keep the refinement LayerNorm at identity for the first E3 study. It is
+    # not part of the learned transformation, and this avoids an observed MPS
+    # LayerNorm-scale backward instability while fc1/fc2 and residual scale
+    # remain fully trainable.
+    e3_refinement = {
+        n for n in all_names
+        if n.startswith(f"layers.{final_layer}.latent_refine.")
+        and ".latent_refine.norm." not in n
+    }
+    e3_scales = {f"layers.{final_layer}.latent_scale"} & all_names
     model.parameter_provenance = ExFusionParameterProvenance(
         imported_parameter_names=tuple(sorted(imported)),
         new_parameter_names=tuple(sorted(all_names - imported)),
         augmentation_parameter_names=tuple(sorted(augmentation)),
         scale_parameter_names=tuple(sorted(scales)),
         continuation_parameter_names=tuple(sorted(continuation)),
+        e3_refinement_parameter_names=tuple(sorted(e3_refinement)),
+        e3_scale_parameter_names=tuple(sorted(e3_scales)),
     )
     return model
 
@@ -774,6 +789,8 @@ def load_qwen_exfusion_checkpoint(path: str, *, map_location: str = "cpu") -> Qw
             augmentation_parameter_names=tuple(p["augmentation_parameter_names"]),
             scale_parameter_names=tuple(p["scale_parameter_names"]),
             continuation_parameter_names=tuple(p.get("continuation_parameter_names", ())),
+            e3_refinement_parameter_names=tuple(p.get("e3_refinement_parameter_names", ())),
+            e3_scale_parameter_names=tuple(p.get("e3_scale_parameter_names", ())),
         )
     return model
 

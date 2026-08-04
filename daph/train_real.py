@@ -206,6 +206,8 @@ def apply_training_stage(model: torch.nn.Module, stage: TrainingStageConfig) -> 
         "augmentation": set(provenance.augmentation_parameter_names),
         "scales": set(provenance.scale_parameter_names),
         "continuation": set(provenance.continuation_parameter_names),
+        "e3_refinement": set(provenance.e3_refinement_parameter_names),
+        "e3_scale": set(provenance.e3_scale_parameter_names),
     }
     unknown = (set(stage.train_parameter_groups) | set(stage.freeze_parameter_groups)) - set(groups)
     if unknown:
@@ -246,6 +248,33 @@ def _stage_param_groups(model: torch.nn.Module, stage: TrainingStageConfig) -> L
             buckets["new"].append(param)
     lrs = {"pretrained": stage.lr_pretrained, "new": stage.lr_new, "scales": stage.lr_scales}
     return [{"params": values, "lr": lrs[key], "group_name": key} for key, values in buckets.items() if values]
+
+
+def finite_and_clip_gradients(parameters: Sequence[Tensor], max_norm: float) -> float:
+    """Check every gradient and clip with a numerically stable global norm.
+
+    Some MPS reductions can overflow while every individual float32 gradient is
+    finite. Accumulating squared norms on CPU in float64 tests the gradients
+    themselves rather than that reduction artifact.
+    """
+    total_sq = 0.0
+    grads: List[Tensor] = []
+    for parameter in parameters:
+        grad = parameter.grad
+        if grad is None:
+            continue
+        if not bool(torch.isfinite(grad).all().item()):
+            return float("nan")
+        grads.append(grad)
+        # Move first: MPS does not implement a float64 cast on-device.
+        cpu_grad = grad.detach().to(device="cpu").to(dtype=torch.float64)
+        total_sq += float(torch.sum(cpu_grad.square()).item())
+    grad_norm = math.sqrt(total_sq)
+    if math.isfinite(grad_norm) and max_norm > 0.0 and grad_norm > max_norm:
+        scale = float(max_norm) / (grad_norm + 1e-12)
+        for grad in grads:
+            grad.mul_(scale)
+    return grad_norm
 
 
 def distillation_loss(
@@ -517,12 +546,18 @@ def train_adapt(
         pending_microsteps += 1
 
         if (step + 1) % cfg.grad_accum == 0:
-            grad_norm = torch.nn.utils.clip_grad_norm_(
+            grad_norm = finite_and_clip_gradients(
                 [p for p in model.parameters() if p.requires_grad], cfg.grad_clip
             )
-            if cfg.fail_on_nonfinite and not bool(torch.isfinite(grad_norm).item()):
+            if cfg.fail_on_nonfinite and not math.isfinite(grad_norm):
+                bad = [
+                    name for name, parameter in model.named_parameters()
+                    if parameter.requires_grad and parameter.grad is not None
+                    and not bool(torch.isfinite(parameter.grad).all().item())
+                ]
                 raise FloatingPointError(
-                    f"Non-finite gradient norm at micro-step {step} for effort {emode}"
+                    f"Non-finite gradient norm at micro-step {step} for effort {emode}; "
+                    f"non-finite gradients: {bad}"
                 )
             opt.step()
             opt.zero_grad(set_to_none=True)
@@ -587,10 +622,10 @@ def train_adapt(
 
     # Flush a partial accumulation window instead of silently dropping it.
     if pending_microsteps > 0:
-        grad_norm = torch.nn.utils.clip_grad_norm_(
+        grad_norm = finite_and_clip_gradients(
             [p for p in model.parameters() if p.requires_grad], cfg.grad_clip
         )
-        if cfg.fail_on_nonfinite and not bool(torch.isfinite(grad_norm).item()):
+        if cfg.fail_on_nonfinite and not math.isfinite(grad_norm):
             raise FloatingPointError("Non-finite gradient norm in final accumulation window")
         opt.step()
         opt.zero_grad(set_to_none=True)

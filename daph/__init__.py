@@ -56,6 +56,7 @@ from .train_real import (
     eval_per_effort, distillation_loss, apply_training_stage,
 )
 from .verifiers import ExactMatchVerifier, FinalAnswerVerifier, NumericVerifier, make_quality_fn
+from .e3_metrics import e3_pair_metrics
 from .counterfactual import (
     EffortCounterfactual,
     CounterfactualCollector,
@@ -143,6 +144,7 @@ __all__ = [
     "FinalAnswerVerifier",
     "NumericVerifier",
     "make_quality_fn",
+    "e3_pair_metrics",
     "PretrainedImportReport",
     "import_state_dict",
     "load_pretrained_into_exfusion",

@@ -34,6 +34,22 @@ python scripts/run_small_real_adaptation.py \
 
 The harness pins the tokenizer revision, trains and validation-selects E0/E1/E3 separately, freezes imported E2 weights, rejects non-finite loss/gradients, skips large checkpoint serialization, and writes `experiment_report.json`.
 
+## Frozen-E2 hard-case E3 ablation
+
+```bash
+python scripts/make_e3_hardcase_arithmetic.py --output runs/e3-hardcase-data
+python scripts/run_e3_hardcase_ablation.py \
+  --model Qwen/Qwen2.5-0.5B \
+  --revision 060db6499f32faf8b98477b0a26969ef7d8b9987 \
+  --hard-train runs/e3-hardcase-data/train.jsonl \
+  --selection runs/e3-hardcase-data/selection.jsonl \
+  --test runs/e3-hardcase-data/test.jsonl \
+  --output runs/e3-hardcase-ablation \
+  --latent-step-counts 1,2,4 --steps 200 --e3-scale 1e-3
+```
+
+This keeps E2 frozen, trains only the final latent refinement and its scale after Gate 0B, and evaluates exact numeric E2/E3 outcomes. The report includes rescues, regressions, net rescue rate, completion CE, hidden-state delta magnitude, and receipt-backed compute overhead. The supplied arithmetic generator is only a reproducible smoke curriculum; qualify a policy only after independent hard-task-family replication.
+
 ## Staged multi-effort adaptation
 
 ```bash
