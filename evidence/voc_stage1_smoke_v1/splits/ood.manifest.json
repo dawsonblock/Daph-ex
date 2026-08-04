@@ -1,0 +1,57 @@
+{
+  "model": {
+    "id": "Qwen/Qwen2.5-0.5B-Instruct",
+    "revision": "7ae557604adf67be50417f59c2c2f167def9a775"
+  },
+  "model_digest": "3a67a2a9c98de221a964938960b12f7c",
+  "environment_digest": "8894947cdc90260790a02ebc54c5b509030a3a73403c4cbaa9260b793821d2e9",
+  "split_manifest": {
+    "splits": {
+      "ood": {
+        "tasks": 8,
+        "task_ids": [
+          "ood-two_step_ood-000000",
+          "ood-two_step_ood-000001",
+          "ood-two_step_ood-000002",
+          "ood-two_step_ood-000003",
+          "ood-two_step_ood-000004",
+          "ood-two_step_ood-000005",
+          "ood-two_step_ood-000006",
+          "ood-two_step_ood-000007"
+        ],
+        "families": [
+          "two_step_ood"
+        ],
+        "prompt_template_fingerprints": [
+          "753d8e6e2fd898d7b586c54cc10ef7f312dd8c2967ab537dfc340c08b492489b"
+        ]
+      }
+    },
+    "tasks_digest": "a1eb57011b6c7d5d6e8a0f071df3e4914804bc726eba8971d50347d00d6565dd",
+    "immutable_splits": [
+      "test",
+      "ood"
+    ],
+    "manifest_digest": "64bc52282b9412d74bd5c55ad7513b034b8c21e2863faef5cc4e9f8ed8cc2bcc"
+  },
+  "collection": {
+    "records": 32,
+    "states": 8,
+    "tasks": 8,
+    "records_digest": "0eef78f65ba95ee35c992eb04570146ed49d68bcab1bf279b5ee5a1b3d7757c3",
+    "file_digest": "fc11bb756c11ffc64df8dc87f29c0b2a61d42cda890988cece2507503087fb43"
+  },
+  "config": {
+    "model": "Qwen/Qwen2.5-0.5B-Instruct",
+    "revision": "7ae557604adf67be50417f59c2c2f167def9a775",
+    "tasks": "runs/voc-stage1-smoke-v2/tasks/ood.jsonl",
+    "split": "ood",
+    "output": "runs/voc-stage1-smoke-v2/ood.jsonl",
+    "max_depth": 0,
+    "max_states_per_task": 16,
+    "max_new_tokens": 24,
+    "device": "mps",
+    "fast_source_digest": false,
+    "normalized_compute_weight": 0.0
+  }
+}

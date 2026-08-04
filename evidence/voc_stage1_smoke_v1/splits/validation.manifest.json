@@ -1,0 +1,61 @@
+{
+  "model": {
+    "id": "Qwen/Qwen2.5-0.5B-Instruct",
+    "revision": "7ae557604adf67be50417f59c2c2f167def9a775"
+  },
+  "model_digest": "3a67a2a9c98de221a964938960b12f7c",
+  "environment_digest": "8894947cdc90260790a02ebc54c5b509030a3a73403c4cbaa9260b793821d2e9",
+  "split_manifest": {
+    "splits": {
+      "validation": {
+        "tasks": 8,
+        "task_ids": [
+          "validation-addition-000000",
+          "validation-addition-000003",
+          "validation-addition-000006",
+          "validation-multiplication-000002",
+          "validation-multiplication-000005",
+          "validation-subtraction-000001",
+          "validation-subtraction-000004",
+          "validation-subtraction-000007"
+        ],
+        "families": [
+          "addition",
+          "multiplication",
+          "subtraction"
+        ],
+        "prompt_template_fingerprints": [
+          "9dded8e862175ce869543a3b7a0f00c9d1d8dbcdc20e3b8efccf6663a1f7166b",
+          "e0b0d2c6b79d16456e87df15f52eb181e778f66e155b7a1263a9efb364a9c944",
+          "e4582ca4bf8e771018848770cab3ca8d2b24a69419a2c76b843624f55e44cc5f"
+        ]
+      }
+    },
+    "tasks_digest": "27b8b0ccebf57e983f24ebff71bc707dcfd6829712f532b354947762999bcb32",
+    "immutable_splits": [
+      "test",
+      "ood"
+    ],
+    "manifest_digest": "5d6054f128909516051b4d6c94238b4a1c3378ab912288c51872bbbec61689c7"
+  },
+  "collection": {
+    "records": 32,
+    "states": 8,
+    "tasks": 8,
+    "records_digest": "50099f84ec361ba090ce16d782d045dd7be839b2df20f53db9d4eee1a765b234",
+    "file_digest": "23b705494022da69d4b8e598d5c8f5a78814e8c5b3a5b62e0e6fadb07a806939"
+  },
+  "config": {
+    "model": "Qwen/Qwen2.5-0.5B-Instruct",
+    "revision": "7ae557604adf67be50417f59c2c2f167def9a775",
+    "tasks": "runs/voc-stage1-smoke-v2/tasks/validation.jsonl",
+    "split": "validation",
+    "output": "runs/voc-stage1-smoke-v2/validation.jsonl",
+    "max_depth": 0,
+    "max_states_per_task": 16,
+    "max_new_tokens": 24,
+    "device": "mps",
+    "fast_source_digest": false,
+    "normalized_compute_weight": 0.0
+  }
+}

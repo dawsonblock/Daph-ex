@@ -1,0 +1,106 @@
+{
+  "splits": {
+    "experience": {
+      "tasks": 16,
+      "task_ids": [
+        "experience-addition-000000",
+        "experience-addition-000003",
+        "experience-addition-000006",
+        "experience-addition-000009",
+        "experience-addition-000012",
+        "experience-addition-000015",
+        "experience-multiplication-000002",
+        "experience-multiplication-000005",
+        "experience-multiplication-000008",
+        "experience-multiplication-000011",
+        "experience-multiplication-000014",
+        "experience-subtraction-000001",
+        "experience-subtraction-000004",
+        "experience-subtraction-000007",
+        "experience-subtraction-000010",
+        "experience-subtraction-000013"
+      ],
+      "families": [
+        "addition",
+        "multiplication",
+        "subtraction"
+      ],
+      "prompt_template_fingerprints": [
+        "08b208bc8b9d8eedb6c637e5892d67a046fb0aba5ce2a672400576cd7cd07122",
+        "0c18cb1946f0d602c16d2fbed5b5fc21ef4ad1f62baebdefbba5a929b982829d",
+        "ad36caaff2d99f6de1f6845bccc4ae5e5261abb8995206818a315b797ec49c37"
+      ]
+    },
+    "ood": {
+      "tasks": 8,
+      "task_ids": [
+        "ood-two_step_ood-000000",
+        "ood-two_step_ood-000001",
+        "ood-two_step_ood-000002",
+        "ood-two_step_ood-000003",
+        "ood-two_step_ood-000004",
+        "ood-two_step_ood-000005",
+        "ood-two_step_ood-000006",
+        "ood-two_step_ood-000007"
+      ],
+      "families": [
+        "two_step_ood"
+      ],
+      "prompt_template_fingerprints": [
+        "753d8e6e2fd898d7b586c54cc10ef7f312dd8c2967ab537dfc340c08b492489b"
+      ]
+    },
+    "test": {
+      "tasks": 8,
+      "task_ids": [
+        "test-addition-000000",
+        "test-addition-000003",
+        "test-addition-000006",
+        "test-multiplication-000002",
+        "test-multiplication-000005",
+        "test-subtraction-000001",
+        "test-subtraction-000004",
+        "test-subtraction-000007"
+      ],
+      "families": [
+        "addition",
+        "multiplication",
+        "subtraction"
+      ],
+      "prompt_template_fingerprints": [
+        "45f73f8a16f139298e199d12cd781c651ff7a6d23ac61430883b3c986941c17e",
+        "b19aae6c66b66323a201b5f2f06929a2a7e7c7e62def56224df498ed95f07d7b",
+        "ef8b8da0928c9c076f6b579e26970dcea833603298c0be2605ceaf4e6a53cbc3"
+      ]
+    },
+    "validation": {
+      "tasks": 8,
+      "task_ids": [
+        "validation-addition-000000",
+        "validation-addition-000003",
+        "validation-addition-000006",
+        "validation-multiplication-000002",
+        "validation-multiplication-000005",
+        "validation-subtraction-000001",
+        "validation-subtraction-000004",
+        "validation-subtraction-000007"
+      ],
+      "families": [
+        "addition",
+        "multiplication",
+        "subtraction"
+      ],
+      "prompt_template_fingerprints": [
+        "9dded8e862175ce869543a3b7a0f00c9d1d8dbcdc20e3b8efccf6663a1f7166b",
+        "e0b0d2c6b79d16456e87df15f52eb181e778f66e155b7a1263a9efb364a9c944",
+        "e4582ca4bf8e771018848770cab3ca8d2b24a69419a2c76b843624f55e44cc5f"
+      ]
+    }
+  },
+  "tasks_digest": "3cc80a8907232fd1ac621b14de6b1c68a5405e37818e9adbfbd3abfe6c3f6b3a",
+  "immutable_splits": [
+    "test",
+    "ood"
+  ],
+  "manifest_digest": "9a8ea1176039b5b4d1f73c44ac20a81fc160992e4a9ca429bf93452dbd5268b7"
+}

@@ -1,0 +1,69 @@
+{
+  "model": {
+    "id": "Qwen/Qwen2.5-0.5B-Instruct",
+    "revision": "7ae557604adf67be50417f59c2c2f167def9a775"
+  },
+  "model_digest": "3a67a2a9c98de221a964938960b12f7c",
+  "environment_digest": "8894947cdc90260790a02ebc54c5b509030a3a73403c4cbaa9260b793821d2e9",
+  "split_manifest": {
+    "splits": {
+      "experience": {
+        "tasks": 16,
+        "task_ids": [
+          "experience-addition-000000",
+          "experience-addition-000003",
+          "experience-addition-000006",
+          "experience-addition-000009",
+          "experience-addition-000012",
+          "experience-addition-000015",
+          "experience-multiplication-000002",
+          "experience-multiplication-000005",
+          "experience-multiplication-000008",
+          "experience-multiplication-000011",
+          "experience-multiplication-000014",
+          "experience-subtraction-000001",
+          "experience-subtraction-000004",
+          "experience-subtraction-000007",
+          "experience-subtraction-000010",
+          "experience-subtraction-000013"
+        ],
+        "families": [
+          "addition",
+          "multiplication",
+          "subtraction"
+        ],
+        "prompt_template_fingerprints": [
+          "08b208bc8b9d8eedb6c637e5892d67a046fb0aba5ce2a672400576cd7cd07122",
+          "0c18cb1946f0d602c16d2fbed5b5fc21ef4ad1f62baebdefbba5a929b982829d",
+          "ad36caaff2d99f6de1f6845bccc4ae5e5261abb8995206818a315b797ec49c37"
+        ]
+      }
+    },
+    "tasks_digest": "db0686021b5e0400fd7d92fafe325fe87a68521324ab5203bb359d61604d275d",
+    "immutable_splits": [
+      "test",
+      "ood"
+    ],
+    "manifest_digest": "1c5c37cf0e06e62570da5aa71d5a8d740ff2f2dc9c5dc3877d836b1c11572a45"
+  },
+  "collection": {
+    "records": 64,
+    "states": 16,
+    "tasks": 16,
+    "records_digest": "d6af8be27b35122474c36603dc22bc39b8255710b62930d82465b536075fba18",
+    "file_digest": "d775ae1efe4ac8022eecb0c9f085a3bb18de2cf3bb64ea894542287d209119e5"
+  },
+  "config": {
+    "model": "Qwen/Qwen2.5-0.5B-Instruct",
+    "revision": "7ae557604adf67be50417f59c2c2f167def9a775",
+    "tasks": "runs/voc-stage1-smoke-v2/tasks/experience.jsonl",
+    "split": "experience",
+    "output": "runs/voc-stage1-smoke-v2/experience.jsonl",
+    "max_depth": 0,
+    "max_states_per_task": 16,
+    "max_new_tokens": 24,
+    "device": "mps",
+    "fast_source_digest": false,
+    "normalized_compute_weight": 0.0
+  }
+}

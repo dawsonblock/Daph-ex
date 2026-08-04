@@ -1,0 +1,47 @@
+{
+  "status": "BLOCKED_BEFORE_VALUE_CONTROLLER",
+  "oracle_train": {
+    "states": 16,
+    "fixed_action_utility": {
+      "STOP": 0.0,
+      "THINK": 0.105,
+      "VERIFY": -0.04000000000000001,
+      "DECOMPOSE": -0.78
+    },
+    "best_fixed_action": "THINK",
+    "best_fixed_utility": 0.105,
+    "immediate_stop_utility": 0.0,
+    "oracle_utility": 0.1225,
+    "oracle_gain_over_fixed": 0.0175,
+    "oracle_gain_lcb": 0.015,
+    "oracle_action_frequency": {
+      "THINK": 2,
+      "STOP": 14
+    },
+    "conditional_value_exists": false,
+    "controller_training_allowed": false,
+    "threshold": 0.02
+  },
+  "hidden_probe": {
+    "auroc": null,
+    "auprc": null,
+    "brier": 0.40352967381477356,
+    "ece": 0.18474957607031683
+  },
+  "cheap_probe": {
+    "auroc": null,
+    "auprc": null,
+    "brier": 0.9989109039306641,
+    "ece": 0.7494549751281738
+  },
+  "probe_gate": {
+    "hidden_auroc": null,
+    "cheap_proxy_auroc": null,
+    "hidden_margin": null,
+    "minimum_hidden_auroc": 0.65,
+    "minimum_margin": 0.03,
+    "qualified": false,
+    "value_controller_training_allowed": false
+  },
+  "research_override": false
+}

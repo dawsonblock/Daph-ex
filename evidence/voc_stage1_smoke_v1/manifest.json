@@ -1,0 +1,114 @@
+{
+  "experiment": "standalone-marginal-utility-controller-stage1-smoke-v1",
+  "package_version": "3.3.0",
+  "implementation_commit": "54b60c47bd3de4718148f1f06f40619c7a4eae09",
+  "model": {
+    "id": "Qwen/Qwen2.5-0.5B-Instruct",
+    "revision": "7ae557604adf67be50417f59c2c2f167def9a775",
+    "full_state_dict_digest": "3a67a2a9c98de221a964938960b12f7c",
+    "frozen": true
+  },
+  "environment_digest": "8894947cdc90260790a02ebc54c5b509030a3a73403c4cbaa9260b793821d2e9",
+  "collection": {
+    "actions": ["STOP", "THINK", "VERIFY", "DECOMPOSE"],
+    "counterfactual_depth": 0,
+    "max_new_tokens": 24,
+    "seed": 20260803,
+    "experience_tasks": 16,
+    "validation_tasks": 8,
+    "test_tasks": 8,
+    "ood_tasks": 8,
+    "hidden_capture_depths_percent": [25, 50, 75, 100]
+  },
+  "utility": {
+    "correct": 1.0,
+    "incorrect": 0.0,
+    "action_cost": {
+      "STOP": 0.0,
+      "THINK": 0.02,
+      "VERIFY": 0.04,
+      "DECOMPOSE": 0.03
+    }
+  },
+  "oracle_results": {
+    "experience": {
+      "best_fixed_action": "THINK",
+      "best_fixed_utility": 0.105,
+      "oracle_utility": 0.1225,
+      "oracle_gain_over_fixed": 0.0175,
+      "oracle_gain_lcb95": 0.015,
+      "oracle_action_frequency": {"THINK": 2, "STOP": 14},
+      "qualified": false
+    },
+    "validation": {
+      "best_fixed_action": "STOP",
+      "best_fixed_utility": 0.0,
+      "oracle_utility": 0.0,
+      "oracle_gain_over_fixed": 0.0,
+      "oracle_gain_lcb95": 0.0,
+      "oracle_action_frequency": {"STOP": 8},
+      "qualified": false
+    },
+    "test": {
+      "best_fixed_action": "STOP",
+      "best_fixed_utility": 0.0,
+      "oracle_utility": 0.0,
+      "oracle_gain_over_fixed": 0.0,
+      "oracle_gain_lcb95": 0.0,
+      "oracle_action_frequency": {"STOP": 8},
+      "qualified": false
+    },
+    "ood": {
+      "best_fixed_action": "THINK",
+      "best_fixed_utility": 0.105,
+      "oracle_utility": 0.1225,
+      "oracle_gain_over_fixed": 0.0175,
+      "oracle_gain_lcb95": 0.0125,
+      "oracle_action_frequency": {"THINK": 1, "STOP": 7},
+      "qualified": false
+    }
+  },
+  "gates": {
+    "minimum_oracle_gain_over_fixed": 0.02,
+    "oracle_opportunity_passed": false,
+    "probe_gate_passed": false,
+    "controller_training_allowed": false,
+    "controller_status": "BLOCKED_BEFORE_VALUE_CONTROLLER",
+    "on_path_evaluation_allowed": false
+  },
+  "tests": {
+    "command": "python -m pytest -q",
+    "result": "139 passed in 4.78s"
+  },
+  "limitations": [
+    "This is a low-power engineering smoke, not a metareasoning hypothesis test.",
+    "The smoke branches only the initial state and uses small arithmetic families.",
+    "No controller was trained because the predeclared oracle opportunity gate failed.",
+    "The next allowed change is a better-powered experience study, not additional architecture."
+  ],
+  "files": {
+    "controller/controller_report.json": "c21fb4804956ceeb19e63a78a7f48828b8bfa80402870da44eec27f89bbe0d92",
+    "pytest_output.txt": "12a5e35221d47007263e46dd50e1fe9e5d49bf5aa664b0635b94eb6afc693f55",
+    "splits/experience.jsonl.gz": "467bc8688609de38288fc5e127f79011ec10645548c384614d8108b3e0214faa",
+    "splits/experience.manifest.json": "4bb14f215c393b34ccd930b460f42d308a68ce98140a2b51239a408aec303cfc",
+    "splits/experience.oracle.json": "ea4a7148098497598f503fd5e4de588e84f01115f44c3f4ddc87ca3f78effb0e",
+    "splits/experience.receipt.json": "bb8cb6dd0b545bdba8dbf1cf1d6e3692cbe4889f79988a002842a697dff29c2d",
+    "splits/validation.jsonl.gz": "b7c02db2ba384d73cca483907303f9685b097e077f36c629d4c4fa5b9b806a41",
+    "splits/validation.manifest.json": "a5d8cee4d755e93982588dd96c55034327be610b4c841d9d28cb5456729f3ac4",
+    "splits/validation.oracle.json": "9223a773ab55cad3ecd7d2dff1fea2805b78489ab3945fc2fb17a3cca3b7b45f",
+    "splits/validation.receipt.json": "a6ed296879f46779cc3925ae7ed429fd6e38779f34221d26f217bcde39650e40",
+    "splits/test.jsonl.gz": "14241d6c8a571edce5e6d821a4b2fac3fba722baf0766376e648d2367f863af1",
+    "splits/test.manifest.json": "0ad49c5ea89f46888cbe0412b553ee92c85fc3ae3a4ef3d85e38bc0894036645",
+    "splits/test.oracle.json": "3aea8df0857f42eb4f5c15bc56fb7810f79de61ab526c706441ef215d087d6f4",
+    "splits/test.receipt.json": "c1a8fe3fd93804cf517774a2e939d48ca88536e101457cce1ebc038b7e1c05da",
+    "splits/ood.jsonl.gz": "b0ca40343d29963221f87b1670cf937369bd739615ddda4a1c1a297a50f9c8cc",
+    "splits/ood.manifest.json": "d79ed8cc9cef9247ca557c403d3fec5808996a8726b30f82ec72c62f2bc31268",
+    "splits/ood.oracle.json": "33c375abd92fee46ff443bdf9eb375007dc6123da0b7f1fd1e8596b574ab36d7",
+    "splits/ood.receipt.json": "b3d42f80c38f7a7a299eb0b6db4884608e12533e3c5bc2e741d678dae9345a85",
+    "tasks/experience.jsonl": "bf81013c2f6a9f68314d39842c19d08372727087de3915d8fd014f45ba638c16",
+    "tasks/validation.jsonl": "1d9af1e329bfe457aa1d5d3a7b4045facddffe78ef16894421039aea9aa902f5",
+    "tasks/test.jsonl": "a22fafc24161dab642801be6bbb7708face55c1defe4d19f93f622a8a8619cd2",
+    "tasks/ood.jsonl": "a3dc1559deb9d2367fe2fa7eef7b2ac95b7f25a48ae1f8bee015b5bb7be6b17d",
+    "tasks/split_manifest.json": "f04d569d3cff5abd86b40dc2e02407155916177ac2a2a6f437364ed993554587"
+  }
+}

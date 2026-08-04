@@ -118,3 +118,5 @@ The experience oracle used THINK for two states and STOP for 14. Validation and 
 This is not a negative result about learned metareasoning: the smoke is far too small and the action prompts are primitive. It is a successful negative test of the research protocol. The system did not manufacture a router result when the sampled action space lacked enough conditional value.
 
 The next allowed experiment is a better-powered experience generation—not added architecture. It should broaden verified task difficulty and include more genuine correct-to-wrong and wrong-to-correct continuations. If two or three properly powered generations still fail the oracle, hidden-signal, or on-path policy gates, the program stop rule applies.
+
+Compressed raw state/action records, tasks, split manifests, execution receipts, oracle reports, the blocked training receipt, and SHA-256 hashes are bundled under [`evidence/voc_stage1_smoke_v1`](../evidence/voc_stage1_smoke_v1/manifest.json).

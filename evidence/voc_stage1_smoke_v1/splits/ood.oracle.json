@@ -1,0 +1,387 @@
+{
+  "oracle": {
+    "states": 8,
+    "fixed_action_utility": {
+      "STOP": 0.0,
+      "THINK": 0.105,
+      "VERIFY": -0.04,
+      "DECOMPOSE": -0.03
+    },
+    "best_fixed_action": "THINK",
+    "best_fixed_utility": 0.105,
+    "immediate_stop_utility": 0.0,
+    "oracle_utility": 0.1225,
+    "oracle_gain_over_fixed": 0.0175,
+    "oracle_gain_lcb": 0.0125,
+    "oracle_action_frequency": {
+      "STOP": 7,
+      "THINK": 1
+    },
+    "conditional_value_exists": false,
+    "controller_training_allowed": false,
+    "threshold": 0.02
+  },
+  "baselines": {
+    "fixed_stop": {
+      "states": 8,
+      "mean_utility": 0.0,
+      "mean_regret": 0.1225,
+      "stop_precision": 0.875,
+      "stop_recall": 1.0,
+      "harmful_continuation_rate": 0.0,
+      "waste_rate": 0.0
+    },
+    "fixed_think": {
+      "states": 8,
+      "mean_utility": 0.105,
+      "mean_regret": 0.0175,
+      "stop_precision": 0.0,
+      "stop_recall": 0.0,
+      "harmful_continuation_rate": 0.0,
+      "waste_rate": 0.875
+    },
+    "fixed_verify": {
+      "states": 8,
+      "mean_utility": -0.04,
+      "mean_regret": 0.1625,
+      "stop_precision": 0.0,
+      "stop_recall": 0.0,
+      "harmful_continuation_rate": 0.0,
+      "waste_rate": 1.0
+    },
+    "fixed_decompose": {
+      "states": 8,
+      "mean_utility": -0.03,
+      "mean_regret": 0.1525,
+      "stop_precision": 0.0,
+      "stop_recall": 0.0,
+      "harmful_continuation_rate": 0.0,
+      "waste_rate": 1.0
+    },
+    "confidence_0.25_think": {
+      "states": 8,
+      "mean_utility": 0.0,
+      "mean_regret": 0.1225,
+      "stop_precision": 0.875,
+      "stop_recall": 1.0,
+      "harmful_continuation_rate": 0.0,
+      "waste_rate": 0.0
+    },
+    "confidence_0.5_think": {
+      "states": 8,
+      "mean_utility": -0.0025,
+      "mean_regret": 0.125,
+      "stop_precision": 0.8571428571428571,
+      "stop_recall": 0.8571428571428571,
+      "harmful_continuation_rate": 0.0,
+      "waste_rate": 0.125
+    },
+    "confidence_0.75_think": {
+      "states": 8,
+      "mean_utility": 0.105,
+      "mean_regret": 0.0175,
+      "stop_precision": 0.0,
+      "stop_recall": 0.0,
+      "harmful_continuation_rate": 0.0,
+      "waste_rate": 0.875
+    },
+    "confidence_0.9_think": {
+      "states": 8,
+      "mean_utility": 0.105,
+      "mean_regret": 0.0175,
+      "stop_precision": 0.0,
+      "stop_recall": 0.0,
+      "harmful_continuation_rate": 0.0,
+      "waste_rate": 0.875
+    },
+    "entropy_0.5_think": {
+      "states": 8,
+      "mean_utility": 0.105,
+      "mean_regret": 0.0175,
+      "stop_precision": 0.0,
+      "stop_recall": 0.0,
+      "harmful_continuation_rate": 0.0,
+      "waste_rate": 0.875
+    },
+    "entropy_1.0_think": {
+      "states": 8,
+      "mean_utility": -0.0125,
+      "mean_regret": 0.135,
+      "stop_precision": 0.6666666666666666,
+      "stop_recall": 0.2857142857142857,
+      "harmful_continuation_rate": 0.0,
+      "waste_rate": 0.625
+    },
+    "entropy_2.0_think": {
+      "states": 8,
+      "mean_utility": 0.0,
+      "mean_regret": 0.1225,
+      "stop_precision": 0.875,
+      "stop_recall": 1.0,
+      "harmful_continuation_rate": 0.0,
+      "waste_rate": 0.0
+    },
+    "entropy_4.0_think": {
+      "states": 8,
+      "mean_utility": 0.0,
+      "mean_regret": 0.1225,
+      "stop_precision": 0.875,
+      "stop_recall": 1.0,
+      "harmful_continuation_rate": 0.0,
+      "waste_rate": 0.0
+    },
+    "length_20_think": {
+      "states": 8,
+      "mean_utility": 0.105,
+      "mean_regret": 0.0175,
+      "stop_precision": 0.0,
+      "stop_recall": 0.0,
+      "harmful_continuation_rate": 0.0,
+      "waste_rate": 0.875
+    },
+    "length_40_think": {
+      "states": 8,
+      "mean_utility": 0.0,
+      "mean_regret": 0.1225,
+      "stop_precision": 0.875,
+      "stop_recall": 1.0,
+      "harmful_continuation_rate": 0.0,
+      "waste_rate": 0.0
+    },
+    "length_80_think": {
+      "states": 8,
+      "mean_utility": 0.0,
+      "mean_regret": 0.1225,
+      "stop_precision": 0.875,
+      "stop_recall": 1.0,
+      "harmful_continuation_rate": 0.0,
+      "waste_rate": 0.0
+    },
+    "length_160_think": {
+      "states": 8,
+      "mean_utility": 0.0,
+      "mean_regret": 0.1225,
+      "stop_precision": 0.875,
+      "stop_recall": 1.0,
+      "harmful_continuation_rate": 0.0,
+      "waste_rate": 0.0
+    },
+    "confidence_0.25_verify": {
+      "states": 8,
+      "mean_utility": 0.0,
+      "mean_regret": 0.1225,
+      "stop_precision": 0.875,
+      "stop_recall": 1.0,
+      "harmful_continuation_rate": 0.0,
+      "waste_rate": 0.0
+    },
+    "confidence_0.5_verify": {
+      "states": 8,
+      "mean_utility": -0.005,
+      "mean_regret": 0.1275,
+      "stop_precision": 0.8571428571428571,
+      "stop_recall": 0.8571428571428571,
+      "harmful_continuation_rate": 0.0,
+      "waste_rate": 0.125
+    },
+    "confidence_0.75_verify": {
+      "states": 8,
+      "mean_utility": -0.04,
+      "mean_regret": 0.1625,
+      "stop_precision": 0.0,
+      "stop_recall": 0.0,
+      "harmful_continuation_rate": 0.0,
+      "waste_rate": 1.0
+    },
+    "confidence_0.9_verify": {
+      "states": 8,
+      "mean_utility": -0.04,
+      "mean_regret": 0.1625,
+      "stop_precision": 0.0,
+      "stop_recall": 0.0,
+      "harmful_continuation_rate": 0.0,
+      "waste_rate": 1.0
+    },
+    "entropy_0.5_verify": {
+      "states": 8,
+      "mean_utility": -0.04,
+      "mean_regret": 0.1625,
+      "stop_precision": 0.0,
+      "stop_recall": 0.0,
+      "harmful_continuation_rate": 0.0,
+      "waste_rate": 1.0
+    },
+    "entropy_1.0_verify": {
+      "states": 8,
+      "mean_utility": -0.025,
+      "mean_regret": 0.1475,
+      "stop_precision": 0.6666666666666666,
+      "stop_recall": 0.2857142857142857,
+      "harmful_continuation_rate": 0.0,
+      "waste_rate": 0.625
+    },
+    "entropy_2.0_verify": {
+      "states": 8,
+      "mean_utility": 0.0,
+      "mean_regret": 0.1225,
+      "stop_precision": 0.875,
+      "stop_recall": 1.0,
+      "harmful_continuation_rate": 0.0,
+      "waste_rate": 0.0
+    },
+    "entropy_4.0_verify": {
+      "states": 8,
+      "mean_utility": 0.0,
+      "mean_regret": 0.1225,
+      "stop_precision": 0.875,
+      "stop_recall": 1.0,
+      "harmful_continuation_rate": 0.0,
+      "waste_rate": 0.0
+    },
+    "length_20_verify": {
+      "states": 8,
+      "mean_utility": -0.04,
+      "mean_regret": 0.1625,
+      "stop_precision": 0.0,
+      "stop_recall": 0.0,
+      "harmful_continuation_rate": 0.0,
+      "waste_rate": 1.0
+    },
+    "length_40_verify": {
+      "states": 8,
+      "mean_utility": 0.0,
+      "mean_regret": 0.1225,
+      "stop_precision": 0.875,
+      "stop_recall": 1.0,
+      "harmful_continuation_rate": 0.0,
+      "waste_rate": 0.0
+    },
+    "length_80_verify": {
+      "states": 8,
+      "mean_utility": 0.0,
+      "mean_regret": 0.1225,
+      "stop_precision": 0.875,
+      "stop_recall": 1.0,
+      "harmful_continuation_rate": 0.0,
+      "waste_rate": 0.0
+    },
+    "length_160_verify": {
+      "states": 8,
+      "mean_utility": 0.0,
+      "mean_regret": 0.1225,
+      "stop_precision": 0.875,
+      "stop_recall": 1.0,
+      "harmful_continuation_rate": 0.0,
+      "waste_rate": 0.0
+    },
+    "confidence_0.25_decompose": {
+      "states": 8,
+      "mean_utility": 0.0,
+      "mean_regret": 0.1225,
+      "stop_precision": 0.875,
+      "stop_recall": 1.0,
+      "harmful_continuation_rate": 0.0,
+      "waste_rate": 0.0
+    },
+    "confidence_0.5_decompose": {
+      "states": 8,
+      "mean_utility": -0.00375,
+      "mean_regret": 0.12625,
+      "stop_precision": 0.8571428571428571,
+      "stop_recall": 0.8571428571428571,
+      "harmful_continuation_rate": 0.0,
+      "waste_rate": 0.125
+    },
+    "confidence_0.75_decompose": {
+      "states": 8,
+      "mean_utility": -0.03,
+      "mean_regret": 0.1525,
+      "stop_precision": 0.0,
+      "stop_recall": 0.0,
+      "harmful_continuation_rate": 0.0,
+      "waste_rate": 1.0
+    },
+    "confidence_0.9_decompose": {
+      "states": 8,
+      "mean_utility": -0.03,
+      "mean_regret": 0.1525,
+      "stop_precision": 0.0,
+      "stop_recall": 0.0,
+      "harmful_continuation_rate": 0.0,
+      "waste_rate": 1.0
+    },
+    "entropy_0.5_decompose": {
+      "states": 8,
+      "mean_utility": -0.03,
+      "mean_regret": 0.1525,
+      "stop_precision": 0.0,
+      "stop_recall": 0.0,
+      "harmful_continuation_rate": 0.0,
+      "waste_rate": 1.0
+    },
+    "entropy_1.0_decompose": {
+      "states": 8,
+      "mean_utility": -0.01875,
+      "mean_regret": 0.14125,
+      "stop_precision": 0.6666666666666666,
+      "stop_recall": 0.2857142857142857,
+      "harmful_continuation_rate": 0.0,
+      "waste_rate": 0.625
+    },
+    "entropy_2.0_decompose": {
+      "states": 8,
+      "mean_utility": 0.0,
+      "mean_regret": 0.1225,
+      "stop_precision": 0.875,
+      "stop_recall": 1.0,
+      "harmful_continuation_rate": 0.0,
+      "waste_rate": 0.0
+    },
+    "entropy_4.0_decompose": {
+      "states": 8,
+      "mean_utility": 0.0,
+      "mean_regret": 0.1225,
+      "stop_precision": 0.875,
+      "stop_recall": 1.0,
+      "harmful_continuation_rate": 0.0,
+      "waste_rate": 0.0
+    },
+    "length_20_decompose": {
+      "states": 8,
+      "mean_utility": -0.03,
+      "mean_regret": 0.1525,
+      "stop_precision": 0.0,
+      "stop_recall": 0.0,
+      "harmful_continuation_rate": 0.0,
+      "waste_rate": 1.0
+    },
+    "length_40_decompose": {
+      "states": 8,
+      "mean_utility": 0.0,
+      "mean_regret": 0.1225,
+      "stop_precision": 0.875,
+      "stop_recall": 1.0,
+      "harmful_continuation_rate": 0.0,
+      "waste_rate": 0.0
+    },
+    "length_80_decompose": {
+      "states": 8,
+      "mean_utility": 0.0,
+      "mean_regret": 0.1225,
+      "stop_precision": 0.875,
+      "stop_recall": 1.0,
+      "harmful_continuation_rate": 0.0,
+      "waste_rate": 0.0
+    },
+    "length_160_decompose": {
+      "states": 8,
+      "mean_utility": 0.0,
+      "mean_regret": 0.1225,
+      "stop_precision": 0.875,
+      "stop_recall": 1.0,
+      "harmful_continuation_rate": 0.0,
+      "waste_rate": 0.0
+    }
+  },
+  "controller_training_allowed": false
+}
