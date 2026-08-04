@@ -103,6 +103,8 @@ See [`docs/QUALITY_CORRECTION_REPORT.md`](docs/QUALITY_CORRECTION_REPORT.md) for
 
 The subsequent frozen-E2 hard-case ablation found a teacher-forced E3 CE dose response but no verified E2→E3 rescues on its held-out arithmetic tasks, so E3 remains unqualified. See [`docs/E3_HARDCASE_ABLATION_REPORT.md`](docs/E3_HARDCASE_ABLATION_REPORT.md).
 
+A corrected checkpoint-specific sparse profile then selected layers 12–14. In a small matched-budget smoke comparison, refinement at the profiled middle layer produced a `0.02070` held-out CE gain versus `0.00543` at the final layer (approximately `3.81×` larger at equal compute), but both variants still produced zero exact-answer rescues. See [`docs/E3_PROFILED_MIDDLE_SMOKE_REPORT.md`](docs/E3_PROFILED_MIDDLE_SMOKE_REPORT.md).
+
 ## Status
 
-The canonical Qwen path and legacy hybrid path coexist. Engineering acceptance is covered by 116 tests. No new real-model profile or statistically positive E3 result is bundled, so the middle-layer hypothesis and policy remain scientifically unqualified.
+The canonical Qwen path and legacy hybrid path coexist. Engineering acceptance is covered by 122 tests. A real but low-budget sparse profile and matched location smoke result are bundled. The middle-layer mechanism signal is encouraging, but E3 task utility and the policy remain scientifically unqualified.

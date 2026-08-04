@@ -1,0 +1,30 @@
+{
+  "hf_model": "Qwen/Qwen2.5-0.5B",
+  "hf_revision": "060db6499f32faf8b98477b0a26969ef7d8b9987",
+  "phase": "both",
+  "seq_len": 32,
+  "max_batches": 1,
+  "thresholds": {
+    "phase0a_rel_ce": 0.01,
+    "phase0b_delta_ppl_strong": 0.15,
+    "phase0b_delta_ppl_weak": 0.4
+  },
+  "source_config": {
+    "hidden_size": 896,
+    "num_hidden_layers": 24,
+    "num_attention_heads": 14,
+    "num_key_value_heads": 2,
+    "intermediate_size": 4864,
+    "vocab_size": 151936,
+    "rope_theta": null,
+    "rms_norm_eps": 1e-06
+  },
+  "tokenizer_pad_token_id": 151643,
+  "environment": {
+    "python": "3.12.0",
+    "platform": "macOS-26.2-arm64-arm-64bit",
+    "torch": "2.10.0",
+    "cuda_available": false,
+    "transformers": "5.13.0"
+  }
+}

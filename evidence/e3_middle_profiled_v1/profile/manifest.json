@@ -1,0 +1,23 @@
+{
+  "model_digest": "cd3379f85f0d78a13e22c84f96a73112",
+  "config_digest": "3c754b74fa289e4545599397734fcbb7f07b0bc760d9a9ac85dfd4038756d273",
+  "profile_digest": "62edb20bf45e4919964df218bf9d917b2ed6ed596237707fbd9bb54da137a232",
+  "profile_status": "PARTIAL_PROFILE",
+  "config": {
+    "profile_mode": "sparse",
+    "training_steps": 2,
+    "seed": 20260803,
+    "epsilon": 1e-08,
+    "explicit_layers": null,
+    "best_contiguous_width": 3,
+    "objective": {
+      "kind": "supervised_ce",
+      "name": "causal_lm_ce",
+      "verified_reward": false,
+      "external_callback_name": null
+    },
+    "validation_metric": "negative_causal_ce",
+    "model_source_revision": null,
+    "tokenizer_revision": null
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "path": null,
+  "tokenizer": "Qwen/Qwen2.5-0.5B",
+  "revision": "060db6499f32faf8b98477b0a26969ef7d8b9987",
+  "type": "synthetic_vocab_tokens",
+  "n_tokens_scored": 62,
+  "seq_len": 32,
+  "max_batches": 1
+}

@@ -1,0 +1,39 @@
+{
+  "experiment": "profiled-middle-vs-final-e3-smoke",
+  "harness_commit": "51d9e2ae5fd5f894da679dcd114f5f528d032afe",
+  "model": {
+    "id": "Qwen/Qwen2.5-0.5B",
+    "revision": "060db6499f32faf8b98477b0a26969ef7d8b9987"
+  },
+  "profile": {
+    "status": "PARTIAL_PROFILE",
+    "digest": "62edb20bf45e4919964df218bf9d917b2ed6ed596237707fbd9bb54da137a232",
+    "sampled_layers": 11,
+    "selected_region": [12, 13, 14],
+    "insertion_layer": 13,
+    "middle_concentration_observed": true
+  },
+  "comparison": {
+    "selected_steps": 4,
+    "heldout_tasks": 8,
+    "profiled_middle_ce_delta": -0.020704060792922974,
+    "final_control_ce_delta": -0.005430996417999268,
+    "middle_to_final_gain_ratio": 3.8122029917578497,
+    "matched_compute_overhead": 0.03574759252947368,
+    "middle_rescues": 0,
+    "middle_regressions": 0,
+    "qualified": false
+  },
+  "sha256": {
+    "phase0_gate0b": "bd7e1149cab2424d82ac5e34148d23666dfde63b604023a70ab4dbdf138fc085",
+    "profile_manifest": "0cd64b53bd1b666ab597df805b97a36f7338b778a0dc7b437ceb5432eef8d39b",
+    "profile_results": "10f3801302e3be02ce5afaa737aa761ab32f7c56868fcfde71ad0c092e066ce5",
+    "profiled_middle_report": "d33ce1516ca8d71f7419b4ef17914b4e256fdde0bb774f448b2ccafdc6c6420f",
+    "final_control_report": "830b355120921960a9393a132ed8f09a3f9d1d83bb88d51d83a032b4e342b0e9",
+    "train_tasks": "04f9830e5965077a13af347b266aef47f1f2a94887f7c6f1a573a02f738f487d",
+    "selection_tasks": "a0bf811aac5cfdad3e610dcc31d98f436a96d9761746586889dff7d2f4ff2091",
+    "test_tasks": "9571eaef00408eb81d68f4e11414413eaa998e7b1ca9b557dcf5c962b49f1ad7"
+  },
+  "checkpoint_included": false,
+  "qualification": "NOT_QUALIFIED"
+}

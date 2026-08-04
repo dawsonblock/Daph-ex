@@ -1,0 +1,57 @@
+{
+  "source_mode": "hf",
+  "hf_model": "Qwen/Qwen2.5-0.5B",
+  "hf_revision": "060db6499f32faf8b98477b0a26969ef7d8b9987",
+  "loss_source": 14.559812484248992,
+  "PPL_source": 2104971.4967045155,
+  "n_tokens": 62,
+  "phase0a": {
+    "loss_compat": 14.559814453125,
+    "PPL_compat": 2104975.6411364726,
+    "rel_ce": 1.3522674211204106e-07,
+    "delta_ppl": 1.968877946106213e-06,
+    "exact_coverage_percent": 100.0,
+    "matched_keys": 291,
+    "skipped_keys": 0,
+    "source_coverage": {
+      "source_tensors_total": 291,
+      "source_tensors_mapped": 291,
+      "source_param_coverage_percent": 100.0,
+      "unmapped_source_key_count": 0,
+      "unmapped_critical_keys": [],
+      "unmapped_critical_count": 0,
+      "unmapped_source_keys_preview": []
+    },
+    "logit_parity": {
+      "logit_mae": 5.6399267123197205e-06,
+      "logit_max_abs": 7.259845733642578e-05,
+      "logit_cosine": 1.0000030994415283,
+      "top1_agreement": 1.0,
+      "kl_source_compat": 1.5068128078610243e-08,
+      "n_valid_positions": 64
+    },
+    "unmapped_critical_count": 0,
+    "decision": "PASS_EXACT",
+    "threshold_rel_ce": 0.01
+  },
+  "phase0b": {
+    "loss_exfusion_e2": 14.559814453125,
+    "PPL_exfusion_e2": 2104975.6411364726,
+    "delta_ppl_vs_base": 0.0,
+    "base": "compat",
+    "parity_metrics": {
+      "ce_compat": 14.559814453125,
+      "ce_exfusion": 14.559814453125,
+      "ce_difference": 0.0,
+      "logit_mae": 0.0,
+      "logit_max_abs": 0.0,
+      "cosine_similarity": 1.0000030994415283,
+      "top1_agreement": 1.0,
+      "kl_divergence": -9.849142834639224e-09,
+      "source_backbone_parameter_identity": true,
+      "passed": true,
+      "decision": "PASS_EXACT"
+    },
+    "decision": "PASS_EXACT"
+  }
+}

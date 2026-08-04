@@ -1,0 +1,8 @@
+{"difficulty_bucket": "hard", "expected": "94733", "prompt": "Calculate exactly: (347 * 247) + (94 * 96). Answer with only the integer: ", "task_family": "synthetic_composed_arithmetic_v1", "task_id": "selection-0000"}
+{"difficulty_bucket": "hard", "expected": "331204", "prompt": "Calculate exactly: (688 * 481) + (12 * 23). Answer with only the integer: ", "task_family": "synthetic_composed_arithmetic_v1", "task_id": "selection-0001"}
+{"difficulty_bucket": "hard", "expected": "90812", "prompt": "Calculate exactly: (204 * 442) + (28 * 23). Answer with only the integer: ", "task_family": "synthetic_composed_arithmetic_v1", "task_id": "selection-0002"}
+{"difficulty_bucket": "hard", "expected": "156999", "prompt": "Calculate exactly: (196 * 792) + (93 * 19). Answer with only the integer: ", "task_family": "synthetic_composed_arithmetic_v1", "task_id": "selection-0003"}
+{"difficulty_bucket": "hard", "expected": "568682", "prompt": "Calculate exactly: (681 * 828) + (83 * 58). Answer with only the integer: ", "task_family": "synthetic_composed_arithmetic_v1", "task_id": "selection-0004"}
+{"difficulty_bucket": "hard", "expected": "52858", "prompt": "Calculate exactly: (346 * 152) + (14 * 19). Answer with only the integer: ", "task_family": "synthetic_composed_arithmetic_v1", "task_id": "selection-0005"}
+{"difficulty_bucket": "hard", "expected": "301680", "prompt": "Calculate exactly: (506 * 595) + (10 * 61). Answer with only the integer: ", "task_family": "synthetic_composed_arithmetic_v1", "task_id": "selection-0006"}
+{"difficulty_bucket": "hard", "expected": "617415", "prompt": "Calculate exactly: (907 * 679) + (22 * 71). Answer with only the integer: ", "task_family": "synthetic_composed_arithmetic_v1", "task_id": "selection-0007"}
