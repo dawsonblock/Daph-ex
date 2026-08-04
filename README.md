@@ -1,4 +1,4 @@
-# DAPH / ExFusion v3.4.1
+# DAPH / ExFusion v3.5.0
 
 Pretrained-compatible adaptive computation with a physically ordered four-level effort hierarchy.
 
@@ -117,6 +117,21 @@ The answer-only follow-up calibrated every split to 50% E2 accuracy and compared
 
 The v3.4.1 real qualification preflight evaluated 3,100 E2 calibration candidates and stopped before E3 training: only three families could supply the required mixed-success capacity, below the predeclared minimum of five. This is a negative data-readiness result, not an E3 result. See [`docs/REAL_QUALIFICATION_PREFLIGHT_V341.md`](docs/REAL_QUALIFICATION_PREFLIGHT_V341.md).
 
+## HRM external-memory research path
+
+`hrm_memory` is a new standalone path around the native, revision-pinned
+`sapientinc/HRM-Text-1B` checkpoint. It implements the untouched PrefixLM
+baseline adapter, append-only provenance memory, structural chunking, hybrid
+dense/BM25 retrieval, Reciprocal Rank Fusion, reranking interfaces, retrieval
+metrics, redundancy-aware evidence packing, the mandatory oracle-context gate,
+cycle tracing, and isolated counterfactual action utilities. Adaptive execution
+fails closed until a controller is marked `VERIFIED_FIT`.
+
+The current code is an engineering foundation, not evidence that HRM benefits
+from RAG or extra recurrence. See
+[`docs/HRM_EXTERNAL_MEMORY_ADAPTIVE_COMPUTE.md`](docs/HRM_EXTERNAL_MEMORY_ADAPTIVE_COMPUTE.md)
+for the staged protocol and commands.
+
 ## Status
 
-The canonical Qwen path, legacy hybrid path, and standalone marginal-utility research package coexist. Engineering acceptance is covered by 169 tests. Experiment tiers, unique-task counts, seed replication, natural-test promotion, and stable-profile promotion are enforced in executable paths. A real but low-budget sparse profile, matched answer-only location study, and negative controller oracle smoke are bundled. Neither E3 task utility nor a learned controller is scientifically qualified.
+The canonical Qwen path, legacy hybrid path, standalone marginal-utility package, and HRM external-memory research foundation coexist. Experiment tiers, unique-task counts, seed replication, natural-test promotion, and stable-profile promotion remain enforced. Neither E3 task utility, HRM external-memory gains, nor a learned controller is scientifically qualified.

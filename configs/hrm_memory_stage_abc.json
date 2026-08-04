@@ -1,0 +1,39 @@
+{
+  "protocol_version": "hrm-memory-0.1",
+  "model": {
+    "id": "sapientinc/HRM-Text-1B",
+    "revision": "9f082d68b8cd0ebc56e33f1c88c45609174c272c",
+    "architecture": "HrmTextForCausalLM",
+    "transformers_minimum": "5.9.0",
+    "condition_nlp": "direct",
+    "condition_reasoning": "synth,cot",
+    "prefix_lm_token_type_ids_required": true
+  },
+  "context_budget": {
+    "total": 4096,
+    "task": 500,
+    "evidence": 2200,
+    "state": 400,
+    "generation": 996
+  },
+  "retrieval": {
+    "dense_top_k": 30,
+    "lexical_top_k": 30,
+    "rrf_k": 60,
+    "reranked_top_k": 10,
+    "required_metrics": ["recall_at_5", "recall_at_10", "recall_at_20", "mrr", "ndcg", "oracle_evidence_recall"]
+  },
+  "oracle_context_gate": {
+    "conditions": ["B0_NO_CONTEXT", "B1_RANDOM_CONTEXT", "B2_NAIVE_RETRIEVAL", "B3_ORACLE_EVIDENCE"],
+    "minimum_oracle_quality_gain": 0.05,
+    "minimum_paired_tasks": 100,
+    "controller_training_allowed": false
+  },
+  "recurrence_ablation": ["H1L3", "H2L3", "H3L3", "H4L3"],
+  "policy_gate": {
+    "requires_oracle_context_pass": true,
+    "requires_iterative_rag_gain": true,
+    "requires_counterfactual_oracle_gap": true,
+    "requires_sham_control_win": true
+  }
+}

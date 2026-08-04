@@ -1,5 +1,16 @@
 # Changelog
 
+## 3.5.0 — HRM external memory + adaptive compute foundation
+
+- Add a revision-pinned native HRM-Text-1B adapter with correct PrefixLM masking.
+- Add append-only source, semantic, and episodic memory with provenance and lineage.
+- Add structural chunking, BM25+dense RRF retrieval, reranking interfaces, and evidence metrics.
+- Add redundancy-aware 4096-token evidence packing and the mandatory oracle-context gate.
+- Add recurrent H/L state tracing, recurrence ablation declarations, isolated counterfactual execution, and a fail-closed utility controller.
+- Add executable Stage A/B/C commands, immutable configuration, protocol documentation, and tests.
+
+This release establishes the experimental substrate. It does not claim HRM memory, retrieval, recurrence, or controller gains.
+
 ## 3.4.1 — qualification-tier enforcement
 
 - Bound `SMOKE`, `PILOT`, `QUALIFICATION`, and `FINAL` sample/group/seed minimums to the executable E3 qualification paths; a two-task result can no longer promote an arm.
