@@ -34,7 +34,7 @@ Generator-scale difficulty is stored as `GENERATOR_EASY`, `GENERATOR_MEDIUM`, or
 
 ## Profile enforcement
 
-Single-seed profiling writes a non-promotable validation record. `scripts/analyze_profile_stability.py` combines independent profile runs, validates the declared profile tier, and measures shared-layer Spearman correlation, top-k overlap, and region stability. Shared-layer ranks are computed only on the intersection evaluated by every seed.
+Single-seed profiling writes a non-promotable validation record. `scripts/analyze_profile_stability.py` combines independent profile runs, validates the declared profile tier, measures shared-layer Spearman correlation, top-k overlap, and region stability, and emits an `AGGREGATED_PROFILE` whose placement is selected from the mean contribution across seeds. Shared-layer ranks are computed only on the intersection evaluated by every seed.
 
 ## Scientific status
 

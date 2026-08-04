@@ -1,0 +1,55 @@
+{
+  "artifact_type": "E3_QUALIFICATION_PREFLIGHT",
+  "claim_strength": "ENGINEERING_PASS",
+  "qualification_status": "NOT_RUN_CALIBRATION_CAPACITY_FAILED",
+  "created_at": "2026-08-04T08:39:49Z",
+  "artifact_commit": "bb7ee432c62ad0c8039a78377c4234a23991901d",
+  "source_tree_digest": "04a12fe5c73395ab4e6bdf73f6817360a555c1fe",
+  "repository_version": "3.4.1",
+  "test_count_at_creation": 168,
+  "config_digest_sha256": "bf0ea3da12d1ab875c4a10ecf2a6dd09edc3e346724b3beb855d6f46b2231837",
+  "model": {
+    "id": "Qwen/Qwen2.5-0.5B",
+    "revision": "060db6499f32faf8b98477b0a26969ef7d8b9987"
+  },
+  "datasets": {
+    "calibration_candidates": {
+      "tasks": 3100,
+      "sha256": "dd7cb703346ca8da4eab0ef991aaf36b702f275ae55743b8531649e43dc6e33f"
+    },
+    "natural_heldout": {
+      "tasks": 500,
+      "sha256": "b1f67a7673884f34fb945387043dc9b9747171c724049d8d49dac446730e61aa",
+      "e2_outcomes_inspected_for_selection": false,
+      "e3_outcomes_inspected_for_selection": false
+    },
+    "e2_outcomes": {
+      "tasks": 3100,
+      "uncompressed_sha256": "83509a694b4d58373c5e8b92e90e7aadf4dd731fb840a75e0bf48cc5339df049",
+      "compressed_file": "e2_outcomes.jsonl.gz",
+      "compressed_sha256": "ff8bf915fa3cf9db9470b9b012fa0acd29a5623f4d8b72a3a6c20aed4234e2c9"
+    }
+  },
+  "e2_capacity_by_family": {
+    "addition_with_carry": {"tasks": 346, "successes": 314, "failures": 32},
+    "code_output": {"tasks": 342, "successes": 7, "failures": 335},
+    "integer_comparison": {"tasks": 336, "successes": 185, "failures": 151},
+    "modular_arithmetic": {"tasks": 351, "successes": 213, "failures": 138},
+    "multi_step_arithmetic": {"tasks": 341, "successes": 4, "failures": 337},
+    "multiplication": {"tasks": 352, "successes": 331, "failures": 21},
+    "pattern_continuation": {"tasks": 343, "successes": 224, "failures": 119},
+    "subtraction": {"tasks": 348, "successes": 326, "failures": 22},
+    "symbolic_substitution": {"tasks": 341, "successes": 27, "failures": 314}
+  },
+  "predeclared_requirement": {
+    "minimum_calibrated_families": 5,
+    "split_counts": [500, 200, 500],
+    "target_e2_accuracy": 0.5
+  },
+  "decision": {
+    "passed": false,
+    "reason": "NO_FIVE_FAMILY_SUBSET_CAN_SUPPLY_PREDECLARED_MIXED_E2_COUNTS",
+    "e3_training_started": false,
+    "router_training_allowed": false
+  }
+}

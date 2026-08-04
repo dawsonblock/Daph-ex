@@ -29,6 +29,7 @@ from daph.verified_tasks import (
     generate_verified_tasks,
     natural_heldout_split,
 )
+from scripts.run_e3_hardcase_ablation import _load_profile_selection
 
 
 def pair(
@@ -280,6 +281,21 @@ def test_profiled_placement_cannot_promote_without_passing_profile_tier():
         experiment_scale_passed=True, natural_test_passed=True,
     )
     assert not report["promoted"]
+
+
+def test_aggregated_profile_is_accepted_only_with_bound_promotion_evidence(tmp_path):
+    (tmp_path / "manifest.json").write_text(json.dumps({
+        "profile_status": "AGGREGATED_PROFILE", "profile_digest": "aggregate-digest",
+    }))
+    (tmp_path / "rankings.json").write_text(json.dumps({"best_contiguous_region": [11, 12, 13]}))
+    (tmp_path / "profile_tier_validation.json").write_text(json.dumps({
+        "tier": "PROFILE_PILOT", "passed": True, "promotion_passed": True,
+        "profile_stability": {"stable_for_promotion": True},
+    }))
+    layers, digest, status, tier = _load_profile_selection(tmp_path)
+    assert layers == [11, 12, 13]
+    assert digest == "aggregate-digest" and status == "AGGREGATED_PROFILE"
+    assert tier["promotion_passed"]
 
 
 def frontier_rows(e1_quality=0.8, e1_compute=0.8):

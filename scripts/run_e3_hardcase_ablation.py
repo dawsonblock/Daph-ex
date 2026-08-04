@@ -161,7 +161,7 @@ def _load_profile_selection(
     status = str(manifest.get("profile_status") or "")
     if not selected or not digest:
         raise ValueError("Profile directory must contain a digest and best_contiguous_region")
-    if status not in {"PARTIAL_PROFILE", "FULL_PROFILE"}:
+    if status not in {"PARTIAL_PROFILE", "FULL_PROFILE", "AGGREGATED_PROFILE"}:
         raise ValueError(f"Unsupported profile status: {status!r}")
     tier_path = (profile_stability_dir or profile_dir) / "profile_tier_validation.json"
     tier = json.loads(tier_path.read_text()) if tier_path.exists() else {

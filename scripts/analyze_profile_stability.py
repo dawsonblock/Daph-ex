@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import sys
 from pathlib import Path
@@ -56,6 +57,32 @@ def main() -> None:
     promotion_passed = bool(tier["passed"] and stability["stable_for_promotion"])
     output = Path(args.output)
     output.mkdir(parents=True, exist_ok=True)
+    mean_contributions = {
+        int(layer): float(values["mean"])
+        for layer, values in stability["contribution_by_layer"].items()
+    }
+    ranking = sorted(mean_contributions, key=lambda layer: (-mean_contributions[layer], layer))
+    regions = []
+    for start in sorted(mean_contributions):
+        region = tuple(range(start, start + args.contiguous_width))
+        if all(layer in mean_contributions for layer in region):
+            regions.append((
+                sum(mean_contributions[layer] for layer in region) / len(region), region,
+            ))
+    best_region = list(max(
+        regions, key=lambda item: (item[0], tuple(-layer for layer in item[1])),
+    )[1]) if regions else [ranking[0]]
+    digest_payload = {
+        "source_digests": [manifest.get("profile_digest") for manifest in manifests],
+        "mean_contributions": mean_contributions,
+        "ranking": ranking,
+        "best_contiguous_region": best_region,
+        "tier": tier,
+        "stability": stability,
+    }
+    aggregate_digest = hashlib.sha256(
+        json.dumps(digest_payload, sort_keys=True, separators=(",", ":")).encode()
+    ).hexdigest()
     report = {
         "profile_tier": tier,
         "profile_stability": stability,
@@ -69,6 +96,21 @@ def main() -> None:
         "promotion_passed": promotion_passed,
     }, indent=2) + "\n")
     (output / "profile_stability.json").write_text(json.dumps(report, indent=2) + "\n")
+    (output / "rankings.json").write_text(json.dumps({
+        "ranking": ranking,
+        "best_contiguous_region": best_region,
+        "mean_contribution_by_layer": {str(key): value for key, value in mean_contributions.items()},
+    }, indent=2) + "\n")
+    (output / "manifest.json").write_text(json.dumps({
+        "profile_status": "AGGREGATED_PROFILE",
+        "profile_digest": aggregate_digest,
+        "profile_tier": tier["tier"],
+        "profile_tier_passed": tier["passed"],
+        "profile_stability_passed": stability["stable_for_promotion"],
+        "promotion_passed": promotion_passed,
+        "source_profile_directories": [str(directory) for directory in directories],
+        "source_profile_digests": [manifest.get("profile_digest") for manifest in manifests],
+    }, indent=2) + "\n")
     print(json.dumps({"promotion_passed": promotion_passed, **tier}, indent=2))
 
 

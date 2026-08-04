@@ -109,7 +109,7 @@ python scripts/run_e3_location_study.py \
   --selection runs/e3-calibration/calibrated/selection.jsonl \
   --test runs/e3-calibration/calibrated/test.jsonl \
   --natural-test runs/e3-multifamily/natural_test.jsonl \
-  --profile-dir artifacts/layer_profile/sparse \
+  --profile-dir artifacts/layer_profile/stability \
   --profile-stability-dir artifacts/layer_profile/stability \
   --output runs/e3-location-study \
   --latent-step-counts 1,2,4 --heldout-steps 4 \
@@ -156,7 +156,7 @@ python scripts/qualify_e3_results.py \
   --experiment-tier QUALIFICATION \
   --training-seeds 20260803,20260817,20260831 \
   --placement middle_recurrent \
-  --test-count 168 --pytest-output runs/e3/pytest_output.txt \
+  --test-count 169 --pytest-output runs/e3/pytest_output.txt \
   --model-id Qwen/Qwen2.5-0.5B \
   --model-revision 060db6499f32faf8b98477b0a26969ef7d8b9987
 ```
