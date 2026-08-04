@@ -1,0 +1,24 @@
+{"difficulty_bucket": "easy", "expected": "10", "prompt": "1 + 9 =", "task_family": "single_addition_calibrated_v1", "task_id": "test-candidate-0024"}
+{"difficulty_bucket": "easy", "expected": "12", "prompt": "9 + 3 =", "task_family": "single_addition_calibrated_v1", "task_id": "test-candidate-0018"}
+{"difficulty_bucket": "easy", "expected": "14", "prompt": "Question: What is 7 + 7? Answer:", "task_family": "single_addition_calibrated_v1", "task_id": "test-candidate-0038"}
+{"difficulty_bucket": "medium", "expected": "80", "prompt": "52 + 28 =", "task_family": "single_addition_calibrated_v1", "task_id": "test-candidate-0020"}
+{"difficulty_bucket": "medium", "expected": "152", "prompt": "80 + 72 =", "task_family": "single_addition_calibrated_v1", "task_id": "test-candidate-0039"}
+{"difficulty_bucket": "easy", "expected": "22", "prompt": "Calculate 8+14. The answer is", "task_family": "single_addition_calibrated_v1", "task_id": "test-candidate-0006"}
+{"difficulty_bucket": "easy", "expected": "13", "prompt": "Question: What is 7 + 6? Answer:", "task_family": "single_addition_calibrated_v1", "task_id": "test-candidate-0060"}
+{"difficulty_bucket": "medium", "expected": "130", "prompt": "97 + 33 =", "task_family": "single_addition_calibrated_v1", "task_id": "test-candidate-0033"}
+{"difficulty_bucket": "easy", "expected": "7", "prompt": "Calculate 4+3. The answer is", "task_family": "single_addition_calibrated_v1", "task_id": "test-candidate-0025"}
+{"difficulty_bucket": "medium", "expected": "112", "prompt": "Question: What is 83 + 29? Answer:", "task_family": "single_addition_calibrated_v1", "task_id": "test-candidate-0061"}
+{"difficulty_bucket": "medium", "expected": "29", "prompt": "Calculate 16+13. The answer is", "task_family": "single_addition_calibrated_v1", "task_id": "test-candidate-0003"}
+{"difficulty_bucket": "easy", "expected": "21", "prompt": "10 + 11 =", "task_family": "single_addition_calibrated_v1", "task_id": "test-candidate-0049"}
+{"difficulty_bucket": "easy", "expected": "20", "prompt": "Question: What is 9 + 11? Answer:", "task_family": "single_addition_calibrated_v1", "task_id": "test-candidate-0026"}
+{"difficulty_bucket": "medium", "expected": "164", "prompt": "75 + 89 =", "task_family": "single_addition_calibrated_v1", "task_id": "test-candidate-0011"}
+{"difficulty_bucket": "easy", "expected": "12", "prompt": "Calculate 0+12. The answer is", "task_family": "single_addition_calibrated_v1", "task_id": "test-candidate-0017"}
+{"difficulty_bucket": "easy", "expected": "24", "prompt": "Question: What is 11 + 13? Answer:", "task_family": "single_addition_calibrated_v1", "task_id": "test-candidate-0045"}
+{"difficulty_bucket": "easy", "expected": "23", "prompt": "12 + 11 =", "task_family": "single_addition_calibrated_v1", "task_id": "test-candidate-0047"}
+{"difficulty_bucket": "medium", "expected": "171", "prompt": "Question: What is 74 + 97? Answer:", "task_family": "single_addition_calibrated_v1", "task_id": "test-candidate-0034"}
+{"difficulty_bucket": "easy", "expected": "28", "prompt": "14 + 14 =", "task_family": "single_addition_calibrated_v1", "task_id": "test-candidate-0008"}
+{"difficulty_bucket": "easy", "expected": "17", "prompt": "Question: What is 12 + 5? Answer:", "task_family": "single_addition_calibrated_v1", "task_id": "test-candidate-0058"}
+{"difficulty_bucket": "medium", "expected": "145", "prompt": "Calculate 94+51. The answer is", "task_family": "single_addition_calibrated_v1", "task_id": "test-candidate-0048"}
+{"difficulty_bucket": "medium", "expected": "72", "prompt": "14 + 58 =", "task_family": "single_addition_calibrated_v1", "task_id": "test-candidate-0007"}
+{"difficulty_bucket": "medium", "expected": "82", "prompt": "34 + 48 =", "task_family": "single_addition_calibrated_v1", "task_id": "test-candidate-0057"}
+{"difficulty_bucket": "easy", "expected": "8", "prompt": "Calculate 7+1. The answer is", "task_family": "single_addition_calibrated_v1", "task_id": "test-candidate-0031"}

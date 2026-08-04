@@ -1,0 +1,64 @@
+{"difficulty_bucket": "easy", "expected": "24", "prompt": "Question: What is 12 + 12? Answer:", "task_family": "single_addition_calibrated_v1", "task_id": "train-candidate-0012"}
+{"difficulty_bucket": "easy", "expected": "9", "prompt": "Calculate 1+8. The answer is", "task_family": "single_addition_calibrated_v1", "task_id": "train-candidate-0113"}
+{"difficulty_bucket": "easy", "expected": "20", "prompt": "Question: What is 12 + 8? Answer:", "task_family": "single_addition_calibrated_v1", "task_id": "train-candidate-0048"}
+{"difficulty_bucket": "medium", "expected": "36", "prompt": "14 + 22 =", "task_family": "single_addition_calibrated_v1", "task_id": "train-candidate-0098"}
+{"difficulty_bucket": "easy", "expected": "10", "prompt": "Question: What is 4 + 6? Answer:", "task_family": "single_addition_calibrated_v1", "task_id": "train-candidate-0062"}
+{"difficulty_bucket": "medium", "expected": "56", "prompt": "15 + 41 =", "task_family": "single_addition_calibrated_v1", "task_id": "train-candidate-0066"}
+{"difficulty_bucket": "easy", "expected": "20", "prompt": "Calculate 15+5. The answer is", "task_family": "single_addition_calibrated_v1", "task_id": "train-candidate-0008"}
+{"difficulty_bucket": "easy", "expected": "27", "prompt": "13 + 14 =", "task_family": "single_addition_calibrated_v1", "task_id": "train-candidate-0028"}
+{"difficulty_bucket": "medium", "expected": "77", "prompt": "Question: What is 12 + 65? Answer:", "task_family": "single_addition_calibrated_v1", "task_id": "train-candidate-0058"}
+{"difficulty_bucket": "easy", "expected": "10", "prompt": "Question: What is 3 + 7? Answer:", "task_family": "single_addition_calibrated_v1", "task_id": "train-candidate-0087"}
+{"difficulty_bucket": "medium", "expected": "160", "prompt": "Question: What is 88 + 72? Answer:", "task_family": "single_addition_calibrated_v1", "task_id": "train-candidate-0035"}
+{"difficulty_bucket": "easy", "expected": "14", "prompt": "10 + 4 =", "task_family": "single_addition_calibrated_v1", "task_id": "train-candidate-0089"}
+{"difficulty_bucket": "medium", "expected": "109", "prompt": "Calculate 90+19. The answer is", "task_family": "single_addition_calibrated_v1", "task_id": "train-candidate-0006"}
+{"difficulty_bucket": "medium", "expected": "169", "prompt": "92 + 77 =", "task_family": "single_addition_calibrated_v1", "task_id": "train-candidate-0101"}
+{"difficulty_bucket": "easy", "expected": "23", "prompt": "Calculate 12+11. The answer is", "task_family": "single_addition_calibrated_v1", "task_id": "train-candidate-0102"}
+{"difficulty_bucket": "medium", "expected": "61", "prompt": "Calculate 42+19. The answer is", "task_family": "single_addition_calibrated_v1", "task_id": "train-candidate-0016"}
+{"difficulty_bucket": "easy", "expected": "17", "prompt": "Calculate 6+11. The answer is", "task_family": "single_addition_calibrated_v1", "task_id": "train-candidate-0082"}
+{"difficulty_bucket": "medium", "expected": "72", "prompt": "Calculate 27+45. The answer is", "task_family": "single_addition_calibrated_v1", "task_id": "train-candidate-0126"}
+{"difficulty_bucket": "easy", "expected": "9", "prompt": "8 + 1 =", "task_family": "single_addition_calibrated_v1", "task_id": "train-candidate-0074"}
+{"difficulty_bucket": "medium", "expected": "98", "prompt": "37 + 61 =", "task_family": "single_addition_calibrated_v1", "task_id": "train-candidate-0118"}
+{"difficulty_bucket": "easy", "expected": "12", "prompt": "1 + 11 =", "task_family": "single_addition_calibrated_v1", "task_id": "train-candidate-0026"}
+{"difficulty_bucket": "easy", "expected": "16", "prompt": "Calculate 6+10. The answer is", "task_family": "single_addition_calibrated_v1", "task_id": "train-candidate-0081"}
+{"difficulty_bucket": "easy", "expected": "19", "prompt": "Calculate 15+4. The answer is", "task_family": "single_addition_calibrated_v1", "task_id": "train-candidate-0027"}
+{"difficulty_bucket": "easy", "expected": "14", "prompt": "Question: What is 6 + 8? Answer:", "task_family": "single_addition_calibrated_v1", "task_id": "train-candidate-0105"}
+{"difficulty_bucket": "easy", "expected": "3", "prompt": "Question: What is 2 + 1? Answer:", "task_family": "single_addition_calibrated_v1", "task_id": "train-candidate-0039"}
+{"difficulty_bucket": "medium", "expected": "91", "prompt": "Question: What is 22 + 69? Answer:", "task_family": "single_addition_calibrated_v1", "task_id": "train-candidate-0080"}
+{"difficulty_bucket": "easy", "expected": "4", "prompt": "Question: What is 1 + 3? Answer:", "task_family": "single_addition_calibrated_v1", "task_id": "train-candidate-0109"}
+{"difficulty_bucket": "medium", "expected": "64", "prompt": "30 + 34 =", "task_family": "single_addition_calibrated_v1", "task_id": "train-candidate-0023"}
+{"difficulty_bucket": "easy", "expected": "2", "prompt": "0 + 2 =", "task_family": "single_addition_calibrated_v1", "task_id": "train-candidate-0093"}
+{"difficulty_bucket": "easy", "expected": "7", "prompt": "Question: What is 4 + 3? Answer:", "task_family": "single_addition_calibrated_v1", "task_id": "train-candidate-0031"}
+{"difficulty_bucket": "medium", "expected": "64", "prompt": "Calculate 28+36. The answer is", "task_family": "single_addition_calibrated_v1", "task_id": "train-candidate-0030"}
+{"difficulty_bucket": "easy", "expected": "2", "prompt": "Calculate 2+0. The answer is", "task_family": "single_addition_calibrated_v1", "task_id": "train-candidate-0084"}
+{"difficulty_bucket": "medium", "expected": "83", "prompt": "Question: What is 16 + 67? Answer:", "task_family": "single_addition_calibrated_v1", "task_id": "train-candidate-0063"}
+{"difficulty_bucket": "medium", "expected": "124", "prompt": "Calculate 47+77. The answer is", "task_family": "single_addition_calibrated_v1", "task_id": "train-candidate-0114"}
+{"difficulty_bucket": "easy", "expected": "16", "prompt": "Question: What is 2 + 14? Answer:", "task_family": "single_addition_calibrated_v1", "task_id": "train-candidate-0021"}
+{"difficulty_bucket": "medium", "expected": "164", "prompt": "Question: What is 88 + 76? Answer:", "task_family": "single_addition_calibrated_v1", "task_id": "train-candidate-0122"}
+{"difficulty_bucket": "medium", "expected": "129", "prompt": "Question: What is 94 + 35? Answer:", "task_family": "single_addition_calibrated_v1", "task_id": "train-candidate-0075"}
+{"difficulty_bucket": "easy", "expected": "13", "prompt": "4 + 9 =", "task_family": "single_addition_calibrated_v1", "task_id": "train-candidate-0106"}
+{"difficulty_bucket": "easy", "expected": "24", "prompt": "11 + 13 =", "task_family": "single_addition_calibrated_v1", "task_id": "train-candidate-0076"}
+{"difficulty_bucket": "easy", "expected": "20", "prompt": "Calculate 9+11. The answer is", "task_family": "single_addition_calibrated_v1", "task_id": "train-candidate-0001"}
+{"difficulty_bucket": "easy", "expected": "16", "prompt": "Calculate 15+1. The answer is", "task_family": "single_addition_calibrated_v1", "task_id": "train-candidate-0090"}
+{"difficulty_bucket": "easy", "expected": "26", "prompt": "Question: What is 15 + 11? Answer:", "task_family": "single_addition_calibrated_v1", "task_id": "train-candidate-0072"}
+{"difficulty_bucket": "easy", "expected": "13", "prompt": "10 + 3 =", "task_family": "single_addition_calibrated_v1", "task_id": "train-candidate-0037"}
+{"difficulty_bucket": "easy", "expected": "27", "prompt": "Question: What is 14 + 13? Answer:", "task_family": "single_addition_calibrated_v1", "task_id": "train-candidate-0045"}
+{"difficulty_bucket": "easy", "expected": "7", "prompt": "Question: What is 7 + 0? Answer:", "task_family": "single_addition_calibrated_v1", "task_id": "train-candidate-0064"}
+{"difficulty_bucket": "easy", "expected": "23", "prompt": "Question: What is 10 + 13? Answer:", "task_family": "single_addition_calibrated_v1", "task_id": "train-candidate-0059"}
+{"difficulty_bucket": "easy", "expected": "23", "prompt": "Calculate 14+9. The answer is", "task_family": "single_addition_calibrated_v1", "task_id": "train-candidate-0079"}
+{"difficulty_bucket": "medium", "expected": "93", "prompt": "Question: What is 30 + 63? Answer:", "task_family": "single_addition_calibrated_v1", "task_id": "train-candidate-0070"}
+{"difficulty_bucket": "medium", "expected": "89", "prompt": "35 + 54 =", "task_family": "single_addition_calibrated_v1", "task_id": "train-candidate-0123"}
+{"difficulty_bucket": "easy", "expected": "14", "prompt": "Question: What is 13 + 1? Answer:", "task_family": "single_addition_calibrated_v1", "task_id": "train-candidate-0104"}
+{"difficulty_bucket": "medium", "expected": "117", "prompt": "Calculate 40+77. The answer is", "task_family": "single_addition_calibrated_v1", "task_id": "train-candidate-0000"}
+{"difficulty_bucket": "easy", "expected": "11", "prompt": "Question: What is 2 + 9? Answer:", "task_family": "single_addition_calibrated_v1", "task_id": "train-candidate-0013"}
+{"difficulty_bucket": "easy", "expected": "21", "prompt": "11 + 10 =", "task_family": "single_addition_calibrated_v1", "task_id": "train-candidate-0115"}
+{"difficulty_bucket": "easy", "expected": "21", "prompt": "Question: What is 10 + 11? Answer:", "task_family": "single_addition_calibrated_v1", "task_id": "train-candidate-0071"}
+{"difficulty_bucket": "medium", "expected": "124", "prompt": "Calculate 97+27. The answer is", "task_family": "single_addition_calibrated_v1", "task_id": "train-candidate-0116"}
+{"difficulty_bucket": "easy", "expected": "10", "prompt": "10 + 0 =", "task_family": "single_addition_calibrated_v1", "task_id": "train-candidate-0095"}
+{"difficulty_bucket": "medium", "expected": "160", "prompt": "Calculate 85+75. The answer is", "task_family": "single_addition_calibrated_v1", "task_id": "train-candidate-0125"}
+{"difficulty_bucket": "easy", "expected": "17", "prompt": "15 + 2 =", "task_family": "single_addition_calibrated_v1", "task_id": "train-candidate-0053"}
+{"difficulty_bucket": "easy", "expected": "1", "prompt": "0 + 1 =", "task_family": "single_addition_calibrated_v1", "task_id": "train-candidate-0061"}
+{"difficulty_bucket": "medium", "expected": "59", "prompt": "Calculate 18+41. The answer is", "task_family": "single_addition_calibrated_v1", "task_id": "train-candidate-0034"}
+{"difficulty_bucket": "medium", "expected": "185", "prompt": "98 + 87 =", "task_family": "single_addition_calibrated_v1", "task_id": "train-candidate-0004"}
+{"difficulty_bucket": "easy", "expected": "17", "prompt": "Calculate 15+2. The answer is", "task_family": "single_addition_calibrated_v1", "task_id": "train-candidate-0107"}
+{"difficulty_bucket": "easy", "expected": "20", "prompt": "8 + 12 =", "task_family": "single_addition_calibrated_v1", "task_id": "train-candidate-0067"}
+{"difficulty_bucket": "medium", "expected": "89", "prompt": "Question: What is 16 + 73? Answer:", "task_family": "single_addition_calibrated_v1", "task_id": "train-candidate-0068"}

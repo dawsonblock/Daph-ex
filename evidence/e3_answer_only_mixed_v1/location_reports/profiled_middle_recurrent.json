@@ -1,0 +1,2278 @@
+{
+  "experiment": "frozen-e2-hardcase-e3-location-dose-ablation",
+  "model": {
+    "id": "Qwen/Qwen2.5-0.5B",
+    "revision": "060db6499f32faf8b98477b0a26969ef7d8b9987",
+    "source_exact_coverage_percent": 100.0
+  },
+  "architecture": {
+    "e3_mode": "profiled_middle_recurrent",
+    "refinement_layer": 13,
+    "selected_region": [
+      12,
+      13,
+      14
+    ],
+    "selection_method": "profiled:preselected:best_contiguous",
+    "source_profile_digest": "62edb20bf45e4919964df218bf9d917b2ed6ed596237707fbd9bb54da137a232",
+    "source_profile_status": "PARTIAL_PROFILE"
+  },
+  "environment": {
+    "torch": "2.10.0",
+    "platform": "macOS-26.2-arm64-arm-64bit",
+    "device": "mps"
+  },
+  "datasets": {
+    "train": {
+      "path": "runs/e3-answer-only-v1/calibrated/train.jsonl",
+      "sha256": "79fd6927930cfdf838da8911a31fea3aa284842fa06f13272a78aa5030c671ff",
+      "tasks": 64
+    },
+    "selection": {
+      "path": "runs/e3-answer-only-v1/calibrated/selection.jsonl",
+      "sha256": "f020bb32efa99df4adb9b940b5087d4681044d02c294f972425cd90190fb3f36",
+      "tasks": 24
+    },
+    "test": {
+      "path": "runs/e3-answer-only-v1/calibrated/test.jsonl",
+      "sha256": "14b99d5ecae23c763c430301b2895ff77f3deb07ae665ef33936a41194c1c5a4",
+      "tasks": 24
+    }
+  },
+  "phase0b": {
+    "ce_compat": 2.8901259899139404,
+    "ce_exfusion": 2.8901259899139404,
+    "ce_difference": 0.0,
+    "logit_mae": 0.0,
+    "logit_max_abs": 0.0,
+    "cosine_similarity": 0.9999993443489075,
+    "top1_agreement": 1.0,
+    "kl_divergence": -2.4739295056974697e-08,
+    "source_backbone_parameter_identity": true,
+    "passed": true,
+    "decision": "PASS_EXACT"
+  },
+  "post_gate0b_initialization": {
+    "gate0b_passed": true,
+    "epsilon": 0.001,
+    "changed_scale_names": [
+      "layers.13.latent_scale"
+    ],
+    "backbone_unchanged": true
+  },
+  "variants": {
+    "1": {
+      "latent_steps": 1,
+      "training": {
+        "config": {
+          "steps": 40,
+          "batch_size": 1,
+          "seq_len": 96,
+          "lr": 0.0001,
+          "lr_pretrained": 1e-05,
+          "weight_decay": 0.01,
+          "grad_clip": 1.0,
+          "warmup_steps": 10,
+          "grad_accum": 1,
+          "log_every": 4,
+          "eval_every": 41,
+          "seed": 20260803,
+          "device": "mps",
+          "effort_mode": "sample",
+          "effort_probs": [
+            0.2,
+            0.2,
+            0.3,
+            0.3
+          ],
+          "effort_schedule": [
+            "fixed_3"
+          ],
+          "freeze_name_contains": [],
+          "pretrained_name_contains": [
+            "embed",
+            "lm_head",
+            "attn.q_proj",
+            "attn.k_proj",
+            "attn.v_proj",
+            "attn.out_proj",
+            "attn_norm",
+            "final_norm",
+            "moe.shared"
+          ],
+          "data_path": "runs/e3-answer-only-v1/location-study-matched4/profiled_middle_recurrent/hard_train_answer_only.jsonl",
+          "val_path": "",
+          "tokenizer_name": "Qwen/Qwen2.5-0.5B",
+          "tokenizer_revision": "060db6499f32faf8b98477b0a26969ef7d8b9987",
+          "output_dir": "runs/e3-answer-only-v1/location-study-matched4/profiled_middle_recurrent/latent_1",
+          "resume": "",
+          "distillation_temperature": 2.0,
+          "beta_e0": 1.0,
+          "beta_e1": 1.0,
+          "hidden_distillation_weight": 0.0,
+          "stages": [
+            {
+              "name": "e3_hardcase_1_steps",
+              "steps": 40,
+              "train_parameter_groups": [
+                "e3_refinement",
+                "e3_scale"
+              ],
+              "freeze_parameter_groups": [],
+              "lr_pretrained": 1e-05,
+              "lr_new": 0.0001,
+              "lr_scales": 1e-05,
+              "effort_sampling": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "distill_e0": false,
+              "distill_e1": false,
+              "train_e3": true,
+              "teacher_mode": "fixed_2",
+              "e3_regression_guard_weight": 0.0
+            }
+          ],
+          "retention_kl_threshold": null,
+          "save_periodic_checkpoints": false,
+          "save_final_checkpoint": false,
+          "save_model_artifact": false,
+          "fail_on_nonfinite": true,
+          "answer_only_loss": true
+        },
+        "optimizer_steps": 40,
+        "history_tail": [
+          {
+            "step": 20,
+            "loss": 4.3437652587890625,
+            "effort_mode": "fixed_3",
+            "grad_norm": 11.642617510912192
+          },
+          {
+            "step": 21,
+            "loss": 5.2218804359436035,
+            "effort_mode": "fixed_3",
+            "grad_norm": 14.753697789015229
+          },
+          {
+            "step": 22,
+            "loss": 5.591163635253906,
+            "effort_mode": "fixed_3",
+            "grad_norm": 16.835311484815662
+          },
+          {
+            "step": 23,
+            "loss": 3.6682348251342773,
+            "effort_mode": "fixed_3",
+            "grad_norm": 19.2568033475046
+          },
+          {
+            "step": 24,
+            "loss": 9.065203666687012,
+            "effort_mode": "fixed_3",
+            "grad_norm": 40.859045655622594
+          },
+          {
+            "step": 25,
+            "loss": 4.883901119232178,
+            "effort_mode": "fixed_3",
+            "grad_norm": 17.809293868348888
+          },
+          {
+            "step": 26,
+            "loss": 8.54314136505127,
+            "effort_mode": "fixed_3",
+            "grad_norm": 44.87510592808582
+          },
+          {
+            "step": 27,
+            "loss": 4.591790199279785,
+            "effort_mode": "fixed_3",
+            "grad_norm": 11.083588296768733
+          },
+          {
+            "step": 28,
+            "loss": 10.681419372558594,
+            "effort_mode": "fixed_3",
+            "grad_norm": 31.61652556687
+          },
+          {
+            "step": 29,
+            "loss": 9.43472671508789,
+            "effort_mode": "fixed_3",
+            "grad_norm": 47.870173913973986
+          },
+          {
+            "step": 30,
+            "loss": 6.39877462387085,
+            "effort_mode": "fixed_3",
+            "grad_norm": 26.64699466481008
+          },
+          {
+            "step": 31,
+            "loss": 10.850729942321777,
+            "effort_mode": "fixed_3",
+            "grad_norm": 25.659021857493197
+          },
+          {
+            "step": 32,
+            "loss": 4.503127098083496,
+            "effort_mode": "fixed_3",
+            "grad_norm": 22.432761429691354
+          },
+          {
+            "step": 33,
+            "loss": 3.656526803970337,
+            "effort_mode": "fixed_3",
+            "grad_norm": 15.530771161149186
+          },
+          {
+            "step": 34,
+            "loss": 3.3358383178710938,
+            "effort_mode": "fixed_3",
+            "grad_norm": 24.161961260195852
+          },
+          {
+            "step": 35,
+            "loss": 2.5000712871551514,
+            "effort_mode": "fixed_3",
+            "grad_norm": 15.246367849738983
+          },
+          {
+            "step": 36,
+            "loss": 2.5662238597869873,
+            "effort_mode": "fixed_3",
+            "grad_norm": 15.735832012496155
+          },
+          {
+            "step": 37,
+            "loss": 5.8771867752075195,
+            "effort_mode": "fixed_3",
+            "grad_norm": 23.131992236555504
+          },
+          {
+            "step": 38,
+            "loss": 4.758290767669678,
+            "effort_mode": "fixed_3",
+            "grad_norm": 15.741716320013369
+          },
+          {
+            "step": 39,
+            "loss": 5.7384843826293945,
+            "effort_mode": "fixed_3",
+            "grad_norm": 21.56907495702153
+          }
+        ],
+        "trained_parameters": [
+          "layers.13.latent_refine.fc1.weight",
+          "layers.13.latent_refine.fc2.weight",
+          "layers.13.latent_scale"
+        ]
+      },
+      "selection": {
+        "tasks": 24,
+        "e2_accuracy": 0.5,
+        "e3_accuracy": 0.5,
+        "rescues": 0,
+        "regressions": 0,
+        "rescue_count": 0,
+        "regression_count": 0,
+        "rescue_rate": 0.0,
+        "regression_rate": 0.0,
+        "net_rescue_rate": 0.0,
+        "e3_correct_given_e2_wrong": 0.0,
+        "e3_wrong_given_e2_correct": 0.0,
+        "by_difficulty": {
+          "easy": {
+            "tasks": 17,
+            "e2_accuracy": 0.5294117647058824,
+            "e3_accuracy": 0.5294117647058824,
+            "rescues": 0,
+            "regressions": 0,
+            "rescue_count": 0,
+            "regression_count": 0,
+            "rescue_rate": 0.0,
+            "regression_rate": 0.0,
+            "net_rescue_rate": 0.0,
+            "e3_correct_given_e2_wrong": 0.0,
+            "e3_wrong_given_e2_correct": 0.0
+          },
+          "medium": {
+            "tasks": 7,
+            "e2_accuracy": 0.42857142857142855,
+            "e3_accuracy": 0.42857142857142855,
+            "rescues": 0,
+            "regressions": 0,
+            "rescue_count": 0,
+            "regression_count": 0,
+            "rescue_rate": 0.0,
+            "regression_rate": 0.0,
+            "net_rescue_rate": 0.0,
+            "e3_correct_given_e2_wrong": 0.0,
+            "e3_wrong_given_e2_correct": 0.0
+          }
+        },
+        "by_task_family": {
+          "single_addition_calibrated_v1": {
+            "tasks": 24,
+            "e2_accuracy": 0.5,
+            "e3_accuracy": 0.5,
+            "rescues": 0,
+            "regressions": 0,
+            "rescue_count": 0,
+            "regression_count": 0,
+            "rescue_rate": 0.0,
+            "regression_rate": 0.0,
+            "net_rescue_rate": 0.0,
+            "e3_correct_given_e2_wrong": 0.0,
+            "e3_wrong_given_e2_correct": 0.0
+          }
+        },
+        "by_refinement_steps": {
+          "1": {
+            "tasks": 24,
+            "e2_accuracy": 0.5,
+            "e3_accuracy": 0.5,
+            "rescues": 0,
+            "regressions": 0,
+            "rescue_count": 0,
+            "regression_count": 0,
+            "rescue_rate": 0.0,
+            "regression_rate": 0.0,
+            "net_rescue_rate": 0.0,
+            "e3_correct_given_e2_wrong": 0.0,
+            "e3_wrong_given_e2_correct": 0.0
+          }
+        },
+        "by_profiled_region": {
+          "12-14": {
+            "tasks": 24,
+            "e2_accuracy": 0.5,
+            "e3_accuracy": 0.5,
+            "rescues": 0,
+            "regressions": 0,
+            "rescue_count": 0,
+            "regression_count": 0,
+            "rescue_rate": 0.0,
+            "regression_rate": 0.0,
+            "net_rescue_rate": 0.0,
+            "e3_correct_given_e2_wrong": 0.0,
+            "e3_wrong_given_e2_correct": 0.0
+          }
+        },
+        "e2_completion_ce": 4.832559684912364,
+        "e3_completion_ce": 4.800368517637253,
+        "e3_ce_delta_vs_e2": -0.03219116727511088,
+        "mean_hidden_delta_l2": 0.3780038443704446,
+        "e3_compute_overhead": 0.008961973247487246,
+        "task_outcomes": [
+          {
+            "task_id": "selection-candidate-0057",
+            "task_family": "single_addition_calibrated_v1",
+            "difficulty_bucket": "medium",
+            "e2_correct": false,
+            "e3_correct": false,
+            "e2_completion": " 102\n\\",
+            "e3_completion": " 102\n\\",
+            "refinement_steps": 1,
+            "profiled_region": "12-14"
+          },
+          {
+            "task_id": "selection-candidate-0025",
+            "task_family": "single_addition_calibrated_v1",
+            "difficulty_bucket": "easy",
+            "e2_correct": false,
+            "e3_correct": false,
+            "e2_completion": " 12 \\]\n\\[",
+            "e3_completion": " 12 \\]\n\\[",
+            "refinement_steps": 1,
+            "profiled_region": "12-14"
+          },
+          {
+            "task_id": "selection-candidate-0059",
+            "task_family": "single_addition_calibrated_v1",
+            "difficulty_bucket": "easy",
+            "e2_correct": false,
+            "e3_correct": false,
+            "e2_completion": " 10 \\]\n\\[",
+            "e3_completion": " 10 \\]\n\\[",
+            "refinement_steps": 1,
+            "profiled_region": "12-14"
+          },
+          {
+            "task_id": "selection-candidate-0020",
+            "task_family": "single_addition_calibrated_v1",
+            "difficulty_bucket": "medium",
+            "e2_correct": true,
+            "e3_correct": true,
+            "e2_completion": " 81. What is",
+            "e3_completion": " 81. What is",
+            "refinement_steps": 1,
+            "profiled_region": "12-14"
+          },
+          {
+            "task_id": "selection-candidate-0053",
+            "task_family": "single_addition_calibrated_v1",
+            "difficulty_bucket": "medium",
+            "e2_correct": false,
+            "e3_correct": false,
+            "e2_completion": " 154\n\\",
+            "e3_completion": " 154\n\\",
+            "refinement_steps": 1,
+            "profiled_region": "12-14"
+          },
+          {
+            "task_id": "selection-candidate-0060",
+            "task_family": "single_addition_calibrated_v1",
+            "difficulty_bucket": "easy",
+            "e2_correct": true,
+            "e3_correct": true,
+            "e2_completion": " 19 \\]\n\nSo",
+            "e3_completion": " 19 \\]\n\nSo",
+            "refinement_steps": 1,
+            "profiled_region": "12-14"
+          },
+          {
+            "task_id": "selection-candidate-0013",
+            "task_family": "single_addition_calibrated_v1",
+            "difficulty_bucket": "medium",
+            "e2_correct": false,
+            "e3_correct": false,
+            "e2_completion": " 45 + 6",
+            "e3_completion": " 45 + 6",
+            "refinement_steps": 1,
+            "profiled_region": "12-14"
+          },
+          {
+            "task_id": "selection-candidate-0036",
+            "task_family": "single_addition_calibrated_v1",
+            "difficulty_bucket": "easy",
+            "e2_correct": false,
+            "e3_correct": false,
+            "e2_completion": " 11 + 5",
+            "e3_completion": " 11 + 5",
+            "refinement_steps": 1,
+            "profiled_region": "12-14"
+          },
+          {
+            "task_id": "selection-candidate-0044",
+            "task_family": "single_addition_calibrated_v1",
+            "difficulty_bucket": "easy",
+            "e2_correct": true,
+            "e3_correct": true,
+            "e2_completion": " 10 \\]\n\nSo",
+            "e3_completion": " 10 \\]\n\nSo",
+            "refinement_steps": 1,
+            "profiled_region": "12-14"
+          },
+          {
+            "task_id": "selection-candidate-0027",
+            "task_family": "single_addition_calibrated_v1",
+            "difficulty_bucket": "easy",
+            "e2_correct": false,
+            "e3_correct": false,
+            "e2_completion": " 13 + 1",
+            "e3_completion": " 13 + 1",
+            "refinement_steps": 1,
+            "profiled_region": "12-14"
+          },
+          {
+            "task_id": "selection-candidate-0043",
+            "task_family": "single_addition_calibrated_v1",
+            "difficulty_bucket": "medium",
+            "e2_correct": false,
+            "e3_correct": false,
+            "e2_completion": " 93 + 2",
+            "e3_completion": " 93 + 2",
+            "refinement_steps": 1,
+            "profiled_region": "12-14"
+          },
+          {
+            "task_id": "selection-candidate-0023",
+            "task_family": "single_addition_calibrated_v1",
+            "difficulty_bucket": "easy",
+            "e2_correct": true,
+            "e3_correct": true,
+            "e2_completion": " 12 \\]\n\\[",
+            "e3_completion": " 12 \\]\n\\[",
+            "refinement_steps": 1,
+            "profiled_region": "12-14"
+          },
+          {
+            "task_id": "selection-candidate-0015",
+            "task_family": "single_addition_calibrated_v1",
+            "difficulty_bucket": "medium",
+            "e2_correct": true,
+            "e3_correct": true,
+            "e2_completion": " 106. Question",
+            "e3_completion": " 106. Question",
+            "refinement_steps": 1,
+            "profiled_region": "12-14"
+          },
+          {
+            "task_id": "selection-candidate-0026",
+            "task_family": "single_addition_calibrated_v1",
+            "difficulty_bucket": "easy",
+            "e2_correct": false,
+            "e3_correct": false,
+            "e2_completion": " 14 + 2",
+            "e3_completion": " 14 + 2",
+            "refinement_steps": 1,
+            "profiled_region": "12-14"
+          },
+          {
+            "task_id": "selection-candidate-0024",
+            "task_family": "single_addition_calibrated_v1",
+            "difficulty_bucket": "easy",
+            "e2_correct": true,
+            "e3_correct": true,
+            "e2_completion": " 4. What is the",
+            "e3_completion": " 4. What is the",
+            "refinement_steps": 1,
+            "profiled_region": "12-14"
+          },
+          {
+            "task_id": "selection-candidate-0047",
+            "task_family": "single_addition_calibrated_v1",
+            "difficulty_bucket": "easy",
+            "e2_correct": true,
+            "e3_correct": true,
+            "e2_completion": " 30 \\text{",
+            "e3_completion": " 30 \\text{",
+            "refinement_steps": 1,
+            "profiled_region": "12-14"
+          },
+          {
+            "task_id": "selection-candidate-0054",
+            "task_family": "single_addition_calibrated_v1",
+            "difficulty_bucket": "easy",
+            "e2_correct": true,
+            "e3_correct": true,
+            "e2_completion": " 11 \\]\n\nSo",
+            "e3_completion": " 11 \\]\n\nSo",
+            "refinement_steps": 1,
+            "profiled_region": "12-14"
+          },
+          {
+            "task_id": "selection-candidate-0062",
+            "task_family": "single_addition_calibrated_v1",
+            "difficulty_bucket": "easy",
+            "e2_correct": true,
+            "e3_correct": true,
+            "e2_completion": " 12. What is",
+            "e3_completion": " 12. What is",
+            "refinement_steps": 1,
+            "profiled_region": "12-14"
+          },
+          {
+            "task_id": "selection-candidate-0045",
+            "task_family": "single_addition_calibrated_v1",
+            "difficulty_bucket": "easy",
+            "e2_correct": false,
+            "e3_correct": false,
+            "e2_completion": " 121 \\]\n",
+            "e3_completion": " 121 \\]\n",
+            "refinement_steps": 1,
+            "profiled_region": "12-14"
+          },
+          {
+            "task_id": "selection-candidate-0005",
+            "task_family": "single_addition_calibrated_v1",
+            "difficulty_bucket": "easy",
+            "e2_correct": false,
+            "e3_correct": false,
+            "e2_completion": " 8 + 5 =",
+            "e3_completion": " 8 + 5 =",
+            "refinement_steps": 1,
+            "profiled_region": "12-14"
+          },
+          {
+            "task_id": "selection-candidate-0061",
+            "task_family": "single_addition_calibrated_v1",
+            "difficulty_bucket": "medium",
+            "e2_correct": true,
+            "e3_correct": true,
+            "e2_completion": " 122. What",
+            "e3_completion": " 122. What",
+            "refinement_steps": 1,
+            "profiled_region": "12-14"
+          },
+          {
+            "task_id": "selection-candidate-0038",
+            "task_family": "single_addition_calibrated_v1",
+            "difficulty_bucket": "easy",
+            "e2_correct": true,
+            "e3_correct": true,
+            "e2_completion": " 18 \\text{",
+            "e3_completion": " 18 \\text{",
+            "refinement_steps": 1,
+            "profiled_region": "12-14"
+          },
+          {
+            "task_id": "selection-candidate-0037",
+            "task_family": "single_addition_calibrated_v1",
+            "difficulty_bucket": "easy",
+            "e2_correct": false,
+            "e3_correct": false,
+            "e2_completion": " 4 + 12",
+            "e3_completion": " 4 + 12",
+            "refinement_steps": 1,
+            "profiled_region": "12-14"
+          },
+          {
+            "task_id": "selection-candidate-0009",
+            "task_family": "single_addition_calibrated_v1",
+            "difficulty_bucket": "easy",
+            "e2_correct": true,
+            "e3_correct": true,
+            "e2_completion": " 12. What is",
+            "e3_completion": " 12. What is",
+            "refinement_steps": 1,
+            "profiled_region": "12-14"
+          }
+        ]
+      },
+      "raw_latent_scale": 0.0013566826237365603,
+      "effective_latent_scale": 0.00134841981343925,
+      "e2_anchor_unchanged": true
+    },
+    "2": {
+      "latent_steps": 2,
+      "training": {
+        "config": {
+          "steps": 40,
+          "batch_size": 1,
+          "seq_len": 96,
+          "lr": 0.0001,
+          "lr_pretrained": 1e-05,
+          "weight_decay": 0.01,
+          "grad_clip": 1.0,
+          "warmup_steps": 10,
+          "grad_accum": 1,
+          "log_every": 4,
+          "eval_every": 41,
+          "seed": 20260803,
+          "device": "mps",
+          "effort_mode": "sample",
+          "effort_probs": [
+            0.2,
+            0.2,
+            0.3,
+            0.3
+          ],
+          "effort_schedule": [
+            "fixed_3"
+          ],
+          "freeze_name_contains": [],
+          "pretrained_name_contains": [
+            "embed",
+            "lm_head",
+            "attn.q_proj",
+            "attn.k_proj",
+            "attn.v_proj",
+            "attn.out_proj",
+            "attn_norm",
+            "final_norm",
+            "moe.shared"
+          ],
+          "data_path": "runs/e3-answer-only-v1/location-study-matched4/profiled_middle_recurrent/hard_train_answer_only.jsonl",
+          "val_path": "",
+          "tokenizer_name": "Qwen/Qwen2.5-0.5B",
+          "tokenizer_revision": "060db6499f32faf8b98477b0a26969ef7d8b9987",
+          "output_dir": "runs/e3-answer-only-v1/location-study-matched4/profiled_middle_recurrent/latent_2",
+          "resume": "",
+          "distillation_temperature": 2.0,
+          "beta_e0": 1.0,
+          "beta_e1": 1.0,
+          "hidden_distillation_weight": 0.0,
+          "stages": [
+            {
+              "name": "e3_hardcase_2_steps",
+              "steps": 40,
+              "train_parameter_groups": [
+                "e3_refinement",
+                "e3_scale"
+              ],
+              "freeze_parameter_groups": [],
+              "lr_pretrained": 1e-05,
+              "lr_new": 0.0001,
+              "lr_scales": 1e-05,
+              "effort_sampling": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "distill_e0": false,
+              "distill_e1": false,
+              "train_e3": true,
+              "teacher_mode": "fixed_2",
+              "e3_regression_guard_weight": 0.0
+            }
+          ],
+          "retention_kl_threshold": null,
+          "save_periodic_checkpoints": false,
+          "save_final_checkpoint": false,
+          "save_model_artifact": false,
+          "fail_on_nonfinite": true,
+          "answer_only_loss": true
+        },
+        "optimizer_steps": 40,
+        "history_tail": [
+          {
+            "step": 20,
+            "loss": 4.33051061630249,
+            "effort_mode": "fixed_3",
+            "grad_norm": 23.02727006857287
+          },
+          {
+            "step": 21,
+            "loss": 5.206753730773926,
+            "effort_mode": "fixed_3",
+            "grad_norm": 27.58527524767862
+          },
+          {
+            "step": 22,
+            "loss": 5.5740556716918945,
+            "effort_mode": "fixed_3",
+            "grad_norm": 31.27700983688869
+          },
+          {
+            "step": 23,
+            "loss": 3.649440050125122,
+            "effort_mode": "fixed_3",
+            "grad_norm": 34.94699300476549
+          },
+          {
+            "step": 24,
+            "loss": 9.025994300842285,
+            "effort_mode": "fixed_3",
+            "grad_norm": 73.36521747231508
+          },
+          {
+            "step": 25,
+            "loss": 4.866254806518555,
+            "effort_mode": "fixed_3",
+            "grad_norm": 32.263409382624495
+          },
+          {
+            "step": 26,
+            "loss": 8.499659538269043,
+            "effort_mode": "fixed_3",
+            "grad_norm": 80.18229452632491
+          },
+          {
+            "step": 27,
+            "loss": 4.579115867614746,
+            "effort_mode": "fixed_3",
+            "grad_norm": 21.271029051221266
+          },
+          {
+            "step": 28,
+            "loss": 10.645848274230957,
+            "effort_mode": "fixed_3",
+            "grad_norm": 60.31270994912352
+          },
+          {
+            "step": 29,
+            "loss": 9.388226509094238,
+            "effort_mode": "fixed_3",
+            "grad_norm": 84.93477456266808
+          },
+          {
+            "step": 30,
+            "loss": 6.370459079742432,
+            "effort_mode": "fixed_3",
+            "grad_norm": 48.69245130001928
+          },
+          {
+            "step": 31,
+            "loss": 10.821820259094238,
+            "effort_mode": "fixed_3",
+            "grad_norm": 48.26722324993728
+          },
+          {
+            "step": 32,
+            "loss": 4.4806365966796875,
+            "effort_mode": "fixed_3",
+            "grad_norm": 39.8109571916898
+          },
+          {
+            "step": 33,
+            "loss": 3.6398746967315674,
+            "effort_mode": "fixed_3",
+            "grad_norm": 28.349469922112316
+          },
+          {
+            "step": 34,
+            "loss": 3.312028408050537,
+            "effort_mode": "fixed_3",
+            "grad_norm": 42.242497556221
+          },
+          {
+            "step": 35,
+            "loss": 2.4845714569091797,
+            "effort_mode": "fixed_3",
+            "grad_norm": 26.945610428501443
+          },
+          {
+            "step": 36,
+            "loss": 2.549623727798462,
+            "effort_mode": "fixed_3",
+            "grad_norm": 28.141559966852405
+          },
+          {
+            "step": 37,
+            "loss": 5.850220203399658,
+            "effort_mode": "fixed_3",
+            "grad_norm": 43.39770207596961
+          },
+          {
+            "step": 38,
+            "loss": 4.739826202392578,
+            "effort_mode": "fixed_3",
+            "grad_norm": 29.416788405672175
+          },
+          {
+            "step": 39,
+            "loss": 5.714132785797119,
+            "effort_mode": "fixed_3",
+            "grad_norm": 39.36545665296614
+          }
+        ],
+        "trained_parameters": [
+          "layers.13.latent_refine.fc1.weight",
+          "layers.13.latent_refine.fc2.weight",
+          "layers.13.latent_scale"
+        ]
+      },
+      "selection": {
+        "tasks": 24,
+        "e2_accuracy": 0.5,
+        "e3_accuracy": 0.5,
+        "rescues": 0,
+        "regressions": 0,
+        "rescue_count": 0,
+        "regression_count": 0,
+        "rescue_rate": 0.0,
+        "regression_rate": 0.0,
+        "net_rescue_rate": 0.0,
+        "e3_correct_given_e2_wrong": 0.0,
+        "e3_wrong_given_e2_correct": 0.0,
+        "by_difficulty": {
+          "easy": {
+            "tasks": 17,
+            "e2_accuracy": 0.5294117647058824,
+            "e3_accuracy": 0.5294117647058824,
+            "rescues": 0,
+            "regressions": 0,
+            "rescue_count": 0,
+            "regression_count": 0,
+            "rescue_rate": 0.0,
+            "regression_rate": 0.0,
+            "net_rescue_rate": 0.0,
+            "e3_correct_given_e2_wrong": 0.0,
+            "e3_wrong_given_e2_correct": 0.0
+          },
+          "medium": {
+            "tasks": 7,
+            "e2_accuracy": 0.42857142857142855,
+            "e3_accuracy": 0.42857142857142855,
+            "rescues": 0,
+            "regressions": 0,
+            "rescue_count": 0,
+            "regression_count": 0,
+            "rescue_rate": 0.0,
+            "regression_rate": 0.0,
+            "net_rescue_rate": 0.0,
+            "e3_correct_given_e2_wrong": 0.0,
+            "e3_wrong_given_e2_correct": 0.0
+          }
+        },
+        "by_task_family": {
+          "single_addition_calibrated_v1": {
+            "tasks": 24,
+            "e2_accuracy": 0.5,
+            "e3_accuracy": 0.5,
+            "rescues": 0,
+            "regressions": 0,
+            "rescue_count": 0,
+            "regression_count": 0,
+            "rescue_rate": 0.0,
+            "regression_rate": 0.0,
+            "net_rescue_rate": 0.0,
+            "e3_correct_given_e2_wrong": 0.0,
+            "e3_wrong_given_e2_correct": 0.0
+          }
+        },
+        "by_refinement_steps": {
+          "2": {
+            "tasks": 24,
+            "e2_accuracy": 0.5,
+            "e3_accuracy": 0.5,
+            "rescues": 0,
+            "regressions": 0,
+            "rescue_count": 0,
+            "regression_count": 0,
+            "rescue_rate": 0.0,
+            "regression_rate": 0.0,
+            "net_rescue_rate": 0.0,
+            "e3_correct_given_e2_wrong": 0.0,
+            "e3_wrong_given_e2_correct": 0.0
+          }
+        },
+        "by_profiled_region": {
+          "12-14": {
+            "tasks": 24,
+            "e2_accuracy": 0.5,
+            "e3_accuracy": 0.5,
+            "rescues": 0,
+            "regressions": 0,
+            "rescue_count": 0,
+            "regression_count": 0,
+            "rescue_rate": 0.0,
+            "regression_rate": 0.0,
+            "net_rescue_rate": 0.0,
+            "e3_correct_given_e2_wrong": 0.0,
+            "e3_wrong_given_e2_correct": 0.0
+          }
+        },
+        "e2_completion_ce": 4.832559684912364,
+        "e3_completion_ce": 4.774468799432118,
+        "e3_ce_delta_vs_e2": -0.05809088548024496,
+        "mean_hidden_delta_l2": 0.7177947014570236,
+        "e3_compute_overhead": 0.017923946494974547,
+        "task_outcomes": [
+          {
+            "task_id": "selection-candidate-0057",
+            "task_family": "single_addition_calibrated_v1",
+            "difficulty_bucket": "medium",
+            "e2_correct": false,
+            "e3_correct": false,
+            "e2_completion": " 102\n\\",
+            "e3_completion": " 102\n\\",
+            "refinement_steps": 2,
+            "profiled_region": "12-14"
+          },
+          {
+            "task_id": "selection-candidate-0025",
+            "task_family": "single_addition_calibrated_v1",
+            "difficulty_bucket": "easy",
+            "e2_correct": false,
+            "e3_correct": false,
+            "e2_completion": " 12 \\]\n\\[",
+            "e3_completion": " 12 \\]\n\\[",
+            "refinement_steps": 2,
+            "profiled_region": "12-14"
+          },
+          {
+            "task_id": "selection-candidate-0059",
+            "task_family": "single_addition_calibrated_v1",
+            "difficulty_bucket": "easy",
+            "e2_correct": false,
+            "e3_correct": false,
+            "e2_completion": " 10 \\]\n\\[",
+            "e3_completion": " 10 \\]\n\\[",
+            "refinement_steps": 2,
+            "profiled_region": "12-14"
+          },
+          {
+            "task_id": "selection-candidate-0020",
+            "task_family": "single_addition_calibrated_v1",
+            "difficulty_bucket": "medium",
+            "e2_correct": true,
+            "e3_correct": true,
+            "e2_completion": " 81. What is",
+            "e3_completion": " 81. What is",
+            "refinement_steps": 2,
+            "profiled_region": "12-14"
+          },
+          {
+            "task_id": "selection-candidate-0053",
+            "task_family": "single_addition_calibrated_v1",
+            "difficulty_bucket": "medium",
+            "e2_correct": false,
+            "e3_correct": false,
+            "e2_completion": " 154\n\\",
+            "e3_completion": " 154\n\\",
+            "refinement_steps": 2,
+            "profiled_region": "12-14"
+          },
+          {
+            "task_id": "selection-candidate-0060",
+            "task_family": "single_addition_calibrated_v1",
+            "difficulty_bucket": "easy",
+            "e2_correct": true,
+            "e3_correct": true,
+            "e2_completion": " 19 \\]\n\nSo",
+            "e3_completion": " 19 \\]\n\nSo",
+            "refinement_steps": 2,
+            "profiled_region": "12-14"
+          },
+          {
+            "task_id": "selection-candidate-0013",
+            "task_family": "single_addition_calibrated_v1",
+            "difficulty_bucket": "medium",
+            "e2_correct": false,
+            "e3_correct": false,
+            "e2_completion": " 45 + 6",
+            "e3_completion": " 45 + 6",
+            "refinement_steps": 2,
+            "profiled_region": "12-14"
+          },
+          {
+            "task_id": "selection-candidate-0036",
+            "task_family": "single_addition_calibrated_v1",
+            "difficulty_bucket": "easy",
+            "e2_correct": false,
+            "e3_correct": false,
+            "e2_completion": " 11 + 5",
+            "e3_completion": " 11 + 5",
+            "refinement_steps": 2,
+            "profiled_region": "12-14"
+          },
+          {
+            "task_id": "selection-candidate-0044",
+            "task_family": "single_addition_calibrated_v1",
+            "difficulty_bucket": "easy",
+            "e2_correct": true,
+            "e3_correct": true,
+            "e2_completion": " 10 \\]\n\nSo",
+            "e3_completion": " 10 \\]\n\nSo",
+            "refinement_steps": 2,
+            "profiled_region": "12-14"
+          },
+          {
+            "task_id": "selection-candidate-0027",
+            "task_family": "single_addition_calibrated_v1",
+            "difficulty_bucket": "easy",
+            "e2_correct": false,
+            "e3_correct": false,
+            "e2_completion": " 13 + 1",
+            "e3_completion": " 13 + 1",
+            "refinement_steps": 2,
+            "profiled_region": "12-14"
+          },
+          {
+            "task_id": "selection-candidate-0043",
+            "task_family": "single_addition_calibrated_v1",
+            "difficulty_bucket": "medium",
+            "e2_correct": false,
+            "e3_correct": false,
+            "e2_completion": " 93 + 2",
+            "e3_completion": " 93 + 2",
+            "refinement_steps": 2,
+            "profiled_region": "12-14"
+          },
+          {
+            "task_id": "selection-candidate-0023",
+            "task_family": "single_addition_calibrated_v1",
+            "difficulty_bucket": "easy",
+            "e2_correct": true,
+            "e3_correct": true,
+            "e2_completion": " 12 \\]\n\\[",
+            "e3_completion": " 12 \\]\n\\[",
+            "refinement_steps": 2,
+            "profiled_region": "12-14"
+          },
+          {
+            "task_id": "selection-candidate-0015",
+            "task_family": "single_addition_calibrated_v1",
+            "difficulty_bucket": "medium",
+            "e2_correct": true,
+            "e3_correct": true,
+            "e2_completion": " 106. Question",
+            "e3_completion": " 106. Question",
+            "refinement_steps": 2,
+            "profiled_region": "12-14"
+          },
+          {
+            "task_id": "selection-candidate-0026",
+            "task_family": "single_addition_calibrated_v1",
+            "difficulty_bucket": "easy",
+            "e2_correct": false,
+            "e3_correct": false,
+            "e2_completion": " 14 + 2",
+            "e3_completion": " 14 + 2",
+            "refinement_steps": 2,
+            "profiled_region": "12-14"
+          },
+          {
+            "task_id": "selection-candidate-0024",
+            "task_family": "single_addition_calibrated_v1",
+            "difficulty_bucket": "easy",
+            "e2_correct": true,
+            "e3_correct": true,
+            "e2_completion": " 4. What is the",
+            "e3_completion": " 4. What is the",
+            "refinement_steps": 2,
+            "profiled_region": "12-14"
+          },
+          {
+            "task_id": "selection-candidate-0047",
+            "task_family": "single_addition_calibrated_v1",
+            "difficulty_bucket": "easy",
+            "e2_correct": true,
+            "e3_correct": true,
+            "e2_completion": " 30 \\text{",
+            "e3_completion": " 30 \\text{",
+            "refinement_steps": 2,
+            "profiled_region": "12-14"
+          },
+          {
+            "task_id": "selection-candidate-0054",
+            "task_family": "single_addition_calibrated_v1",
+            "difficulty_bucket": "easy",
+            "e2_correct": true,
+            "e3_correct": true,
+            "e2_completion": " 11 \\]\n\nSo",
+            "e3_completion": " 11 \\]\n\nSo",
+            "refinement_steps": 2,
+            "profiled_region": "12-14"
+          },
+          {
+            "task_id": "selection-candidate-0062",
+            "task_family": "single_addition_calibrated_v1",
+            "difficulty_bucket": "easy",
+            "e2_correct": true,
+            "e3_correct": true,
+            "e2_completion": " 12. What is",
+            "e3_completion": " 12. What is",
+            "refinement_steps": 2,
+            "profiled_region": "12-14"
+          },
+          {
+            "task_id": "selection-candidate-0045",
+            "task_family": "single_addition_calibrated_v1",
+            "difficulty_bucket": "easy",
+            "e2_correct": false,
+            "e3_correct": false,
+            "e2_completion": " 121 \\]\n",
+            "e3_completion": " 121 \\]\n",
+            "refinement_steps": 2,
+            "profiled_region": "12-14"
+          },
+          {
+            "task_id": "selection-candidate-0005",
+            "task_family": "single_addition_calibrated_v1",
+            "difficulty_bucket": "easy",
+            "e2_correct": false,
+            "e3_correct": false,
+            "e2_completion": " 8 + 5 =",
+            "e3_completion": " 8 + 5 =",
+            "refinement_steps": 2,
+            "profiled_region": "12-14"
+          },
+          {
+            "task_id": "selection-candidate-0061",
+            "task_family": "single_addition_calibrated_v1",
+            "difficulty_bucket": "medium",
+            "e2_correct": true,
+            "e3_correct": true,
+            "e2_completion": " 122. What",
+            "e3_completion": " 122. What",
+            "refinement_steps": 2,
+            "profiled_region": "12-14"
+          },
+          {
+            "task_id": "selection-candidate-0038",
+            "task_family": "single_addition_calibrated_v1",
+            "difficulty_bucket": "easy",
+            "e2_correct": true,
+            "e3_correct": true,
+            "e2_completion": " 18 \\text{",
+            "e3_completion": " 18 \\text{",
+            "refinement_steps": 2,
+            "profiled_region": "12-14"
+          },
+          {
+            "task_id": "selection-candidate-0037",
+            "task_family": "single_addition_calibrated_v1",
+            "difficulty_bucket": "easy",
+            "e2_correct": false,
+            "e3_correct": false,
+            "e2_completion": " 4 + 12",
+            "e3_completion": " 4 + 12",
+            "refinement_steps": 2,
+            "profiled_region": "12-14"
+          },
+          {
+            "task_id": "selection-candidate-0009",
+            "task_family": "single_addition_calibrated_v1",
+            "difficulty_bucket": "easy",
+            "e2_correct": true,
+            "e3_correct": true,
+            "e2_completion": " 12. What is",
+            "e3_completion": " 12. What is",
+            "refinement_steps": 2,
+            "profiled_region": "12-14"
+          }
+        ]
+      },
+      "raw_latent_scale": 0.0013531072763726115,
+      "effective_latent_scale": 0.001344909192994237,
+      "e2_anchor_unchanged": true
+    },
+    "4": {
+      "latent_steps": 4,
+      "training": {
+        "config": {
+          "steps": 40,
+          "batch_size": 1,
+          "seq_len": 96,
+          "lr": 0.0001,
+          "lr_pretrained": 1e-05,
+          "weight_decay": 0.01,
+          "grad_clip": 1.0,
+          "warmup_steps": 10,
+          "grad_accum": 1,
+          "log_every": 4,
+          "eval_every": 41,
+          "seed": 20260803,
+          "device": "mps",
+          "effort_mode": "sample",
+          "effort_probs": [
+            0.2,
+            0.2,
+            0.3,
+            0.3
+          ],
+          "effort_schedule": [
+            "fixed_3"
+          ],
+          "freeze_name_contains": [],
+          "pretrained_name_contains": [
+            "embed",
+            "lm_head",
+            "attn.q_proj",
+            "attn.k_proj",
+            "attn.v_proj",
+            "attn.out_proj",
+            "attn_norm",
+            "final_norm",
+            "moe.shared"
+          ],
+          "data_path": "runs/e3-answer-only-v1/location-study-matched4/profiled_middle_recurrent/hard_train_answer_only.jsonl",
+          "val_path": "",
+          "tokenizer_name": "Qwen/Qwen2.5-0.5B",
+          "tokenizer_revision": "060db6499f32faf8b98477b0a26969ef7d8b9987",
+          "output_dir": "runs/e3-answer-only-v1/location-study-matched4/profiled_middle_recurrent/latent_4",
+          "resume": "",
+          "distillation_temperature": 2.0,
+          "beta_e0": 1.0,
+          "beta_e1": 1.0,
+          "hidden_distillation_weight": 0.0,
+          "stages": [
+            {
+              "name": "e3_hardcase_4_steps",
+              "steps": 40,
+              "train_parameter_groups": [
+                "e3_refinement",
+                "e3_scale"
+              ],
+              "freeze_parameter_groups": [],
+              "lr_pretrained": 1e-05,
+              "lr_new": 0.0001,
+              "lr_scales": 1e-05,
+              "effort_sampling": [
+                0.0,
+                0.0,
+                0.0,
+                1.0
+              ],
+              "distill_e0": false,
+              "distill_e1": false,
+              "train_e3": true,
+              "teacher_mode": "fixed_2",
+              "e3_regression_guard_weight": 0.0
+            }
+          ],
+          "retention_kl_threshold": null,
+          "save_periodic_checkpoints": false,
+          "save_final_checkpoint": false,
+          "save_model_artifact": false,
+          "fail_on_nonfinite": true,
+          "answer_only_loss": true
+        },
+        "optimizer_steps": 40,
+        "history_tail": [
+          {
+            "step": 20,
+            "loss": 4.307265281677246,
+            "effort_mode": "fixed_3",
+            "grad_norm": 42.70031241191999
+          },
+          {
+            "step": 21,
+            "loss": 5.177052974700928,
+            "effort_mode": "fixed_3",
+            "grad_norm": 52.38350558021854
+          },
+          {
+            "step": 22,
+            "loss": 5.540722370147705,
+            "effort_mode": "fixed_3",
+            "grad_norm": 59.05579024195275
+          },
+          {
+            "step": 23,
+            "loss": 3.6159722805023193,
+            "effort_mode": "fixed_3",
+            "grad_norm": 62.40315826248766
+          },
+          {
+            "step": 24,
+            "loss": 8.95704174041748,
+            "effort_mode": "fixed_3",
+            "grad_norm": 129.65289546353017
+          },
+          {
+            "step": 25,
+            "loss": 4.834326267242432,
+            "effort_mode": "fixed_3",
+            "grad_norm": 57.967680206761074
+          },
+          {
+            "step": 26,
+            "loss": 8.422918319702148,
+            "effort_mode": "fixed_3",
+            "grad_norm": 141.2418154504061
+          },
+          {
+            "step": 27,
+            "loss": 4.55591344833374,
+            "effort_mode": "fixed_3",
+            "grad_norm": 39.55911589873734
+          },
+          {
+            "step": 28,
+            "loss": 10.5780029296875,
+            "effort_mode": "fixed_3",
+            "grad_norm": 114.55921553141692
+          },
+          {
+            "step": 29,
+            "loss": 9.304662704467773,
+            "effort_mode": "fixed_3",
+            "grad_norm": 150.4641714208262
+          },
+          {
+            "step": 30,
+            "loss": 6.316849708557129,
+            "effort_mode": "fixed_3",
+            "grad_norm": 89.44137143881984
+          },
+          {
+            "step": 31,
+            "loss": 10.761602401733398,
+            "effort_mode": "fixed_3",
+            "grad_norm": 94.66543007069059
+          },
+          {
+            "step": 32,
+            "loss": 4.439361095428467,
+            "effort_mode": "fixed_3",
+            "grad_norm": 71.05650545466547
+          },
+          {
+            "step": 33,
+            "loss": 3.606593370437622,
+            "effort_mode": "fixed_3",
+            "grad_norm": 53.58802185233573
+          },
+          {
+            "step": 34,
+            "loss": 3.2683963775634766,
+            "effort_mode": "fixed_3",
+            "grad_norm": 74.60754865223778
+          },
+          {
+            "step": 35,
+            "loss": 2.455500364303589,
+            "effort_mode": "fixed_3",
+            "grad_norm": 48.44554998160254
+          },
+          {
+            "step": 36,
+            "loss": 2.518230676651001,
+            "effort_mode": "fixed_3",
+            "grad_norm": 51.05705774770614
+          },
+          {
+            "step": 37,
+            "loss": 5.7965474128723145,
+            "effort_mode": "fixed_3",
+            "grad_norm": 83.41392180692034
+          },
+          {
+            "step": 38,
+            "loss": 4.704125881195068,
+            "effort_mode": "fixed_3",
+            "grad_norm": 55.41589379394251
+          },
+          {
+            "step": 39,
+            "loss": 5.663013458251953,
+            "effort_mode": "fixed_3",
+            "grad_norm": 76.01113592200296
+          }
+        ],
+        "trained_parameters": [
+          "layers.13.latent_refine.fc1.weight",
+          "layers.13.latent_refine.fc2.weight",
+          "layers.13.latent_scale"
+        ]
+      },
+      "selection": {
+        "tasks": 24,
+        "e2_accuracy": 0.5,
+        "e3_accuracy": 0.5416666666666666,
+        "rescues": 1,
+        "regressions": 0,
+        "rescue_count": 1,
+        "regression_count": 0,
+        "rescue_rate": 0.041666666666666664,
+        "regression_rate": 0.0,
+        "net_rescue_rate": 0.041666666666666664,
+        "e3_correct_given_e2_wrong": 0.08333333333333333,
+        "e3_wrong_given_e2_correct": 0.0,
+        "by_difficulty": {
+          "easy": {
+            "tasks": 17,
+            "e2_accuracy": 0.5294117647058824,
+            "e3_accuracy": 0.5882352941176471,
+            "rescues": 1,
+            "regressions": 0,
+            "rescue_count": 1,
+            "regression_count": 0,
+            "rescue_rate": 0.058823529411764705,
+            "regression_rate": 0.0,
+            "net_rescue_rate": 0.058823529411764705,
+            "e3_correct_given_e2_wrong": 0.125,
+            "e3_wrong_given_e2_correct": 0.0
+          },
+          "medium": {
+            "tasks": 7,
+            "e2_accuracy": 0.42857142857142855,
+            "e3_accuracy": 0.42857142857142855,
+            "rescues": 0,
+            "regressions": 0,
+            "rescue_count": 0,
+            "regression_count": 0,
+            "rescue_rate": 0.0,
+            "regression_rate": 0.0,
+            "net_rescue_rate": 0.0,
+            "e3_correct_given_e2_wrong": 0.0,
+            "e3_wrong_given_e2_correct": 0.0
+          }
+        },
+        "by_task_family": {
+          "single_addition_calibrated_v1": {
+            "tasks": 24,
+            "e2_accuracy": 0.5,
+            "e3_accuracy": 0.5416666666666666,
+            "rescues": 1,
+            "regressions": 0,
+            "rescue_count": 1,
+            "regression_count": 0,
+            "rescue_rate": 0.041666666666666664,
+            "regression_rate": 0.0,
+            "net_rescue_rate": 0.041666666666666664,
+            "e3_correct_given_e2_wrong": 0.08333333333333333,
+            "e3_wrong_given_e2_correct": 0.0
+          }
+        },
+        "by_refinement_steps": {
+          "4": {
+            "tasks": 24,
+            "e2_accuracy": 0.5,
+            "e3_accuracy": 0.5416666666666666,
+            "rescues": 1,
+            "regressions": 0,
+            "rescue_count": 1,
+            "regression_count": 0,
+            "rescue_rate": 0.041666666666666664,
+            "regression_rate": 0.0,
+            "net_rescue_rate": 0.041666666666666664,
+            "e3_correct_given_e2_wrong": 0.08333333333333333,
+            "e3_wrong_given_e2_correct": 0.0
+          }
+        },
+        "by_profiled_region": {
+          "12-14": {
+            "tasks": 24,
+            "e2_accuracy": 0.5,
+            "e3_accuracy": 0.5416666666666666,
+            "rescues": 1,
+            "regressions": 0,
+            "rescue_count": 1,
+            "regression_count": 0,
+            "rescue_rate": 0.041666666666666664,
+            "regression_rate": 0.0,
+            "net_rescue_rate": 0.041666666666666664,
+            "e3_correct_given_e2_wrong": 0.08333333333333333,
+            "e3_wrong_given_e2_correct": 0.0
+          }
+        },
+        "e2_completion_ce": 4.832559684912364,
+        "e3_completion_ce": 4.7222980459531145,
+        "e3_ce_delta_vs_e2": -0.11026163895924886,
+        "mean_hidden_delta_l2": 1.4741307199001312,
+        "e3_compute_overhead": 0.03584789298994915,
+        "task_outcomes": [
+          {
+            "task_id": "selection-candidate-0057",
+            "task_family": "single_addition_calibrated_v1",
+            "difficulty_bucket": "medium",
+            "e2_correct": false,
+            "e3_correct": false,
+            "e2_completion": " 102\n\\",
+            "e3_completion": " 102\n\\",
+            "refinement_steps": 4,
+            "profiled_region": "12-14"
+          },
+          {
+            "task_id": "selection-candidate-0025",
+            "task_family": "single_addition_calibrated_v1",
+            "difficulty_bucket": "easy",
+            "e2_correct": false,
+            "e3_correct": false,
+            "e2_completion": " 12 \\]\n\\[",
+            "e3_completion": " 12 \\]\n\\[",
+            "refinement_steps": 4,
+            "profiled_region": "12-14"
+          },
+          {
+            "task_id": "selection-candidate-0059",
+            "task_family": "single_addition_calibrated_v1",
+            "difficulty_bucket": "easy",
+            "e2_correct": false,
+            "e3_correct": false,
+            "e2_completion": " 10 \\]\n\\[",
+            "e3_completion": " 10 \\]\n\\[",
+            "refinement_steps": 4,
+            "profiled_region": "12-14"
+          },
+          {
+            "task_id": "selection-candidate-0020",
+            "task_family": "single_addition_calibrated_v1",
+            "difficulty_bucket": "medium",
+            "e2_correct": true,
+            "e3_correct": true,
+            "e2_completion": " 81. What is",
+            "e3_completion": " 81. What is",
+            "refinement_steps": 4,
+            "profiled_region": "12-14"
+          },
+          {
+            "task_id": "selection-candidate-0053",
+            "task_family": "single_addition_calibrated_v1",
+            "difficulty_bucket": "medium",
+            "e2_correct": false,
+            "e3_correct": false,
+            "e2_completion": " 154\n\\",
+            "e3_completion": " 154\n\\",
+            "refinement_steps": 4,
+            "profiled_region": "12-14"
+          },
+          {
+            "task_id": "selection-candidate-0060",
+            "task_family": "single_addition_calibrated_v1",
+            "difficulty_bucket": "easy",
+            "e2_correct": true,
+            "e3_correct": true,
+            "e2_completion": " 19 \\]\n\nSo",
+            "e3_completion": " 19 \\]\n\nSo",
+            "refinement_steps": 4,
+            "profiled_region": "12-14"
+          },
+          {
+            "task_id": "selection-candidate-0013",
+            "task_family": "single_addition_calibrated_v1",
+            "difficulty_bucket": "medium",
+            "e2_correct": false,
+            "e3_correct": false,
+            "e2_completion": " 45 + 6",
+            "e3_completion": " 45 + 6",
+            "refinement_steps": 4,
+            "profiled_region": "12-14"
+          },
+          {
+            "task_id": "selection-candidate-0036",
+            "task_family": "single_addition_calibrated_v1",
+            "difficulty_bucket": "easy",
+            "e2_correct": false,
+            "e3_correct": false,
+            "e2_completion": " 11 + 5",
+            "e3_completion": " 11 + 5",
+            "refinement_steps": 4,
+            "profiled_region": "12-14"
+          },
+          {
+            "task_id": "selection-candidate-0044",
+            "task_family": "single_addition_calibrated_v1",
+            "difficulty_bucket": "easy",
+            "e2_correct": true,
+            "e3_correct": true,
+            "e2_completion": " 10 \\]\n\nSo",
+            "e3_completion": " 10 \\]\n\nSo",
+            "refinement_steps": 4,
+            "profiled_region": "12-14"
+          },
+          {
+            "task_id": "selection-candidate-0027",
+            "task_family": "single_addition_calibrated_v1",
+            "difficulty_bucket": "easy",
+            "e2_correct": false,
+            "e3_correct": false,
+            "e2_completion": " 13 + 1",
+            "e3_completion": " 13 + 1",
+            "refinement_steps": 4,
+            "profiled_region": "12-14"
+          },
+          {
+            "task_id": "selection-candidate-0043",
+            "task_family": "single_addition_calibrated_v1",
+            "difficulty_bucket": "medium",
+            "e2_correct": false,
+            "e3_correct": false,
+            "e2_completion": " 93 + 2",
+            "e3_completion": " 93 + 2",
+            "refinement_steps": 4,
+            "profiled_region": "12-14"
+          },
+          {
+            "task_id": "selection-candidate-0023",
+            "task_family": "single_addition_calibrated_v1",
+            "difficulty_bucket": "easy",
+            "e2_correct": true,
+            "e3_correct": true,
+            "e2_completion": " 12 \\]\n\\[",
+            "e3_completion": " 12 \\]\n\\[",
+            "refinement_steps": 4,
+            "profiled_region": "12-14"
+          },
+          {
+            "task_id": "selection-candidate-0015",
+            "task_family": "single_addition_calibrated_v1",
+            "difficulty_bucket": "medium",
+            "e2_correct": true,
+            "e3_correct": true,
+            "e2_completion": " 106. Question",
+            "e3_completion": " 106. Question",
+            "refinement_steps": 4,
+            "profiled_region": "12-14"
+          },
+          {
+            "task_id": "selection-candidate-0026",
+            "task_family": "single_addition_calibrated_v1",
+            "difficulty_bucket": "easy",
+            "e2_correct": false,
+            "e3_correct": false,
+            "e2_completion": " 14 + 2",
+            "e3_completion": " 14 + 2",
+            "refinement_steps": 4,
+            "profiled_region": "12-14"
+          },
+          {
+            "task_id": "selection-candidate-0024",
+            "task_family": "single_addition_calibrated_v1",
+            "difficulty_bucket": "easy",
+            "e2_correct": true,
+            "e3_correct": true,
+            "e2_completion": " 4. What is the",
+            "e3_completion": " 4. What is the",
+            "refinement_steps": 4,
+            "profiled_region": "12-14"
+          },
+          {
+            "task_id": "selection-candidate-0047",
+            "task_family": "single_addition_calibrated_v1",
+            "difficulty_bucket": "easy",
+            "e2_correct": true,
+            "e3_correct": true,
+            "e2_completion": " 30 \\text{",
+            "e3_completion": " 30 \\text{",
+            "refinement_steps": 4,
+            "profiled_region": "12-14"
+          },
+          {
+            "task_id": "selection-candidate-0054",
+            "task_family": "single_addition_calibrated_v1",
+            "difficulty_bucket": "easy",
+            "e2_correct": true,
+            "e3_correct": true,
+            "e2_completion": " 11 \\]\n\nSo",
+            "e3_completion": " 11 \\]\n\nSo",
+            "refinement_steps": 4,
+            "profiled_region": "12-14"
+          },
+          {
+            "task_id": "selection-candidate-0062",
+            "task_family": "single_addition_calibrated_v1",
+            "difficulty_bucket": "easy",
+            "e2_correct": true,
+            "e3_correct": true,
+            "e2_completion": " 12. What is",
+            "e3_completion": " 12. What is",
+            "refinement_steps": 4,
+            "profiled_region": "12-14"
+          },
+          {
+            "task_id": "selection-candidate-0045",
+            "task_family": "single_addition_calibrated_v1",
+            "difficulty_bucket": "easy",
+            "e2_correct": false,
+            "e3_correct": false,
+            "e2_completion": " 121 \\]\n",
+            "e3_completion": " 121 \\]\n",
+            "refinement_steps": 4,
+            "profiled_region": "12-14"
+          },
+          {
+            "task_id": "selection-candidate-0005",
+            "task_family": "single_addition_calibrated_v1",
+            "difficulty_bucket": "easy",
+            "e2_correct": false,
+            "e3_correct": false,
+            "e2_completion": " 8 + 5 =",
+            "e3_completion": " 8 + 5 =",
+            "refinement_steps": 4,
+            "profiled_region": "12-14"
+          },
+          {
+            "task_id": "selection-candidate-0061",
+            "task_family": "single_addition_calibrated_v1",
+            "difficulty_bucket": "medium",
+            "e2_correct": true,
+            "e3_correct": true,
+            "e2_completion": " 122. What",
+            "e3_completion": " 122. What",
+            "refinement_steps": 4,
+            "profiled_region": "12-14"
+          },
+          {
+            "task_id": "selection-candidate-0038",
+            "task_family": "single_addition_calibrated_v1",
+            "difficulty_bucket": "easy",
+            "e2_correct": true,
+            "e3_correct": true,
+            "e2_completion": " 18 \\text{",
+            "e3_completion": " 18 \\text{",
+            "refinement_steps": 4,
+            "profiled_region": "12-14"
+          },
+          {
+            "task_id": "selection-candidate-0037",
+            "task_family": "single_addition_calibrated_v1",
+            "difficulty_bucket": "easy",
+            "e2_correct": false,
+            "e3_correct": true,
+            "e2_completion": " 4 + 12",
+            "e3_completion": " 16. Question:",
+            "refinement_steps": 4,
+            "profiled_region": "12-14"
+          },
+          {
+            "task_id": "selection-candidate-0009",
+            "task_family": "single_addition_calibrated_v1",
+            "difficulty_bucket": "easy",
+            "e2_correct": true,
+            "e3_correct": true,
+            "e2_completion": " 12. What is",
+            "e3_completion": " 12. What is",
+            "refinement_steps": 4,
+            "profiled_region": "12-14"
+          }
+        ]
+      },
+      "raw_latent_scale": 0.0013582166284322739,
+      "effective_latent_scale": 0.0013499259948730469,
+      "e2_anchor_unchanged": true
+    }
+  },
+  "selection_winner_steps": 4,
+  "selected_latent_steps": 4,
+  "heldout_step_policy": "forced_matched",
+  "heldout": {
+    "tasks": 24,
+    "e2_accuracy": 0.5,
+    "e3_accuracy": 0.5,
+    "rescues": 0,
+    "regressions": 0,
+    "rescue_count": 0,
+    "regression_count": 0,
+    "rescue_rate": 0.0,
+    "regression_rate": 0.0,
+    "net_rescue_rate": 0.0,
+    "e3_correct_given_e2_wrong": 0.0,
+    "e3_wrong_given_e2_correct": 0.0,
+    "by_difficulty": {
+      "easy": {
+        "tasks": 14,
+        "e2_accuracy": 0.6428571428571429,
+        "e3_accuracy": 0.6428571428571429,
+        "rescues": 0,
+        "regressions": 0,
+        "rescue_count": 0,
+        "regression_count": 0,
+        "rescue_rate": 0.0,
+        "regression_rate": 0.0,
+        "net_rescue_rate": 0.0,
+        "e3_correct_given_e2_wrong": 0.0,
+        "e3_wrong_given_e2_correct": 0.0
+      },
+      "medium": {
+        "tasks": 10,
+        "e2_accuracy": 0.3,
+        "e3_accuracy": 0.3,
+        "rescues": 0,
+        "regressions": 0,
+        "rescue_count": 0,
+        "regression_count": 0,
+        "rescue_rate": 0.0,
+        "regression_rate": 0.0,
+        "net_rescue_rate": 0.0,
+        "e3_correct_given_e2_wrong": 0.0,
+        "e3_wrong_given_e2_correct": 0.0
+      }
+    },
+    "by_task_family": {
+      "single_addition_calibrated_v1": {
+        "tasks": 24,
+        "e2_accuracy": 0.5,
+        "e3_accuracy": 0.5,
+        "rescues": 0,
+        "regressions": 0,
+        "rescue_count": 0,
+        "regression_count": 0,
+        "rescue_rate": 0.0,
+        "regression_rate": 0.0,
+        "net_rescue_rate": 0.0,
+        "e3_correct_given_e2_wrong": 0.0,
+        "e3_wrong_given_e2_correct": 0.0
+      }
+    },
+    "by_refinement_steps": {
+      "4": {
+        "tasks": 24,
+        "e2_accuracy": 0.5,
+        "e3_accuracy": 0.5,
+        "rescues": 0,
+        "regressions": 0,
+        "rescue_count": 0,
+        "regression_count": 0,
+        "rescue_rate": 0.0,
+        "regression_rate": 0.0,
+        "net_rescue_rate": 0.0,
+        "e3_correct_given_e2_wrong": 0.0,
+        "e3_wrong_given_e2_correct": 0.0
+      }
+    },
+    "by_profiled_region": {
+      "12-14": {
+        "tasks": 24,
+        "e2_accuracy": 0.5,
+        "e3_accuracy": 0.5,
+        "rescues": 0,
+        "regressions": 0,
+        "rescue_count": 0,
+        "regression_count": 0,
+        "rescue_rate": 0.0,
+        "regression_rate": 0.0,
+        "net_rescue_rate": 0.0,
+        "e3_correct_given_e2_wrong": 0.0,
+        "e3_wrong_given_e2_correct": 0.0
+      }
+    },
+    "e2_completion_ce": 4.754210740327835,
+    "e3_completion_ce": 4.64917916059494,
+    "e3_ce_delta_vs_e2": -0.1050315797328949,
+    "mean_hidden_delta_l2": 1.459865892926852,
+    "e3_compute_overhead": 0.03584771190340561,
+    "task_outcomes": [
+      {
+        "task_id": "test-candidate-0024",
+        "task_family": "single_addition_calibrated_v1",
+        "difficulty_bucket": "easy",
+        "e2_correct": true,
+        "e3_correct": true,
+        "e2_completion": " 10 \\]\n\\[",
+        "e3_completion": " 10 \\]\n\\[",
+        "refinement_steps": 4,
+        "profiled_region": "12-14"
+      },
+      {
+        "task_id": "test-candidate-0018",
+        "task_family": "single_addition_calibrated_v1",
+        "difficulty_bucket": "easy",
+        "e2_correct": true,
+        "e3_correct": true,
+        "e2_completion": " 12 \\]\n\nSo",
+        "e3_completion": " 12 \\]\n\nSo",
+        "refinement_steps": 4,
+        "profiled_region": "12-14"
+      },
+      {
+        "task_id": "test-candidate-0038",
+        "task_family": "single_addition_calibrated_v1",
+        "difficulty_bucket": "easy",
+        "e2_correct": false,
+        "e3_correct": false,
+        "e2_completion": " 7 + 7 =",
+        "e3_completion": " 7 + 7 =",
+        "refinement_steps": 4,
+        "profiled_region": "12-14"
+      },
+      {
+        "task_id": "test-candidate-0020",
+        "task_family": "single_addition_calibrated_v1",
+        "difficulty_bucket": "medium",
+        "e2_correct": false,
+        "e3_correct": false,
+        "e2_completion": " 50 \\]\n\nSo",
+        "e3_completion": " 50 \\]\n\nSo",
+        "refinement_steps": 4,
+        "profiled_region": "12-14"
+      },
+      {
+        "task_id": "test-candidate-0039",
+        "task_family": "single_addition_calibrated_v1",
+        "difficulty_bucket": "medium",
+        "e2_correct": false,
+        "e3_correct": false,
+        "e2_completion": " 172\n\\",
+        "e3_completion": " 172\n\\",
+        "refinement_steps": 4,
+        "profiled_region": "12-14"
+      },
+      {
+        "task_id": "test-candidate-0006",
+        "task_family": "single_addition_calibrated_v1",
+        "difficulty_bucket": "easy",
+        "e2_correct": true,
+        "e3_correct": true,
+        "e2_completion": " 22. What is",
+        "e3_completion": " 22. What is",
+        "refinement_steps": 4,
+        "profiled_region": "12-14"
+      },
+      {
+        "task_id": "test-candidate-0060",
+        "task_family": "single_addition_calibrated_v1",
+        "difficulty_bucket": "easy",
+        "e2_correct": false,
+        "e3_correct": false,
+        "e2_completion": " 7 + 6 =",
+        "e3_completion": " 7 + 6 =",
+        "refinement_steps": 4,
+        "profiled_region": "12-14"
+      },
+      {
+        "task_id": "test-candidate-0033",
+        "task_family": "single_addition_calibrated_v1",
+        "difficulty_bucket": "medium",
+        "e2_correct": false,
+        "e3_correct": false,
+        "e2_completion": " 120\n\\",
+        "e3_completion": " 120\n\\",
+        "refinement_steps": 4,
+        "profiled_region": "12-14"
+      },
+      {
+        "task_id": "test-candidate-0025",
+        "task_family": "single_addition_calibrated_v1",
+        "difficulty_bucket": "easy",
+        "e2_correct": true,
+        "e3_correct": true,
+        "e2_completion": " 7. What is the",
+        "e3_completion": " 7. What is the",
+        "refinement_steps": 4,
+        "profiled_region": "12-14"
+      },
+      {
+        "task_id": "test-candidate-0061",
+        "task_family": "single_addition_calibrated_v1",
+        "difficulty_bucket": "medium",
+        "e2_correct": false,
+        "e3_correct": false,
+        "e2_completion": " 83 + 2",
+        "e3_completion": " 83 + 2",
+        "refinement_steps": 4,
+        "profiled_region": "12-14"
+      },
+      {
+        "task_id": "test-candidate-0003",
+        "task_family": "single_addition_calibrated_v1",
+        "difficulty_bucket": "medium",
+        "e2_correct": true,
+        "e3_correct": true,
+        "e2_completion": " 29. What is",
+        "e3_completion": " 29. What is",
+        "refinement_steps": 4,
+        "profiled_region": "12-14"
+      },
+      {
+        "task_id": "test-candidate-0049",
+        "task_family": "single_addition_calibrated_v1",
+        "difficulty_bucket": "easy",
+        "e2_correct": true,
+        "e3_correct": true,
+        "e2_completion": " 21 \\]\n\nSo",
+        "e3_completion": " 21\n\\]\n\n",
+        "refinement_steps": 4,
+        "profiled_region": "12-14"
+      },
+      {
+        "task_id": "test-candidate-0026",
+        "task_family": "single_addition_calibrated_v1",
+        "difficulty_bucket": "easy",
+        "e2_correct": false,
+        "e3_correct": false,
+        "e2_completion": " 9 + 11",
+        "e3_completion": " 9 + 11",
+        "refinement_steps": 4,
+        "profiled_region": "12-14"
+      },
+      {
+        "task_id": "test-candidate-0011",
+        "task_family": "single_addition_calibrated_v1",
+        "difficulty_bucket": "medium",
+        "e2_correct": false,
+        "e3_correct": false,
+        "e2_completion": " 144\n\\",
+        "e3_completion": " 184\n\\",
+        "refinement_steps": 4,
+        "profiled_region": "12-14"
+      },
+      {
+        "task_id": "test-candidate-0017",
+        "task_family": "single_addition_calibrated_v1",
+        "difficulty_bucket": "easy",
+        "e2_correct": true,
+        "e3_correct": true,
+        "e2_completion": " 12. What is",
+        "e3_completion": " 12. What is",
+        "refinement_steps": 4,
+        "profiled_region": "12-14"
+      },
+      {
+        "task_id": "test-candidate-0045",
+        "task_family": "single_addition_calibrated_v1",
+        "difficulty_bucket": "easy",
+        "e2_correct": false,
+        "e3_correct": false,
+        "e2_completion": " 11 + 1",
+        "e3_completion": " 11 + 1",
+        "refinement_steps": 4,
+        "profiled_region": "12-14"
+      },
+      {
+        "task_id": "test-candidate-0047",
+        "task_family": "single_addition_calibrated_v1",
+        "difficulty_bucket": "easy",
+        "e2_correct": true,
+        "e3_correct": true,
+        "e2_completion": " 23 \\]\n\nSo",
+        "e3_completion": " 23 \\]\n\nSo",
+        "refinement_steps": 4,
+        "profiled_region": "12-14"
+      },
+      {
+        "task_id": "test-candidate-0034",
+        "task_family": "single_addition_calibrated_v1",
+        "difficulty_bucket": "medium",
+        "e2_correct": false,
+        "e3_correct": false,
+        "e2_completion": " 74 + 9",
+        "e3_completion": " 74 + 9",
+        "refinement_steps": 4,
+        "profiled_region": "12-14"
+      },
+      {
+        "task_id": "test-candidate-0008",
+        "task_family": "single_addition_calibrated_v1",
+        "difficulty_bucket": "easy",
+        "e2_correct": true,
+        "e3_correct": true,
+        "e2_completion": " 28 \\]\n\nSo",
+        "e3_completion": " 28 \\]\n\nSo",
+        "refinement_steps": 4,
+        "profiled_region": "12-14"
+      },
+      {
+        "task_id": "test-candidate-0058",
+        "task_family": "single_addition_calibrated_v1",
+        "difficulty_bucket": "easy",
+        "e2_correct": false,
+        "e3_correct": false,
+        "e2_completion": " 12 + 5",
+        "e3_completion": " 12 + 5",
+        "refinement_steps": 4,
+        "profiled_region": "12-14"
+      },
+      {
+        "task_id": "test-candidate-0048",
+        "task_family": "single_addition_calibrated_v1",
+        "difficulty_bucket": "medium",
+        "e2_correct": true,
+        "e3_correct": true,
+        "e2_completion": " 145. What",
+        "e3_completion": " 145. What",
+        "refinement_steps": 4,
+        "profiled_region": "12-14"
+      },
+      {
+        "task_id": "test-candidate-0007",
+        "task_family": "single_addition_calibrated_v1",
+        "difficulty_bucket": "medium",
+        "e2_correct": true,
+        "e3_correct": true,
+        "e2_completion": " 72\n\\]\n\n",
+        "e3_completion": " 72\n\\]\n\n",
+        "refinement_steps": 4,
+        "profiled_region": "12-14"
+      },
+      {
+        "task_id": "test-candidate-0057",
+        "task_family": "single_addition_calibrated_v1",
+        "difficulty_bucket": "medium",
+        "e2_correct": false,
+        "e3_correct": false,
+        "e2_completion": " 92\n\\]\n\n",
+        "e3_completion": " 92\n\\]\n\n",
+        "refinement_steps": 4,
+        "profiled_region": "12-14"
+      },
+      {
+        "task_id": "test-candidate-0031",
+        "task_family": "single_addition_calibrated_v1",
+        "difficulty_bucket": "easy",
+        "e2_correct": true,
+        "e3_correct": true,
+        "e2_completion": " 8. What is the",
+        "e3_completion": " 8. What is the",
+        "refinement_steps": 4,
+        "profiled_region": "12-14"
+      }
+    ]
+  },
+  "qualification": {
+    "tasks": 24,
+    "e2_accuracy": 0.5,
+    "e3_accuracy": 0.5,
+    "rescues": 0,
+    "regressions": 0,
+    "rescue_count": 0,
+    "regression_count": 0,
+    "rescue_rate": 0.0,
+    "regression_rate": 0.0,
+    "net_rescue_rate": 0.0,
+    "e3_correct_given_e2_wrong": 0.0,
+    "e3_wrong_given_e2_correct": 0.0,
+    "by_difficulty": {
+      "easy": {
+        "tasks": 14,
+        "e2_accuracy": 0.6428571428571429,
+        "e3_accuracy": 0.6428571428571429,
+        "rescues": 0,
+        "regressions": 0,
+        "rescue_count": 0,
+        "regression_count": 0,
+        "rescue_rate": 0.0,
+        "regression_rate": 0.0,
+        "net_rescue_rate": 0.0,
+        "e3_correct_given_e2_wrong": 0.0,
+        "e3_wrong_given_e2_correct": 0.0
+      },
+      "medium": {
+        "tasks": 10,
+        "e2_accuracy": 0.3,
+        "e3_accuracy": 0.3,
+        "rescues": 0,
+        "regressions": 0,
+        "rescue_count": 0,
+        "regression_count": 0,
+        "rescue_rate": 0.0,
+        "regression_rate": 0.0,
+        "net_rescue_rate": 0.0,
+        "e3_correct_given_e2_wrong": 0.0,
+        "e3_wrong_given_e2_correct": 0.0
+      }
+    },
+    "by_task_family": {
+      "single_addition_calibrated_v1": {
+        "tasks": 24,
+        "e2_accuracy": 0.5,
+        "e3_accuracy": 0.5,
+        "rescues": 0,
+        "regressions": 0,
+        "rescue_count": 0,
+        "regression_count": 0,
+        "rescue_rate": 0.0,
+        "regression_rate": 0.0,
+        "net_rescue_rate": 0.0,
+        "e3_correct_given_e2_wrong": 0.0,
+        "e3_wrong_given_e2_correct": 0.0
+      }
+    },
+    "by_refinement_steps": {
+      "4": {
+        "tasks": 24,
+        "e2_accuracy": 0.5,
+        "e3_accuracy": 0.5,
+        "rescues": 0,
+        "regressions": 0,
+        "rescue_count": 0,
+        "regression_count": 0,
+        "rescue_rate": 0.0,
+        "regression_rate": 0.0,
+        "net_rescue_rate": 0.0,
+        "e3_correct_given_e2_wrong": 0.0,
+        "e3_wrong_given_e2_correct": 0.0
+      }
+    },
+    "by_profiled_region": {
+      "12-14": {
+        "tasks": 24,
+        "e2_accuracy": 0.5,
+        "e3_accuracy": 0.5,
+        "rescues": 0,
+        "regressions": 0,
+        "rescue_count": 0,
+        "regression_count": 0,
+        "rescue_rate": 0.0,
+        "regression_rate": 0.0,
+        "net_rescue_rate": 0.0,
+        "e3_correct_given_e2_wrong": 0.0,
+        "e3_wrong_given_e2_correct": 0.0
+      }
+    },
+    "mean_verified_utility_delta": 0.0,
+    "quality_delta_lcb": 0.0,
+    "confidence": 0.95,
+    "qualified": false,
+    "policy_training_allowed": false,
+    "thresholds": {
+      "min_verified_utility_delta": 0.0,
+      "min_net_rescue_rate": 0.0,
+      "bootstrap_samples": 2000
+    },
+    "e2_frozen": true,
+    "e2_difficulty_band_passed": true,
+    "e2_accuracy_band": [
+      0.3,
+      0.7
+    ]
+  },
+  "training_objective": {
+    "name": "answer_token_only_causal_ce",
+    "prompt_tokens_supervised": false
+  },
+  "limitations": [
+    "This is a targeted task-loss ablation, not a general-language capability claim.",
+    "Do not train or claim an effort router unless this result replicates on independent hard-task families."
+  ]
+}

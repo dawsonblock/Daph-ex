@@ -8,7 +8,7 @@ Layer profiling, hard-case mining, task-level rescue statistics, dose/location/v
 
 ## Acceptance evidence
 
-- Full local suite: 116 passed.
+- The v3.2.0 release snapshot recorded 116 passing tests; the current answer-only qualification build passes 124 tests in the default test environment.
 - Exact Gate 0B: covered by existing and new tests.
 - Physical effort ordering and E3 extra compute: covered by receipt tests.
 - Scalar digest and one-record QwenExFusion collection: covered end to end.

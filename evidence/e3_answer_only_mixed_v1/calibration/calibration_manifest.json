@@ -1,0 +1,1362 @@
+{
+  "experiment": "e2-mixed-success-task-calibration",
+  "model": {
+    "id": "Qwen/Qwen2.5-0.5B",
+    "revision": "060db6499f32faf8b98477b0a26969ef7d8b9987"
+  },
+  "e2_runtime": "pinned_hf_source_proxy_for_imported_e2",
+  "environment": {
+    "torch": "2.10.0",
+    "platform": "macOS-26.2-arm64-arm-64bit",
+    "device": "mps"
+  },
+  "config": {
+    "min_e2_accuracy": 0.3,
+    "max_e2_accuracy": 0.7,
+    "target_e2_accuracy": 0.5,
+    "max_new_tokens": 6,
+    "seed": 20260803
+  },
+  "splits": {
+    "train": {
+      "candidate_tasks": 128,
+      "candidate_e2_accuracy": 0.6171875,
+      "candidate_successes": 79,
+      "candidate_failures": 49,
+      "selected_tasks": 64,
+      "selected_successes": 32,
+      "selected_failures": 32,
+      "selected_e2_accuracy": 0.5,
+      "min_accuracy": 0.3,
+      "max_accuracy": 0.7,
+      "target_accuracy": 0.5,
+      "seed": 20260803,
+      "candidate_path": "runs/e3-answer-only-v1/candidates/train_candidates.jsonl",
+      "candidate_sha256": "27b2815951fb258efb0e3f78eba93bc42eb4b50ecf1792e42d053a27edb5fadf",
+      "selected_path": "runs/e3-answer-only-v1/calibrated/train.jsonl",
+      "selected_sha256": "79fd6927930cfdf838da8911a31fea3aa284842fa06f13272a78aa5030c671ff",
+      "outcomes": [
+        {
+          "task_id": "train-candidate-0000",
+          "e2_correct": true,
+          "e2_completion": " 117. What"
+        },
+        {
+          "task_id": "train-candidate-0001",
+          "e2_correct": true,
+          "e2_completion": " 20. What is"
+        },
+        {
+          "task_id": "train-candidate-0002",
+          "e2_correct": true,
+          "e2_completion": " 13\n\\]\n\n"
+        },
+        {
+          "task_id": "train-candidate-0003",
+          "e2_correct": true,
+          "e2_completion": " 11. What is"
+        },
+        {
+          "task_id": "train-candidate-0004",
+          "e2_correct": false,
+          "e2_completion": " 175\n\\"
+        },
+        {
+          "task_id": "train-candidate-0005",
+          "e2_correct": true,
+          "e2_completion": " 21\n\\]\n\n"
+        },
+        {
+          "task_id": "train-candidate-0006",
+          "e2_correct": false,
+          "e2_completion": " 119. What"
+        },
+        {
+          "task_id": "train-candidate-0007",
+          "e2_correct": true,
+          "e2_completion": " 125. What"
+        },
+        {
+          "task_id": "train-candidate-0008",
+          "e2_correct": true,
+          "e2_completion": " 20. What is"
+        },
+        {
+          "task_id": "train-candidate-0009",
+          "e2_correct": true,
+          "e2_completion": " 102. What"
+        },
+        {
+          "task_id": "train-candidate-0010",
+          "e2_correct": true,
+          "e2_completion": " 54. Question:"
+        },
+        {
+          "task_id": "train-candidate-0011",
+          "e2_correct": true,
+          "e2_completion": " 46. What is"
+        },
+        {
+          "task_id": "train-candidate-0012",
+          "e2_correct": false,
+          "e2_completion": " 12 + 1"
+        },
+        {
+          "task_id": "train-candidate-0013",
+          "e2_correct": false,
+          "e2_completion": " 2 + 9 ="
+        },
+        {
+          "task_id": "train-candidate-0014",
+          "e2_correct": false,
+          "e2_completion": " 14 \\]\n\nSo"
+        },
+        {
+          "task_id": "train-candidate-0015",
+          "e2_correct": true,
+          "e2_completion": " 62. What is"
+        },
+        {
+          "task_id": "train-candidate-0016",
+          "e2_correct": true,
+          "e2_completion": " 61. What is"
+        },
+        {
+          "task_id": "train-candidate-0017",
+          "e2_correct": true,
+          "e2_completion": " 25. What is"
+        },
+        {
+          "task_id": "train-candidate-0018",
+          "e2_correct": false,
+          "e2_completion": " 187\n\\"
+        },
+        {
+          "task_id": "train-candidate-0019",
+          "e2_correct": true,
+          "e2_completion": " 10. What is"
+        },
+        {
+          "task_id": "train-candidate-0020",
+          "e2_correct": true,
+          "e2_completion": " 125. What"
+        },
+        {
+          "task_id": "train-candidate-0021",
+          "e2_correct": true,
+          "e2_completion": " 16. Question:"
+        },
+        {
+          "task_id": "train-candidate-0022",
+          "e2_correct": true,
+          "e2_completion": " 19. What is"
+        },
+        {
+          "task_id": "train-candidate-0023",
+          "e2_correct": true,
+          "e2_completion": " 64\n\\]\n\n"
+        },
+        {
+          "task_id": "train-candidate-0024",
+          "e2_correct": false,
+          "e2_completion": " 75 + 4"
+        },
+        {
+          "task_id": "train-candidate-0025",
+          "e2_correct": true,
+          "e2_completion": " 0 + 1 ="
+        },
+        {
+          "task_id": "train-candidate-0026",
+          "e2_correct": true,
+          "e2_completion": " 12 \\]\n\\["
+        },
+        {
+          "task_id": "train-candidate-0027",
+          "e2_correct": true,
+          "e2_completion": " 19. What is"
+        },
+        {
+          "task_id": "train-candidate-0028",
+          "e2_correct": true,
+          "e2_completion": " 27 \\]\n\nSo"
+        },
+        {
+          "task_id": "train-candidate-0029",
+          "e2_correct": false,
+          "e2_completion": " 2 + 8 ="
+        },
+        {
+          "task_id": "train-candidate-0030",
+          "e2_correct": true,
+          "e2_completion": " 64. What is"
+        },
+        {
+          "task_id": "train-candidate-0031",
+          "e2_correct": false,
+          "e2_completion": " 4 + 3 ="
+        },
+        {
+          "task_id": "train-candidate-0032",
+          "e2_correct": true,
+          "e2_completion": " 10. What is"
+        },
+        {
+          "task_id": "train-candidate-0033",
+          "e2_correct": false,
+          "e2_completion": " 6 + 5 ="
+        },
+        {
+          "task_id": "train-candidate-0034",
+          "e2_correct": true,
+          "e2_completion": " 59. What is"
+        },
+        {
+          "task_id": "train-candidate-0035",
+          "e2_correct": false,
+          "e2_completion": " 88 + 7"
+        },
+        {
+          "task_id": "train-candidate-0036",
+          "e2_correct": true,
+          "e2_completion": " 5. What is the"
+        },
+        {
+          "task_id": "train-candidate-0037",
+          "e2_correct": true,
+          "e2_completion": " 13\n\\]\n\n"
+        },
+        {
+          "task_id": "train-candidate-0038",
+          "e2_correct": true,
+          "e2_completion": " 9. Question: What"
+        },
+        {
+          "task_id": "train-candidate-0039",
+          "e2_correct": true,
+          "e2_completion": " 3. Question: What"
+        },
+        {
+          "task_id": "train-candidate-0040",
+          "e2_correct": true,
+          "e2_completion": " 10 \\]\n\nSo"
+        },
+        {
+          "task_id": "train-candidate-0041",
+          "e2_correct": false,
+          "e2_completion": " 12 + 9"
+        },
+        {
+          "task_id": "train-candidate-0042",
+          "e2_correct": true,
+          "e2_completion": " 20. What is"
+        },
+        {
+          "task_id": "train-candidate-0043",
+          "e2_correct": true,
+          "e2_completion": " 26. Question:"
+        },
+        {
+          "task_id": "train-candidate-0044",
+          "e2_correct": false,
+          "e2_completion": " 1 \\) and \\("
+        },
+        {
+          "task_id": "train-candidate-0045",
+          "e2_correct": true,
+          "e2_completion": " 27. Question:"
+        },
+        {
+          "task_id": "train-candidate-0046",
+          "e2_correct": true,
+          "e2_completion": " 139. What"
+        },
+        {
+          "task_id": "train-candidate-0047",
+          "e2_correct": true,
+          "e2_completion": " 25. What is"
+        },
+        {
+          "task_id": "train-candidate-0048",
+          "e2_correct": false,
+          "e2_completion": " 12 + 8"
+        },
+        {
+          "task_id": "train-candidate-0049",
+          "e2_correct": true,
+          "e2_completion": " 148. What"
+        },
+        {
+          "task_id": "train-candidate-0050",
+          "e2_correct": true,
+          "e2_completion": " 13 \\]\n\nSo"
+        },
+        {
+          "task_id": "train-candidate-0051",
+          "e2_correct": true,
+          "e2_completion": " 41\n\\]\n\n"
+        },
+        {
+          "task_id": "train-candidate-0052",
+          "e2_correct": true,
+          "e2_completion": " 31\n\\]\n\n"
+        },
+        {
+          "task_id": "train-candidate-0053",
+          "e2_correct": true,
+          "e2_completion": " 17 \\]\n\\["
+        },
+        {
+          "task_id": "train-candidate-0054",
+          "e2_correct": false,
+          "e2_completion": " 61 + 9"
+        },
+        {
+          "task_id": "train-candidate-0055",
+          "e2_correct": false,
+          "e2_completion": " 62 + 3"
+        },
+        {
+          "task_id": "train-candidate-0056",
+          "e2_correct": true,
+          "e2_completion": " 19 \\]\n\nSo"
+        },
+        {
+          "task_id": "train-candidate-0057",
+          "e2_correct": true,
+          "e2_completion": " 18 \\]\n\nSo"
+        },
+        {
+          "task_id": "train-candidate-0058",
+          "e2_correct": false,
+          "e2_completion": " 12 + 6"
+        },
+        {
+          "task_id": "train-candidate-0059",
+          "e2_correct": false,
+          "e2_completion": " 10 + 1"
+        },
+        {
+          "task_id": "train-candidate-0060",
+          "e2_correct": true,
+          "e2_completion": " 26. What is"
+        },
+        {
+          "task_id": "train-candidate-0061",
+          "e2_correct": false,
+          "e2_completion": " 100 \\]\n\n"
+        },
+        {
+          "task_id": "train-candidate-0062",
+          "e2_correct": false,
+          "e2_completion": " 4 + 6 ="
+        },
+        {
+          "task_id": "train-candidate-0063",
+          "e2_correct": false,
+          "e2_completion": " 16 + 6"
+        },
+        {
+          "task_id": "train-candidate-0064",
+          "e2_correct": false,
+          "e2_completion": " 7 + 0 ="
+        },
+        {
+          "task_id": "train-candidate-0065",
+          "e2_correct": true,
+          "e2_completion": " 0 + 9 ="
+        },
+        {
+          "task_id": "train-candidate-0066",
+          "e2_correct": true,
+          "e2_completion": " 56\n\\]\n\n"
+        },
+        {
+          "task_id": "train-candidate-0067",
+          "e2_correct": false,
+          "e2_completion": " 24 \\]\n\nSo"
+        },
+        {
+          "task_id": "train-candidate-0068",
+          "e2_correct": false,
+          "e2_completion": " 16 + 7"
+        },
+        {
+          "task_id": "train-candidate-0069",
+          "e2_correct": true,
+          "e2_completion": " 7 \\]\n\nSo,"
+        },
+        {
+          "task_id": "train-candidate-0070",
+          "e2_correct": false,
+          "e2_completion": " 30 + 6"
+        },
+        {
+          "task_id": "train-candidate-0071",
+          "e2_correct": false,
+          "e2_completion": " 10 + 1"
+        },
+        {
+          "task_id": "train-candidate-0072",
+          "e2_correct": true,
+          "e2_completion": " 26. Question:"
+        },
+        {
+          "task_id": "train-candidate-0073",
+          "e2_correct": true,
+          "e2_completion": " 108. What"
+        },
+        {
+          "task_id": "train-candidate-0074",
+          "e2_correct": false,
+          "e2_completion": " 10\n\\]\n\n"
+        },
+        {
+          "task_id": "train-candidate-0075",
+          "e2_correct": false,
+          "e2_completion": " 94 + 3"
+        },
+        {
+          "task_id": "train-candidate-0076",
+          "e2_correct": false,
+          "e2_completion": " 14\n\\]\n\n"
+        },
+        {
+          "task_id": "train-candidate-0077",
+          "e2_correct": true,
+          "e2_completion": " 10\n\\]\n\n"
+        },
+        {
+          "task_id": "train-candidate-0078",
+          "e2_correct": false,
+          "e2_completion": " 15\n\\]\n\n"
+        },
+        {
+          "task_id": "train-candidate-0079",
+          "e2_correct": true,
+          "e2_completion": " 23. What is"
+        },
+        {
+          "task_id": "train-candidate-0080",
+          "e2_correct": false,
+          "e2_completion": " 22 + 6"
+        },
+        {
+          "task_id": "train-candidate-0081",
+          "e2_correct": true,
+          "e2_completion": " 16. What is"
+        },
+        {
+          "task_id": "train-candidate-0082",
+          "e2_correct": true,
+          "e2_completion": " 17. What is"
+        },
+        {
+          "task_id": "train-candidate-0083",
+          "e2_correct": false,
+          "e2_completion": " 119\n\\"
+        },
+        {
+          "task_id": "train-candidate-0084",
+          "e2_correct": true,
+          "e2_completion": " 2. What is the"
+        },
+        {
+          "task_id": "train-candidate-0085",
+          "e2_correct": true,
+          "e2_completion": " 18. What is"
+        },
+        {
+          "task_id": "train-candidate-0086",
+          "e2_correct": true,
+          "e2_completion": " 184. What"
+        },
+        {
+          "task_id": "train-candidate-0087",
+          "e2_correct": false,
+          "e2_completion": " 3 + 7 ="
+        },
+        {
+          "task_id": "train-candidate-0088",
+          "e2_correct": false,
+          "e2_completion": " 58 + 8"
+        },
+        {
+          "task_id": "train-candidate-0089",
+          "e2_correct": true,
+          "e2_completion": " 14\n\\]\n\n"
+        },
+        {
+          "task_id": "train-candidate-0090",
+          "e2_correct": true,
+          "e2_completion": " 16. What is"
+        },
+        {
+          "task_id": "train-candidate-0091",
+          "e2_correct": false,
+          "e2_completion": " 7 + 14"
+        },
+        {
+          "task_id": "train-candidate-0092",
+          "e2_correct": false,
+          "e2_completion": " 10 + 9"
+        },
+        {
+          "task_id": "train-candidate-0093",
+          "e2_correct": false,
+          "e2_completion": " 10 \\text{"
+        },
+        {
+          "task_id": "train-candidate-0094",
+          "e2_correct": true,
+          "e2_completion": " 14 \\]\n\\["
+        },
+        {
+          "task_id": "train-candidate-0095",
+          "e2_correct": true,
+          "e2_completion": " 10\n\\]\n\n"
+        },
+        {
+          "task_id": "train-candidate-0096",
+          "e2_correct": true,
+          "e2_completion": " 100. What"
+        },
+        {
+          "task_id": "train-candidate-0097",
+          "e2_correct": false,
+          "e2_completion": " 7 + 4 ="
+        },
+        {
+          "task_id": "train-candidate-0098",
+          "e2_correct": true,
+          "e2_completion": " 36\n\\]\n\n"
+        },
+        {
+          "task_id": "train-candidate-0099",
+          "e2_correct": true,
+          "e2_completion": " 15. Question:"
+        },
+        {
+          "task_id": "train-candidate-0100",
+          "e2_correct": true,
+          "e2_completion": " 23. What is"
+        },
+        {
+          "task_id": "train-candidate-0101",
+          "e2_correct": false,
+          "e2_completion": " 199\n\\"
+        },
+        {
+          "task_id": "train-candidate-0102",
+          "e2_correct": true,
+          "e2_completion": " 23. What is"
+        },
+        {
+          "task_id": "train-candidate-0103",
+          "e2_correct": true,
+          "e2_completion": " 18 \\]\n\nSo"
+        },
+        {
+          "task_id": "train-candidate-0104",
+          "e2_correct": false,
+          "e2_completion": " 13 + 1"
+        },
+        {
+          "task_id": "train-candidate-0105",
+          "e2_correct": false,
+          "e2_completion": " 6 + 8 ="
+        },
+        {
+          "task_id": "train-candidate-0106",
+          "e2_correct": false,
+          "e2_completion": " 16 \\]\n\\["
+        },
+        {
+          "task_id": "train-candidate-0107",
+          "e2_correct": true,
+          "e2_completion": " 17. What is"
+        },
+        {
+          "task_id": "train-candidate-0108",
+          "e2_correct": false,
+          "e2_completion": " 8 + 11"
+        },
+        {
+          "task_id": "train-candidate-0109",
+          "e2_correct": false,
+          "e2_completion": " 1 + 3 ="
+        },
+        {
+          "task_id": "train-candidate-0110",
+          "e2_correct": true,
+          "e2_completion": " 16. What is"
+        },
+        {
+          "task_id": "train-candidate-0111",
+          "e2_correct": false,
+          "e2_completion": " 13 + 2"
+        },
+        {
+          "task_id": "train-candidate-0112",
+          "e2_correct": true,
+          "e2_completion": " 12 \\]\n\nSo"
+        },
+        {
+          "task_id": "train-candidate-0113",
+          "e2_correct": true,
+          "e2_completion": " 9. What is the"
+        },
+        {
+          "task_id": "train-candidate-0114",
+          "e2_correct": true,
+          "e2_completion": " 124. What"
+        },
+        {
+          "task_id": "train-candidate-0115",
+          "e2_correct": false,
+          "e2_completion": " 11 + 1"
+        },
+        {
+          "task_id": "train-candidate-0116",
+          "e2_correct": true,
+          "e2_completion": " 124. What"
+        },
+        {
+          "task_id": "train-candidate-0117",
+          "e2_correct": true,
+          "e2_completion": " 15 \\]\n\nSo"
+        },
+        {
+          "task_id": "train-candidate-0118",
+          "e2_correct": false,
+          "e2_completion": " 138\n\\"
+        },
+        {
+          "task_id": "train-candidate-0119",
+          "e2_correct": true,
+          "e2_completion": " 10. What is"
+        },
+        {
+          "task_id": "train-candidate-0120",
+          "e2_correct": true,
+          "e2_completion": " 28 \\]\n\nSo"
+        },
+        {
+          "task_id": "train-candidate-0121",
+          "e2_correct": true,
+          "e2_completion": " 8. What is the"
+        },
+        {
+          "task_id": "train-candidate-0122",
+          "e2_correct": false,
+          "e2_completion": " 88 + 7"
+        },
+        {
+          "task_id": "train-candidate-0123",
+          "e2_correct": false,
+          "e2_completion": " 109 \\]\n\n"
+        },
+        {
+          "task_id": "train-candidate-0124",
+          "e2_correct": true,
+          "e2_completion": " 13\n\\]\n\n"
+        },
+        {
+          "task_id": "train-candidate-0125",
+          "e2_correct": true,
+          "e2_completion": " 160. What"
+        },
+        {
+          "task_id": "train-candidate-0126",
+          "e2_correct": true,
+          "e2_completion": " 72. What is"
+        },
+        {
+          "task_id": "train-candidate-0127",
+          "e2_correct": true,
+          "e2_completion": " 14. What is"
+        }
+      ]
+    },
+    "selection": {
+      "candidate_tasks": 64,
+      "candidate_e2_accuracy": 0.53125,
+      "candidate_successes": 34,
+      "candidate_failures": 30,
+      "selected_tasks": 24,
+      "selected_successes": 12,
+      "selected_failures": 12,
+      "selected_e2_accuracy": 0.5,
+      "min_accuracy": 0.3,
+      "max_accuracy": 0.7,
+      "target_accuracy": 0.5,
+      "seed": 20260804,
+      "candidate_path": "runs/e3-answer-only-v1/candidates/selection_candidates.jsonl",
+      "candidate_sha256": "e58df14eb1207f692f024a594177f3023afc504b521f44512ec31dd529db88e5",
+      "selected_path": "runs/e3-answer-only-v1/calibrated/selection.jsonl",
+      "selected_sha256": "f020bb32efa99df4adb9b940b5087d4681044d02c294f972425cd90190fb3f36",
+      "outcomes": [
+        {
+          "task_id": "selection-candidate-0000",
+          "e2_correct": true,
+          "e2_completion": " 11\n\\]\n\n"
+        },
+        {
+          "task_id": "selection-candidate-0001",
+          "e2_correct": false,
+          "e2_completion": " 144 \\]\n"
+        },
+        {
+          "task_id": "selection-candidate-0002",
+          "e2_correct": false,
+          "e2_completion": " 14 + 1"
+        },
+        {
+          "task_id": "selection-candidate-0003",
+          "e2_correct": true,
+          "e2_completion": " 71. What is"
+        },
+        {
+          "task_id": "selection-candidate-0004",
+          "e2_correct": true,
+          "e2_completion": " 123. What"
+        },
+        {
+          "task_id": "selection-candidate-0005",
+          "e2_correct": false,
+          "e2_completion": " 8 + 5 ="
+        },
+        {
+          "task_id": "selection-candidate-0006",
+          "e2_correct": false,
+          "e2_completion": " 33\n\\]\n\n"
+        },
+        {
+          "task_id": "selection-candidate-0007",
+          "e2_correct": true,
+          "e2_completion": " 28. What is"
+        },
+        {
+          "task_id": "selection-candidate-0008",
+          "e2_correct": true,
+          "e2_completion": " 24 \\]\n\nSo"
+        },
+        {
+          "task_id": "selection-candidate-0009",
+          "e2_correct": true,
+          "e2_completion": " 12. What is"
+        },
+        {
+          "task_id": "selection-candidate-0010",
+          "e2_correct": false,
+          "e2_completion": " 56 + 9"
+        },
+        {
+          "task_id": "selection-candidate-0011",
+          "e2_correct": false,
+          "e2_completion": " 100 \\]\n"
+        },
+        {
+          "task_id": "selection-candidate-0012",
+          "e2_correct": true,
+          "e2_completion": " 15. What is"
+        },
+        {
+          "task_id": "selection-candidate-0013",
+          "e2_correct": false,
+          "e2_completion": " 45 + 6"
+        },
+        {
+          "task_id": "selection-candidate-0014",
+          "e2_correct": true,
+          "e2_completion": " 15 \\]\n\nSo"
+        },
+        {
+          "task_id": "selection-candidate-0015",
+          "e2_correct": true,
+          "e2_completion": " 106. Question"
+        },
+        {
+          "task_id": "selection-candidate-0016",
+          "e2_correct": false,
+          "e2_completion": " 1 + 13"
+        },
+        {
+          "task_id": "selection-candidate-0017",
+          "e2_correct": false,
+          "e2_completion": " 10 + 1"
+        },
+        {
+          "task_id": "selection-candidate-0018",
+          "e2_correct": true,
+          "e2_completion": " 27 \\]\n\nSo"
+        },
+        {
+          "task_id": "selection-candidate-0019",
+          "e2_correct": true,
+          "e2_completion": " 16. What is"
+        },
+        {
+          "task_id": "selection-candidate-0020",
+          "e2_correct": true,
+          "e2_completion": " 81. What is"
+        },
+        {
+          "task_id": "selection-candidate-0021",
+          "e2_correct": true,
+          "e2_completion": " 10. What is"
+        },
+        {
+          "task_id": "selection-candidate-0022",
+          "e2_correct": false,
+          "e2_completion": " 11 + 3"
+        },
+        {
+          "task_id": "selection-candidate-0023",
+          "e2_correct": true,
+          "e2_completion": " 12 \\]\n\\["
+        },
+        {
+          "task_id": "selection-candidate-0024",
+          "e2_correct": true,
+          "e2_completion": " 4. What is the"
+        },
+        {
+          "task_id": "selection-candidate-0025",
+          "e2_correct": false,
+          "e2_completion": " 12 \\]\n\\["
+        },
+        {
+          "task_id": "selection-candidate-0026",
+          "e2_correct": false,
+          "e2_completion": " 14 + 2"
+        },
+        {
+          "task_id": "selection-candidate-0027",
+          "e2_correct": false,
+          "e2_completion": " 13 + 1"
+        },
+        {
+          "task_id": "selection-candidate-0028",
+          "e2_correct": false,
+          "e2_completion": " 6 + 4 ="
+        },
+        {
+          "task_id": "selection-candidate-0029",
+          "e2_correct": false,
+          "e2_completion": " 5 + 9 ="
+        },
+        {
+          "task_id": "selection-candidate-0030",
+          "e2_correct": true,
+          "e2_completion": " 86. What is"
+        },
+        {
+          "task_id": "selection-candidate-0031",
+          "e2_correct": false,
+          "e2_completion": " 15 + 6"
+        },
+        {
+          "task_id": "selection-candidate-0032",
+          "e2_correct": false,
+          "e2_completion": " 67 + 5"
+        },
+        {
+          "task_id": "selection-candidate-0033",
+          "e2_correct": true,
+          "e2_completion": " 11. What is"
+        },
+        {
+          "task_id": "selection-candidate-0034",
+          "e2_correct": true,
+          "e2_completion": " 108\n\\"
+        },
+        {
+          "task_id": "selection-candidate-0035",
+          "e2_correct": true,
+          "e2_completion": " 0 + 3 ="
+        },
+        {
+          "task_id": "selection-candidate-0036",
+          "e2_correct": false,
+          "e2_completion": " 11 + 5"
+        },
+        {
+          "task_id": "selection-candidate-0037",
+          "e2_correct": false,
+          "e2_completion": " 4 + 12"
+        },
+        {
+          "task_id": "selection-candidate-0038",
+          "e2_correct": true,
+          "e2_completion": " 18 \\text{"
+        },
+        {
+          "task_id": "selection-candidate-0039",
+          "e2_correct": true,
+          "e2_completion": " 169. What"
+        },
+        {
+          "task_id": "selection-candidate-0040",
+          "e2_correct": true,
+          "e2_completion": " 136. What"
+        },
+        {
+          "task_id": "selection-candidate-0041",
+          "e2_correct": true,
+          "e2_completion": " 15. What is"
+        },
+        {
+          "task_id": "selection-candidate-0042",
+          "e2_correct": true,
+          "e2_completion": " 144. What"
+        },
+        {
+          "task_id": "selection-candidate-0043",
+          "e2_correct": false,
+          "e2_completion": " 93 + 2"
+        },
+        {
+          "task_id": "selection-candidate-0044",
+          "e2_correct": true,
+          "e2_completion": " 10 \\]\n\nSo"
+        },
+        {
+          "task_id": "selection-candidate-0045",
+          "e2_correct": false,
+          "e2_completion": " 121 \\]\n"
+        },
+        {
+          "task_id": "selection-candidate-0046",
+          "e2_correct": true,
+          "e2_completion": " 17. What is"
+        },
+        {
+          "task_id": "selection-candidate-0047",
+          "e2_correct": true,
+          "e2_completion": " 30 \\text{"
+        },
+        {
+          "task_id": "selection-candidate-0048",
+          "e2_correct": false,
+          "e2_completion": " 10 \\) and"
+        },
+        {
+          "task_id": "selection-candidate-0049",
+          "e2_correct": false,
+          "e2_completion": " 14 + 0"
+        },
+        {
+          "task_id": "selection-candidate-0050",
+          "e2_correct": false,
+          "e2_completion": " 66 + 8"
+        },
+        {
+          "task_id": "selection-candidate-0051",
+          "e2_correct": false,
+          "e2_completion": " 62\n\\]\n\n"
+        },
+        {
+          "task_id": "selection-candidate-0052",
+          "e2_correct": false,
+          "e2_completion": " 95 + 3"
+        },
+        {
+          "task_id": "selection-candidate-0053",
+          "e2_correct": false,
+          "e2_completion": " 154\n\\"
+        },
+        {
+          "task_id": "selection-candidate-0054",
+          "e2_correct": true,
+          "e2_completion": " 11 \\]\n\nSo"
+        },
+        {
+          "task_id": "selection-candidate-0055",
+          "e2_correct": true,
+          "e2_completion": " 25. Question:"
+        },
+        {
+          "task_id": "selection-candidate-0056",
+          "e2_correct": false,
+          "e2_completion": " 14 + 5"
+        },
+        {
+          "task_id": "selection-candidate-0057",
+          "e2_correct": false,
+          "e2_completion": " 102\n\\"
+        },
+        {
+          "task_id": "selection-candidate-0058",
+          "e2_correct": true,
+          "e2_completion": " 112. What"
+        },
+        {
+          "task_id": "selection-candidate-0059",
+          "e2_correct": false,
+          "e2_completion": " 10 \\]\n\\["
+        },
+        {
+          "task_id": "selection-candidate-0060",
+          "e2_correct": true,
+          "e2_completion": " 19 \\]\n\nSo"
+        },
+        {
+          "task_id": "selection-candidate-0061",
+          "e2_correct": true,
+          "e2_completion": " 122. What"
+        },
+        {
+          "task_id": "selection-candidate-0062",
+          "e2_correct": true,
+          "e2_completion": " 12. What is"
+        },
+        {
+          "task_id": "selection-candidate-0063",
+          "e2_correct": true,
+          "e2_completion": " 7 \\) (not"
+        }
+      ]
+    },
+    "test": {
+      "candidate_tasks": 64,
+      "candidate_e2_accuracy": 0.625,
+      "candidate_successes": 40,
+      "candidate_failures": 24,
+      "selected_tasks": 24,
+      "selected_successes": 12,
+      "selected_failures": 12,
+      "selected_e2_accuracy": 0.5,
+      "min_accuracy": 0.3,
+      "max_accuracy": 0.7,
+      "target_accuracy": 0.5,
+      "seed": 20260805,
+      "candidate_path": "runs/e3-answer-only-v1/candidates/test_candidates.jsonl",
+      "candidate_sha256": "eaadd3e17595312b1af382e5fd3fabd63c31658ae85acae2269988482b919979",
+      "selected_path": "runs/e3-answer-only-v1/calibrated/test.jsonl",
+      "selected_sha256": "14b99d5ecae23c763c430301b2895ff77f3deb07ae665ef33936a41194c1c5a4",
+      "outcomes": [
+        {
+          "task_id": "test-candidate-0000",
+          "e2_correct": true,
+          "e2_completion": " 9. What is the"
+        },
+        {
+          "task_id": "test-candidate-0001",
+          "e2_correct": true,
+          "e2_completion": " 14. What is"
+        },
+        {
+          "task_id": "test-candidate-0002",
+          "e2_correct": true,
+          "e2_completion": " 25. What is"
+        },
+        {
+          "task_id": "test-candidate-0003",
+          "e2_correct": true,
+          "e2_completion": " 29. What is"
+        },
+        {
+          "task_id": "test-candidate-0004",
+          "e2_correct": false,
+          "e2_completion": " 52 + 9"
+        },
+        {
+          "task_id": "test-candidate-0005",
+          "e2_correct": true,
+          "e2_completion": " 15\n\\]\n\n"
+        },
+        {
+          "task_id": "test-candidate-0006",
+          "e2_correct": true,
+          "e2_completion": " 22. What is"
+        },
+        {
+          "task_id": "test-candidate-0007",
+          "e2_correct": true,
+          "e2_completion": " 72\n\\]\n\n"
+        },
+        {
+          "task_id": "test-candidate-0008",
+          "e2_correct": true,
+          "e2_completion": " 28 \\]\n\nSo"
+        },
+        {
+          "task_id": "test-candidate-0009",
+          "e2_correct": true,
+          "e2_completion": " 69\n\\]\n\n"
+        },
+        {
+          "task_id": "test-candidate-0010",
+          "e2_correct": false,
+          "e2_completion": " 186\n\\"
+        },
+        {
+          "task_id": "test-candidate-0011",
+          "e2_correct": false,
+          "e2_completion": " 144\n\\"
+        },
+        {
+          "task_id": "test-candidate-0012",
+          "e2_correct": true,
+          "e2_completion": " 23. What is"
+        },
+        {
+          "task_id": "test-candidate-0013",
+          "e2_correct": true,
+          "e2_completion": " 5. What is the"
+        },
+        {
+          "task_id": "test-candidate-0014",
+          "e2_correct": true,
+          "e2_completion": " 15 \\]\n\nSo"
+        },
+        {
+          "task_id": "test-candidate-0015",
+          "e2_correct": true,
+          "e2_completion": " 96. What is"
+        },
+        {
+          "task_id": "test-candidate-0016",
+          "e2_correct": false,
+          "e2_completion": " 15 + 1"
+        },
+        {
+          "task_id": "test-candidate-0017",
+          "e2_correct": true,
+          "e2_completion": " 12. What is"
+        },
+        {
+          "task_id": "test-candidate-0018",
+          "e2_correct": true,
+          "e2_completion": " 12 \\]\n\nSo"
+        },
+        {
+          "task_id": "test-candidate-0019",
+          "e2_correct": true,
+          "e2_completion": " 83. What is"
+        },
+        {
+          "task_id": "test-candidate-0020",
+          "e2_correct": false,
+          "e2_completion": " 50 \\]\n\nSo"
+        },
+        {
+          "task_id": "test-candidate-0021",
+          "e2_correct": false,
+          "e2_completion": " 43 + 6"
+        },
+        {
+          "task_id": "test-candidate-0022",
+          "e2_correct": false,
+          "e2_completion": " 1 + 12"
+        },
+        {
+          "task_id": "test-candidate-0023",
+          "e2_correct": false,
+          "e2_completion": " 7 + 9 ="
+        },
+        {
+          "task_id": "test-candidate-0024",
+          "e2_correct": true,
+          "e2_completion": " 10 \\]\n\\["
+        },
+        {
+          "task_id": "test-candidate-0025",
+          "e2_correct": true,
+          "e2_completion": " 7. What is the"
+        },
+        {
+          "task_id": "test-candidate-0026",
+          "e2_correct": false,
+          "e2_completion": " 9 + 11"
+        },
+        {
+          "task_id": "test-candidate-0027",
+          "e2_correct": false,
+          "e2_completion": " 98 + 6"
+        },
+        {
+          "task_id": "test-candidate-0028",
+          "e2_correct": true,
+          "e2_completion": " 9. What is the"
+        },
+        {
+          "task_id": "test-candidate-0029",
+          "e2_correct": true,
+          "e2_completion": " 78. What is"
+        },
+        {
+          "task_id": "test-candidate-0030",
+          "e2_correct": false,
+          "e2_completion": " 7 + 13"
+        },
+        {
+          "task_id": "test-candidate-0031",
+          "e2_correct": true,
+          "e2_completion": " 8. What is the"
+        },
+        {
+          "task_id": "test-candidate-0032",
+          "e2_correct": true,
+          "e2_completion": " 5. What is the"
+        },
+        {
+          "task_id": "test-candidate-0033",
+          "e2_correct": false,
+          "e2_completion": " 120\n\\"
+        },
+        {
+          "task_id": "test-candidate-0034",
+          "e2_correct": false,
+          "e2_completion": " 74 + 9"
+        },
+        {
+          "task_id": "test-candidate-0035",
+          "e2_correct": true,
+          "e2_completion": " 27 \\]\n\nSo"
+        },
+        {
+          "task_id": "test-candidate-0036",
+          "e2_correct": false,
+          "e2_completion": " 10 \\]\n\nSo"
+        },
+        {
+          "task_id": "test-candidate-0037",
+          "e2_correct": true,
+          "e2_completion": " 18 \\]\n\nSo"
+        },
+        {
+          "task_id": "test-candidate-0038",
+          "e2_correct": false,
+          "e2_completion": " 7 + 7 ="
+        },
+        {
+          "task_id": "test-candidate-0039",
+          "e2_correct": false,
+          "e2_completion": " 172\n\\"
+        },
+        {
+          "task_id": "test-candidate-0040",
+          "e2_correct": true,
+          "e2_completion": " 15. What is"
+        },
+        {
+          "task_id": "test-candidate-0041",
+          "e2_correct": true,
+          "e2_completion": " 14\n\\]\n\n"
+        },
+        {
+          "task_id": "test-candidate-0042",
+          "e2_correct": false,
+          "e2_completion": " 15 + 1"
+        },
+        {
+          "task_id": "test-candidate-0043",
+          "e2_correct": true,
+          "e2_completion": " 12. What is"
+        },
+        {
+          "task_id": "test-candidate-0044",
+          "e2_correct": true,
+          "e2_completion": " 18. Question:"
+        },
+        {
+          "task_id": "test-candidate-0045",
+          "e2_correct": false,
+          "e2_completion": " 11 + 1"
+        },
+        {
+          "task_id": "test-candidate-0046",
+          "e2_correct": true,
+          "e2_completion": " 14. What is"
+        },
+        {
+          "task_id": "test-candidate-0047",
+          "e2_correct": true,
+          "e2_completion": " 23 \\]\n\nSo"
+        },
+        {
+          "task_id": "test-candidate-0048",
+          "e2_correct": true,
+          "e2_completion": " 145. What"
+        },
+        {
+          "task_id": "test-candidate-0049",
+          "e2_correct": true,
+          "e2_completion": " 21 \\]\n\nSo"
+        },
+        {
+          "task_id": "test-candidate-0050",
+          "e2_correct": true,
+          "e2_completion": " 56. What is"
+        },
+        {
+          "task_id": "test-candidate-0051",
+          "e2_correct": true,
+          "e2_completion": " 15. What is"
+        },
+        {
+          "task_id": "test-candidate-0052",
+          "e2_correct": true,
+          "e2_completion": " 16 \\]\n\\["
+        },
+        {
+          "task_id": "test-candidate-0053",
+          "e2_correct": true,
+          "e2_completion": " 7. What is the"
+        },
+        {
+          "task_id": "test-candidate-0054",
+          "e2_correct": true,
+          "e2_completion": " 14. What is"
+        },
+        {
+          "task_id": "test-candidate-0055",
+          "e2_correct": true,
+          "e2_completion": " 8 \\]\n\\[ "
+        },
+        {
+          "task_id": "test-candidate-0056",
+          "e2_correct": true,
+          "e2_completion": " 22. What is"
+        },
+        {
+          "task_id": "test-candidate-0057",
+          "e2_correct": false,
+          "e2_completion": " 92\n\\]\n\n"
+        },
+        {
+          "task_id": "test-candidate-0058",
+          "e2_correct": false,
+          "e2_completion": " 12 + 5"
+        },
+        {
+          "task_id": "test-candidate-0059",
+          "e2_correct": true,
+          "e2_completion": " 3. What is the"
+        },
+        {
+          "task_id": "test-candidate-0060",
+          "e2_correct": false,
+          "e2_completion": " 7 + 6 ="
+        },
+        {
+          "task_id": "test-candidate-0061",
+          "e2_correct": false,
+          "e2_completion": " 83 + 2"
+        },
+        {
+          "task_id": "test-candidate-0062",
+          "e2_correct": false,
+          "e2_completion": " 75 + 3"
+        },
+        {
+          "task_id": "test-candidate-0063",
+          "e2_correct": false,
+          "e2_completion": " 59 + 8"
+        }
+      ]
+    }
+  }
+}

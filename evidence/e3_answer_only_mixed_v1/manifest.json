@@ -1,0 +1,52 @@
+{
+  "experiment": "answer-only-mixed-e2-matched-e3-location-study-v1",
+  "implementation_commit": "534ccc5376215f98399c78ccf64dfb4bf608c515",
+  "model": {
+    "id": "Qwen/Qwen2.5-0.5B",
+    "revision": "060db6499f32faf8b98477b0a26969ef7d8b9987"
+  },
+  "training": {
+    "objective": "answer_token_only_causal_ce",
+    "steps_per_dose": 40,
+    "latent_step_candidates": [1, 2, 4],
+    "heldout_latent_steps": 4,
+    "e2_backbone_frozen": true,
+    "seed": 20260803
+  },
+  "evaluation": {
+    "train_tasks": 64,
+    "selection_tasks": 24,
+    "heldout_tasks": 24,
+    "e2_accuracy_each_split": 0.5,
+    "confidence": 0.95,
+    "bootstrap_samples": 2000
+  },
+  "result": {
+    "best_mode": "middle_recurrent",
+    "best_refinement_layer_zero_based": 12,
+    "heldout_e2_accuracy": 0.5,
+    "heldout_e3_accuracy": 0.5416666666666666,
+    "rescues": 1,
+    "regressions": 0,
+    "net_rescue_rate": 0.041666666666666664,
+    "verified_utility_delta_lcb95": 0.0,
+    "compute_overhead": 0.03584771190340561,
+    "qualified": false,
+    "policy_training_allowed": false
+  },
+  "tests": {
+    "command": "python -m pytest -q",
+    "result": "124 passed in 4.61s"
+  },
+  "files": {
+    "calibration/calibration_manifest.json": "1912a2d9c2e09b3d047090e8cb3f00ce3d7097a03bd6a9047af74b6b98a1eba1",
+    "calibration/train.jsonl": "79fd6927930cfdf838da8911a31fea3aa284842fa06f13272a78aa5030c671ff",
+    "calibration/selection.jsonl": "f020bb32efa99df4adb9b940b5087d4681044d02c294f972425cd90190fb3f36",
+    "calibration/test.jsonl": "14b99d5ecae23c763c430301b2895ff77f3deb07ae665ef33936a41194c1c5a4",
+    "location_reports/final_refine.json": "d711ef5211737ed7d211d87c874271149daaedb54025a49d0520b380a27dc225",
+    "location_reports/middle_recurrent.json": "3e9e97137a69dd15cbfa32123960bc6c18b75093fca09000b02ec44f52dbdd6d",
+    "location_reports/profiled_middle_recurrent.json": "2a8f7aec7b3f373657bd0e9f74561e362dd2d7e4d61362623f85bd6943ee3c92",
+    "location_study_report.json": "bfe341bfeea5c7038a65f45bd8fd7796034c23f321f84127c6878c33e5371911",
+    "pytest_output.txt": "8529047a7d5ceca016cf1b9532dfeb6d40eabc5f5d2685170b6b18e1c852d080"
+  }
+}

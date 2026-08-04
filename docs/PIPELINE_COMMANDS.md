@@ -68,20 +68,54 @@ For verified reward/GRPO, call `LayerContributionProfiler.run()` with a `LayerAd
 
 ## Frozen-E2 hard-case E3 ablation
 
+First construct disjoint candidates and calibrate each split to a non-degenerate E2 accuracy band using the pinned source checkpoint:
+
 ```bash
-python scripts/make_e3_hardcase_arithmetic.py --output runs/e3-hardcase-data
+python scripts/make_e3_calibration_pool.py \
+  --output runs/e3-calibration/candidates
+
+python scripts/calibrate_e2_task_band.py \
+  --model Qwen/Qwen2.5-0.5B \
+  --revision 060db6499f32faf8b98477b0a26969ef7d8b9987 \
+  --candidate-dir runs/e3-calibration/candidates \
+  --output runs/e3-calibration/calibrated \
+  --train-count 64 --selection-count 24 --test-count 24 \
+  --target-e2-accuracy 0.50
+```
+
+Then run the three locations with identical training, evaluation, and held-out refinement dose:
+
+```bash
+python scripts/run_e3_location_study.py \
+  --model Qwen/Qwen2.5-0.5B \
+  --revision 060db6499f32faf8b98477b0a26969ef7d8b9987 \
+  --hard-train runs/e3-calibration/calibrated/train.jsonl \
+  --selection runs/e3-calibration/calibrated/selection.jsonl \
+  --test runs/e3-calibration/calibrated/test.jsonl \
+  --profile-dir artifacts/layer_profile/sparse \
+  --output runs/e3-location-study \
+  --latent-step-counts 1,2,4 --heldout-steps 4 \
+  --steps 200 --e3-scale 1e-3
+```
+
+This path uses answer-token-only causal loss and a paired bootstrap qualification gate. The consolidated report keeps `policy_training_allowed=false` unless a location has a strictly positive verified-utility lower confidence bound.
+
+For an individual arm:
+
+```bash
 python scripts/run_e3_hardcase_ablation.py \
   --model Qwen/Qwen2.5-0.5B \
   --revision 060db6499f32faf8b98477b0a26969ef7d8b9987 \
-  --hard-train runs/e3-hardcase-data/train.jsonl \
-  --selection runs/e3-hardcase-data/selection.jsonl \
-  --test runs/e3-hardcase-data/test.jsonl \
-  --output runs/e3-hardcase-ablation \
+  --hard-train runs/e3-calibration/calibrated/train.jsonl \
+  --selection runs/e3-calibration/calibrated/selection.jsonl \
+  --test runs/e3-calibration/calibrated/test.jsonl \
+  --output runs/e3-location-study/middle_recurrent \
   --e3-mode middle_recurrent \
-  --latent-step-counts 1,2,4 --steps 200 --e3-scale 1e-3
+  --latent-step-counts 1,2,4 --heldout-steps 4 \
+  --steps 200 --e3-scale 1e-3
 ```
 
-This keeps E2 frozen, trains only the configured E3 refiner and scale after Gate 0B, and evaluates exact numeric E2/E3 outcomes. Use `--e3-mode final_refine` for the matched final-state control. Use `--e3-mode profiled_middle_recurrent --profile-dir artifacts/layer_profile/sparse` to bind the run to a measured profile; partial profiles remain labeled partial in the report. The report includes the actual refinement layer, selected region, rescues, regressions, net rescue rate, completion CE, hidden-state delta magnitude, and receipt-backed compute overhead. The supplied arithmetic generator is only a reproducible smoke curriculum; qualify a policy only after independent hard-task-family replication.
+This keeps E2 frozen, trains only the configured E3 refiner and scale after Gate 0B, masks prompt and padding tokens from the task loss, and evaluates exact numeric E2/E3 outcomes. Use `--e3-mode final_refine` for the matched final-state control. Use `--e3-mode profiled_middle_recurrent --profile-dir artifacts/layer_profile/sparse` to bind the run to a measured profile; partial profiles remain labeled partial in the report. The report includes the actual refinement layer, selected region, rescues, regressions, net rescue rate, completion CE, hidden-state delta magnitude, receipt-backed compute overhead, and paired confidence bound. The supplied arithmetic calibration pool is only a reproducible smoke curriculum; qualify a policy only after independent hard-task-family replication.
 
 ## E3 architecture, dose, and location contracts
 

@@ -1,0 +1,24 @@
+{"difficulty_bucket": "medium", "expected": "112", "prompt": "31 + 81 =", "task_family": "single_addition_calibrated_v1", "task_id": "selection-candidate-0057"}
+{"difficulty_bucket": "easy", "expected": "11", "prompt": "0 + 11 =", "task_family": "single_addition_calibrated_v1", "task_id": "selection-candidate-0025"}
+{"difficulty_bucket": "easy", "expected": "7", "prompt": "2 + 5 =", "task_family": "single_addition_calibrated_v1", "task_id": "selection-candidate-0059"}
+{"difficulty_bucket": "medium", "expected": "81", "prompt": "Calculate 46+35. The answer is", "task_family": "single_addition_calibrated_v1", "task_id": "selection-candidate-0020"}
+{"difficulty_bucket": "medium", "expected": "124", "prompt": "47 + 77 =", "task_family": "single_addition_calibrated_v1", "task_id": "selection-candidate-0053"}
+{"difficulty_bucket": "easy", "expected": "19", "prompt": "15 + 4 =", "task_family": "single_addition_calibrated_v1", "task_id": "selection-candidate-0060"}
+{"difficulty_bucket": "medium", "expected": "107", "prompt": "Question: What is 45 + 62? Answer:", "task_family": "single_addition_calibrated_v1", "task_id": "selection-candidate-0013"}
+{"difficulty_bucket": "easy", "expected": "16", "prompt": "Question: What is 11 + 5? Answer:", "task_family": "single_addition_calibrated_v1", "task_id": "selection-candidate-0036"}
+{"difficulty_bucket": "easy", "expected": "10", "prompt": "4 + 6 =", "task_family": "single_addition_calibrated_v1", "task_id": "selection-candidate-0044"}
+{"difficulty_bucket": "easy", "expected": "28", "prompt": "Question: What is 13 + 15? Answer:", "task_family": "single_addition_calibrated_v1", "task_id": "selection-candidate-0027"}
+{"difficulty_bucket": "medium", "expected": "116", "prompt": "Question: What is 93 + 23? Answer:", "task_family": "single_addition_calibrated_v1", "task_id": "selection-candidate-0043"}
+{"difficulty_bucket": "easy", "expected": "12", "prompt": "2 + 10 =", "task_family": "single_addition_calibrated_v1", "task_id": "selection-candidate-0023"}
+{"difficulty_bucket": "medium", "expected": "106", "prompt": "Question: What is 80 + 26? Answer:", "task_family": "single_addition_calibrated_v1", "task_id": "selection-candidate-0015"}
+{"difficulty_bucket": "easy", "expected": "16", "prompt": "Question: What is 14 + 2? Answer:", "task_family": "single_addition_calibrated_v1", "task_id": "selection-candidate-0026"}
+{"difficulty_bucket": "easy", "expected": "4", "prompt": "Calculate 1+3. The answer is", "task_family": "single_addition_calibrated_v1", "task_id": "selection-candidate-0024"}
+{"difficulty_bucket": "easy", "expected": "30", "prompt": "15 + 15 =", "task_family": "single_addition_calibrated_v1", "task_id": "selection-candidate-0047"}
+{"difficulty_bucket": "easy", "expected": "11", "prompt": "10 + 1 =", "task_family": "single_addition_calibrated_v1", "task_id": "selection-candidate-0054"}
+{"difficulty_bucket": "easy", "expected": "12", "prompt": "Calculate 2+10. The answer is", "task_family": "single_addition_calibrated_v1", "task_id": "selection-candidate-0062"}
+{"difficulty_bucket": "easy", "expected": "15", "prompt": "4 + 11 =", "task_family": "single_addition_calibrated_v1", "task_id": "selection-candidate-0045"}
+{"difficulty_bucket": "easy", "expected": "13", "prompt": "Question: What is 8 + 5? Answer:", "task_family": "single_addition_calibrated_v1", "task_id": "selection-candidate-0005"}
+{"difficulty_bucket": "medium", "expected": "122", "prompt": "Calculate 59+63. The answer is", "task_family": "single_addition_calibrated_v1", "task_id": "selection-candidate-0061"}
+{"difficulty_bucket": "easy", "expected": "18", "prompt": "10 + 8 =", "task_family": "single_addition_calibrated_v1", "task_id": "selection-candidate-0038"}
+{"difficulty_bucket": "easy", "expected": "16", "prompt": "Question: What is 4 + 12? Answer:", "task_family": "single_addition_calibrated_v1", "task_id": "selection-candidate-0037"}
+{"difficulty_bucket": "easy", "expected": "12", "prompt": "Calculate 3+9. The answer is", "task_family": "single_addition_calibrated_v1", "task_id": "selection-candidate-0009"}

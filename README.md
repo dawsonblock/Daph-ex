@@ -1,4 +1,4 @@
-# DAPH / ExFusion v3.2
+# DAPH / ExFusion v3.2.1
 
 Pretrained-compatible adaptive computation with a physically ordered four-level effort hierarchy.
 
@@ -105,6 +105,8 @@ The subsequent frozen-E2 hard-case ablation found a teacher-forced E3 CE dose re
 
 A corrected checkpoint-specific sparse profile then selected layers 12–14. In a small matched-budget smoke comparison, refinement at the profiled middle layer produced a `0.02070` held-out CE gain versus `0.00543` at the final layer (approximately `3.81×` larger at equal compute), but both variants still produced zero exact-answer rescues. See [`docs/E3_PROFILED_MIDDLE_SMOKE_REPORT.md`](docs/E3_PROFILED_MIDDLE_SMOKE_REPORT.md).
 
+The answer-only follow-up calibrated every split to 50% E2 accuracy and compared final, heuristic-middle, and profiled-middle refinement at a matched four-step dose. Heuristic-middle produced the first held-out verified rescue (`1` rescue, `0` regressions) and the largest CE improvement, but its paired 95% bootstrap lower bound remained zero. E3 and policy training therefore remain unqualified. See [`docs/E3_ANSWER_ONLY_MIXED_RESULT.md`](docs/E3_ANSWER_ONLY_MIXED_RESULT.md).
+
 ## Status
 
-The canonical Qwen path and legacy hybrid path coexist. Engineering acceptance is covered by 122 tests. A real but low-budget sparse profile and matched location smoke result are bundled. The middle-layer mechanism signal is encouraging, but E3 task utility and the policy remain scientifically unqualified.
+The canonical Qwen path and legacy hybrid path coexist. Engineering acceptance is covered by 124 tests. A real but low-budget sparse profile and matched answer-only location study are bundled. The middle-layer mechanism signal is encouraging, but E3 task utility and the policy remain scientifically unqualified.
