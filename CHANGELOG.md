@@ -8,6 +8,7 @@
 - Expanded every verified task family to three distinct prompt templates and labeled generator-scale difficulty separately from empirical/model difficulty.
 - Corrected profile stability to rank only layers shared by every seed and added a multi-seed profile aggregation command.
 - Added final-tier predeclared sample-size enforcement and fail-fast CLI validation before model loading or GPU training.
+- Made the multi-seed location study resumable and removed duplicated receipt records from summary payloads for long qualification runs.
 
 This release changes qualification enforcement, not the scientific result. The historical one-rescue result remains `MECHANISM_SIGNAL`; router training remains blocked.
 

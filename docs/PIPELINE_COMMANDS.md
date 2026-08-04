@@ -116,6 +116,7 @@ python scripts/run_e3_location_study.py \
   --steps 200 --e3-scale 1e-3 \
   --training-seeds 20260803,20260817,20260831 \
   --experiment-tier QUALIFICATION \
+  --resume \
   --bootstrap-samples 10000 \
   --lambda-compute 1.0 --lambda-sweep 0,0.1,0.25,0.5,1,2
 ```

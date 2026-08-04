@@ -393,7 +393,7 @@ def main() -> None:
         and profile_promotion_passed
     )
     qualification = {
-        **paired_qualification,
+        **{key: value for key, value in paired_qualification.items() if key != "paired_records"},
         "e2_frozen": e2_frozen,
         "e2_difficulty_band_passed": e2_band_passed,
         "e2_accuracy_band": [args.min_e2_accuracy, args.max_e2_accuracy],
@@ -444,7 +444,18 @@ def main() -> None:
         "limitations": ["This is a targeted task-loss ablation, not a general-language capability claim.", "Do not train or claim an effort router unless this result replicates on independent hard-task families."],
     }
     (output / "e3_hardcase_ablation_report.json").write_text(json.dumps(report, indent=2, default=str))
-    print(json.dumps(report["qualification"], indent=2))
+    print(json.dumps({
+        "qualification_status": qualification["qualification_status"],
+        "qualified": qualification["qualified"],
+        "quality_lcb95": qualification["quality_lcb95"],
+        "utility_lcb95": qualification["utility_lcb95"],
+        "unique_task_count": qualification["unique_task_count"],
+        "experiment_scale": qualification["experiment_scale"],
+        "natural_qualification_status": (
+            natural_qualification["qualification_status"] if natural_qualification else "NO_NATURAL_TEST"
+        ),
+        "profile_promotion_passed": profile_promotion_passed,
+    }, indent=2))
 
 
 if __name__ == "__main__":

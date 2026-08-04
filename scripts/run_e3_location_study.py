@@ -61,6 +61,7 @@ def main() -> None:
     parser.add_argument("--experiment-tier", choices=("SMOKE", "PILOT", "QUALIFICATION", "FINAL"), default="SMOKE")
     parser.add_argument("--predeclared-heldout-examples", type=int, help="Required for FINAL")
     parser.add_argument("--heldout-steps", type=int, default=4)
+    parser.add_argument("--resume", action="store_true", help="Reuse completed per-mode/per-seed reports")
     args = parser.parse_args()
     output = Path(args.output)
     output.mkdir(parents=True, exist_ok=True)
@@ -132,8 +133,10 @@ def main() -> None:
             # Keep the evidence portable: record a repository-relative command while
             # executing with the current interpreter and resolved script path.
             commands[mode][str(training_seed)] = ["python", "scripts/run_e3_hardcase_ablation.py", *command[2:]]
-            subprocess.run(command, cwd=ROOT, check=True)
-            reports[mode][training_seed] = json.loads((mode_output / "e3_hardcase_ablation_report.json").read_text())
+            report_path = mode_output / "e3_hardcase_ablation_report.json"
+            if not (args.resume and report_path.exists()):
+                subprocess.run(command, cwd=ROOT, check=True)
+            reports[mode][training_seed] = json.loads(report_path.read_text())
 
     selected_steps = {
         mode: {str(seed): int(report["selected_latent_steps"]) for seed, report in by_seed.items()}
@@ -163,22 +166,22 @@ def main() -> None:
             ),
         ) if natural_pairs else None
         local_seed_reports = {
-            str(seed): qualify_e3_pairs(
+            str(seed): {key: value for key, value in qualify_e3_pairs(
                 report["heldout"]["task_outcomes"],
                 E3QualificationConfig(
                     lambda_compute=args.lambda_compute, bootstrap_samples=args.bootstrap_samples,
                     confidence=args.confidence, group_key=args.bootstrap_group_key, seed=seed,
                 ),
-            ) for seed, report in by_seed.items()
+            ).items() if key != "paired_records"} for seed, report in by_seed.items()
         }
         local_seed_natural_reports = {
-            str(seed): qualify_e3_pairs(
+            str(seed): {key: value for key, value in qualify_e3_pairs(
                 report["natural_heldout"]["task_outcomes"],
                 E3QualificationConfig(
                     lambda_compute=args.lambda_compute, bootstrap_samples=args.bootstrap_samples,
                     confidence=args.confidence, group_key=args.bootstrap_group_key, seed=seed + 1000,
                 ),
-            ) for seed, report in by_seed.items()
+            ).items() if key != "paired_records"} for seed, report in by_seed.items()
             if report.get("natural_heldout")
         }
         seed_pass_rate = sum(
@@ -248,6 +251,7 @@ def main() -> None:
         "experiment": "matched-e3-final-heuristic-profiled-location-study",
         "model": {"id": args.model, "revision": args.revision},
         "commands": commands,
+        "resumed": args.resume,
         "training_seeds": list(training_seeds),
         "experiment_scale": scale_report,
         "selected_steps": selected_steps,
