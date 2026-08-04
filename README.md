@@ -1,4 +1,4 @@
-# DAPH / ExFusion v3.5.0
+# DAPH / ExFusion v3.6.0
 
 Pretrained-compatible adaptive computation with a physically ordered four-level effort hierarchy.
 
@@ -119,7 +119,7 @@ The v3.4.1 real qualification preflight evaluated 3,100 E2 calibration candidate
 
 ## HRM external-memory research path
 
-`hrm_memory` is a new standalone path around the native, revision-pinned
+`hrm_adaptive_memory` is the canonical standalone control plane around the native, revision-pinned
 `sapientinc/HRM-Text-1B` checkpoint. It implements the untouched PrefixLM
 baseline adapter, append-only provenance memory, structural chunking, hybrid
 dense/BM25 retrieval, Reciprocal Rank Fusion, reranking interfaces, retrieval
@@ -127,11 +127,17 @@ metrics, redundancy-aware evidence packing, the mandatory oracle-context gate,
 cycle tracing, and isolated counterfactual action utilities. Adaptive execution
 fails closed until a controller is marked `VERIFIED_FIT`.
 
+Release 3.6 adds backend-neutral asynchronous contracts, five logical memory
+kinds over three operational layers, immutable source locks and derivation
+receipts, a true paired B0/B1/B2/B3 runner, and grouped Gate A qualification.
+The old `hrm_memory` imports are deprecated compatibility aliases for this
+release only.
+
 The current code is an engineering foundation, not evidence that HRM benefits
 from RAG or extra recurrence. See
-[`docs/HRM_EXTERNAL_MEMORY_ADAPTIVE_COMPUTE.md`](docs/HRM_EXTERNAL_MEMORY_ADAPTIVE_COMPUTE.md)
+[`docs/HRM_ADAPTIVE_MEMORY_CONTROL_PLANE.md`](docs/HRM_ADAPTIVE_MEMORY_CONTROL_PLANE.md)
 for the staged protocol and commands.
 
 ## Status
 
-The canonical Qwen path, legacy hybrid path, standalone marginal-utility package, and HRM external-memory research foundation coexist. Experiment tiers, unique-task counts, seed replication, natural-test promotion, and stable-profile promotion remain enforced. Neither E3 task utility, HRM external-memory gains, nor a learned controller is scientifically qualified.
+The canonical Qwen path, legacy hybrid path, standalone marginal-utility package, and HRM adaptive-memory control plane coexist. The complete suite has 204 tests. Gate A has not been run on a real paired qualification set, so RuVector expansion, Graphiti integration, recurrence control, and executive training remain blocked. Neither E3 task utility, HRM external-memory gains, nor a learned controller is scientifically qualified.

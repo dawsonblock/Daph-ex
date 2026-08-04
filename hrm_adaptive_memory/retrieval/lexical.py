@@ -5,7 +5,7 @@ import re
 from collections import Counter
 from typing import Sequence
 
-from hrm_memory.memory.chunking import Chunk
+from hrm_adaptive_memory.memory.chunking import Chunk
 
 
 def tokenize(text: str) -> list[str]:

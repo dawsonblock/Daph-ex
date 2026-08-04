@@ -49,3 +49,11 @@ class SemanticMemoryStore(JsonlMemoryStore):
 
 class EpisodicMemoryStore(JsonlMemoryStore):
     expected_type = MemoryType.EPISODIC
+
+
+class ProceduralMemoryStore(JsonlMemoryStore):
+    expected_type = MemoryType.PROCEDURAL
+
+
+class ConsolidatedMemoryStore(JsonlMemoryStore):
+    expected_type = MemoryType.CONSOLIDATED

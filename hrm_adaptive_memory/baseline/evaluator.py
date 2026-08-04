@@ -88,5 +88,7 @@ class OracleContextGate:
             "minimum_paired_tasks": self.minimum_paired_tasks,
             "paired_tasks": len(base_ids),
             "next_stage": "STRUCTURED_RAG" if passed else "RETRIEVAL_CONDITIONED_ADAPTATION",
+            "scientific_qualification": False,
+            "retrieval_expansion_allowed": False,
             "controller_training_allowed": False,
         }

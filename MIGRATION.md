@@ -28,3 +28,19 @@ Important API differences:
 Legacy `load_pretrained_into_exfusion()` and `DAPHHybridModelV3` utilities remain for reproduction of earlier experiments; they are not the canonical Phase 0B route.
 
 Old QwenExFusion checkpoints without `e3_config` load with `final_refine`, preserving their historical graph. New checkpoints serialize the E3 configuration, selected region, profile digest, and probe depth.
+
+## HRM adaptive-memory namespace in 3.6
+
+The canonical HRM research package is now `hrm_adaptive_memory`:
+
+```python
+from hrm_adaptive_memory.experiments.context_study import ContextStudyRunner
+```
+
+Imports through `hrm_memory` remain deprecated compatibility aliases for the
+3.6 release and emit `DeprecationWarning`. They are scheduled for removal in
+3.7. Migrate imports now; do not create new modules under the legacy namespace.
+
+This rename does not enable RuVector, Graphiti, consolidation, adaptive
+recurrence, or executive-policy training. Those remain fail-closed behind the
+paired B0/B1/B2/B3 Gate A study and their later scientific gates.

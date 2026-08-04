@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Protocol, Sequence
 
-from hrm_memory.memory.chunking import Chunk
+from hrm_adaptive_memory.memory.chunking import Chunk
 from .lexical import tokenize
 
 

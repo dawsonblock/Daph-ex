@@ -14,8 +14,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from hrm_memory.baseline.evaluator import BaselineCondition
-from hrm_memory.hrm.model import HRMAdapter, HRMModelSpec, PromptCondition
+from hrm_adaptive_memory.baseline.evaluator import BaselineCondition
+from hrm_adaptive_memory.hrm.model import HRMAdapter, HRMModelSpec, PromptCondition
 
 
 def normalize_answer(value: object) -> str:

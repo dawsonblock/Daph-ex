@@ -6,8 +6,8 @@ import re
 from dataclasses import dataclass, field
 from typing import Callable, Iterable, Mapping, Sequence
 
-from hrm_memory.memory.chunking import Chunk, approximate_tokens
-from hrm_memory.retrieval.hybrid import RetrievalCandidate
+from hrm_adaptive_memory.memory.chunking import Chunk, approximate_tokens
+from hrm_adaptive_memory.retrieval.hybrid import RetrievalCandidate
 
 
 @dataclass(frozen=True)

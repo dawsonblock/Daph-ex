@@ -1,0 +1,41 @@
+{
+  "protocol_version": "hrm-context-study-v1",
+  "model": {
+    "id": "sapientinc/HRM-Text-1B",
+    "revision": "9f082d68b8cd0ebc56e33f1c88c45609174c272c",
+    "prompt_condition": "synth,cot",
+    "prefix_lm": true
+  },
+  "experiment": {
+    "tier": "QUALIFICATION",
+    "tasks": 500,
+    "minimum_groups": 5,
+    "conditions": [
+      "B0_NO_CONTEXT",
+      "B1_RANDOM_CONTEXT",
+      "B2_NAIVE_RETRIEVAL",
+      "B3_ORACLE_EVIDENCE"
+    ],
+    "bootstrap_samples": 10000,
+    "bootstrap_seed": 42,
+    "minimum_mean_quality_gain": 0.05
+  },
+  "retrieval": {
+    "backend": "bm25",
+    "k": 10,
+    "ruvector_enabled": false,
+    "graphiti_enabled": false
+  },
+  "context_budget": {
+    "total": 4096,
+    "task": 500,
+    "evidence": 2200,
+    "state": 400,
+    "generation": 996
+  },
+  "promotion": {
+    "retrieval_expansion_allowed": false,
+    "graphiti_integration_allowed": false,
+    "controller_training_allowed": false
+  }
+}

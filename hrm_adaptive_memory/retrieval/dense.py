@@ -4,7 +4,7 @@ import hashlib
 import math
 from typing import Callable, Sequence
 
-from hrm_memory.memory.chunking import Chunk
+from hrm_adaptive_memory.memory.chunking import Chunk
 from .lexical import tokenize
 
 

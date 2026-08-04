@@ -1,5 +1,9 @@
 # HRM External Memory + Adaptive Compute
 
+> Superseded for implementation by
+> [`HRM_ADAPTIVE_MEMORY_CONTROL_PLANE.md`](HRM_ADAPTIVE_MEMORY_CONTROL_PLANE.md).
+> This document preserves the original v3.5 foundation protocol.
+
 ## Scope and claim discipline
 
 This branch adds a standalone research path around the native
@@ -51,7 +55,7 @@ Primary references:
 
 ### Stage A — untouched HRM baseline
 
-`hrm_memory.hrm.HRMAdapter` loads the pinned native checkpoint lazily, verifies
+`hrm_adaptive_memory.hrm.HRMAdapter` loads the pinned native checkpoint lazily, verifies
 its configuration, renders official condition prefixes, and creates the
 PrefixLM mask. The baseline command records prompt/completion tokens, latency,
 task family, difficulty, model revision, and raw output.

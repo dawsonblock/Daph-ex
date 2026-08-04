@@ -11,7 +11,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from hrm_memory.memory.chunking import StructuralChunker
+from hrm_adaptive_memory.memory.chunking import StructuralChunker
 
 
 def main() -> None:

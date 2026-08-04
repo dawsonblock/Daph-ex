@@ -11,10 +11,10 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from hrm_memory.context.packer import EvidencePacker
-from hrm_memory.memory.chunking import StructuralChunker
-from hrm_memory.retrieval.hybrid import HybridRetriever
-from hrm_memory.retrieval.reranker import LexicalOverlapReranker
+from hrm_adaptive_memory.context.packer import EvidencePacker
+from hrm_adaptive_memory.memory.chunking import StructuralChunker
+from hrm_adaptive_memory.retrieval.hybrid import HybridRetriever
+from hrm_adaptive_memory.retrieval.reranker import LexicalOverlapReranker
 
 
 def main() -> None:

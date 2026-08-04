@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Sequence
 
-from hrm_memory.memory.chunking import Chunk
+from hrm_adaptive_memory.memory.chunking import Chunk
 from .dense import DenseRetriever
 from .lexical import BM25Retriever
 from .reranker import Reranker, rerank

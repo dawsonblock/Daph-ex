@@ -6,7 +6,7 @@ import json
 from dataclasses import asdict, dataclass, field
 from typing import Any, Callable, Mapping, Sequence
 
-from hrm_memory.controller.actions import Action, ActionOutcome
+from hrm_adaptive_memory.controller.actions import Action, ActionOutcome
 
 
 @dataclass(frozen=True)

@@ -1,28 +1,38 @@
-"""HRM external-memory and adaptive-compute research package.
+"""Deprecated compatibility namespace for :mod:`hrm_adaptive_memory`.
 
-The package deliberately separates retrieval, context packing, model use, and
-adaptive decisions.  Learned control stays blocked until oracle-context and
-counterfactual opportunity gates pass.
+Release 3.6 retains these aliases for one release. New code must import the
+canonical package. The compatibility namespace is scheduled for removal in
+3.7.
 """
 
-from .baseline.evaluator import BaselineCondition, BaselineResult, OracleContextGate
-from .context.packer import ContextBudget, EvidencePacket, EvidencePacker
-from .controller.actions import Action, ActionOutcome, action_utilities
-from .controller.policy import ControllerDecision, UtilityController
-from .execution.counterfactual import CounterfactualCollector, DecisionState
-from .hrm.model import HRMAdapter, HRMModelSpec, PromptCondition
-from .hrm.recurrent_hooks import HRMRecurrentTracer, RecurrentStateTrace
-from .memory.chunking import Chunk, StructuralChunker
-from .memory.schema import MemoryRecord, MemoryStatus, MemoryType
-from .memory.stores import EpisodicMemoryStore, SemanticMemoryStore, SourceMemoryStore
-from .retrieval.hybrid import HybridRetriever, RetrievalCandidate
+from __future__ import annotations
 
-__all__ = [
-    "Action", "ActionOutcome", "BaselineCondition", "BaselineResult", "Chunk",
-    "ContextBudget", "ControllerDecision", "CounterfactualCollector", "DecisionState",
-    "EpisodicMemoryStore", "EvidencePacket", "EvidencePacker", "HRMAdapter",
-    "HRMModelSpec", "HRMRecurrentTracer", "HybridRetriever", "MemoryRecord",
-    "MemoryStatus", "MemoryType", "OracleContextGate", "PromptCondition",
-    "RecurrentStateTrace", "RetrievalCandidate", "SemanticMemoryStore",
-    "SourceMemoryStore", "StructuralChunker", "UtilityController", "action_utilities",
-]
+import importlib
+import sys
+import warnings
+
+warnings.warn(
+    "hrm_memory is deprecated; import hrm_adaptive_memory instead",
+    DeprecationWarning,
+    stacklevel=2,
+)
+
+_MODULES = (
+    "baseline", "baseline.evaluator", "baseline.metrics",
+    "context", "context.packer",
+    "controller", "controller.actions", "controller.policy",
+    "execution", "execution.counterfactual", "execution.oracle",
+    "hrm", "hrm.model", "hrm.recurrent_hooks", "hrm.variable_recurrence",
+    "memory", "memory.chunking", "memory.contradiction", "memory.schema", "memory.stores",
+    "retrieval", "retrieval.dense", "retrieval.evaluator", "retrieval.hybrid",
+    "retrieval.lexical", "retrieval.reranker",
+)
+
+for _suffix in _MODULES:
+    _module = importlib.import_module(f"hrm_adaptive_memory.{_suffix}")
+    sys.modules[f"{__name__}.{_suffix}"] = _module
+    if "." not in _suffix:
+        globals()[_suffix] = _module
+
+from hrm_adaptive_memory import *  # noqa: F401,F403,E402
+from hrm_adaptive_memory import __all__

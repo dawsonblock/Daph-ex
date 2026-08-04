@@ -1,5 +1,17 @@
 # Changelog
 
+## 3.6.0 — HRM adaptive-memory control plane
+
+- Rename the canonical research namespace to `hrm_adaptive_memory` while retaining one-release `hrm_memory` compatibility aliases.
+- Add asynchronous retrieval, graph, memory, consolidation, HRM-runtime, and action-executor contracts with immutable receipts and explicit capability negotiation.
+- Add five logical memory kinds, fail-closed lifecycle transitions, immutable provider-neutral derivation caching, and an audited external-source lock.
+- Add loopback-only sidecar configuration and keep every external runtime disabled until its scientific prerequisite passes.
+- Add a canonical paired B0/B1/B2/B3 runner that constructs each context, independently consumes oracle labels, token-matches irrelevant context, records prompt/evidence/model receipts, and prevents fake results from qualifying.
+- Add deterministic grouped Gate A bootstrap with 24/100/500 task tiers; only a 500-task qualification can unlock retrieval expansion.
+- Preserve primitive BM25/hash/hybrid controls and add 13 adversarial control-plane tests, including a deterministic loopback RuVector bridge contract; complete suite: 204 passing tests.
+
+No real Gate A experiment is included. RuVector, Graphiti, iterative retrieval, adaptive recurrence, and controller training remain blocked.
+
 ## 3.5.0 — HRM external memory + adaptive compute foundation
 
 - Add a revision-pinned native HRM-Text-1B adapter with correct PrefixLM masking.

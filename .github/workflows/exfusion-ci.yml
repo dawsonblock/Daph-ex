@@ -69,6 +69,12 @@ jobs:
           tests/test_qwen_exfusion_gate0b.py
           tests/test_effort_compute_ordering.py
 
+      - name: Run HRM control-plane contract gates
+        run: >-
+          python -m pytest -q
+          tests/test_hrm_control_plane.py
+          tests/test_hrm_memory.py
+
       - name: Run synthetic Phase 0 pipeline
         run: >-
           python scripts/run_phase0_retention.py

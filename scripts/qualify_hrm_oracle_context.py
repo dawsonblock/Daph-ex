@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Apply the Stage C oracle-context gate to paired baseline results."""
+"""Legacy descriptive oracle-context diagnostic; use Gate A for qualification."""
 
 from __future__ import annotations
 
@@ -11,7 +11,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from hrm_memory.baseline.evaluator import BaselineCondition, BaselineResult, OracleContextGate
+from hrm_adaptive_memory.baseline.evaluator import BaselineCondition, BaselineResult, OracleContextGate
 
 
 def main() -> None:
@@ -19,7 +19,7 @@ def main() -> None:
     parser.add_argument("--results", required=True)
     parser.add_argument("--output", required=True)
     parser.add_argument("--minimum-gain", type=float, default=0.05)
-    parser.add_argument("--minimum-tasks", type=int, default=2)
+    parser.add_argument("--minimum-tasks", type=int, default=500)
     args = parser.parse_args()
     rows = []
     for line in Path(args.results).read_text().splitlines():

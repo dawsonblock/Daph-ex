@@ -10,24 +10,24 @@ import pytest
 import torch
 from torch import nn
 
-from hrm_memory.baseline.evaluator import BaselineCondition, BaselineResult, OracleContextGate
-from hrm_memory.context.packer import ContextBudget, EvidenceItem, EvidencePacker
-from hrm_memory.controller.actions import Action, ActionOutcome
-from hrm_memory.controller.policy import UtilityController
-from hrm_memory.execution.counterfactual import CounterfactualCollector, DecisionState
-from hrm_memory.execution.oracle import oracle_opportunity
-from hrm_memory.hrm.model import HRMAdapter, HRMModelSpec, PromptCondition
-from hrm_memory.hrm.recurrent_hooks import HRMRecurrentTracer
-from hrm_memory.hrm.variable_recurrence import recurrence_arms
-from hrm_memory.memory.chunking import Chunk, StructuralChunker
-from hrm_memory.memory.contradiction import ContradictionLedger
-from hrm_memory.memory.schema import MemoryRecord, MemoryStatus, MemoryType
-from hrm_memory.memory.stores import SemanticMemoryStore, SourceMemoryStore
-from hrm_memory.retrieval.dense import DenseRetriever, HashingEmbedder
-from hrm_memory.retrieval.evaluator import evaluate_retrieval
-from hrm_memory.retrieval.hybrid import HybridRetriever, RetrievalCandidate
-from hrm_memory.retrieval.lexical import BM25Retriever
-from hrm_memory.retrieval.reranker import LexicalOverlapReranker
+from hrm_adaptive_memory.baseline.evaluator import BaselineCondition, BaselineResult, OracleContextGate
+from hrm_adaptive_memory.context.packer import ContextBudget, EvidenceItem, EvidencePacker
+from hrm_adaptive_memory.controller.actions import Action, ActionOutcome
+from hrm_adaptive_memory.controller.policy import UtilityController
+from hrm_adaptive_memory.execution.counterfactual import CounterfactualCollector, DecisionState
+from hrm_adaptive_memory.execution.oracle import oracle_opportunity
+from hrm_adaptive_memory.hrm.model import HRMAdapter, HRMModelSpec, PromptCondition
+from hrm_adaptive_memory.hrm.recurrent_hooks import HRMRecurrentTracer
+from hrm_adaptive_memory.hrm.variable_recurrence import recurrence_arms
+from hrm_adaptive_memory.memory.chunking import Chunk, StructuralChunker
+from hrm_adaptive_memory.memory.contradiction import ContradictionLedger
+from hrm_adaptive_memory.memory.schema import MemoryRecord, MemoryStatus, MemoryType
+from hrm_adaptive_memory.memory.stores import SemanticMemoryStore, SourceMemoryStore
+from hrm_adaptive_memory.retrieval.dense import DenseRetriever, HashingEmbedder
+from hrm_adaptive_memory.retrieval.evaluator import evaluate_retrieval
+from hrm_adaptive_memory.retrieval.hybrid import HybridRetriever, RetrievalCandidate
+from hrm_adaptive_memory.retrieval.lexical import BM25Retriever
+from hrm_adaptive_memory.retrieval.reranker import LexicalOverlapReranker
 
 
 def chunk(identifier: str, content: str, tokens: int = 20, source: str = "source") -> Chunk:

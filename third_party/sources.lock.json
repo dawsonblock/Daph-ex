@@ -1,0 +1,82 @@
+{
+  "schema_version": "1.0",
+  "source_bundle": {
+    "filename": "memory builds from github.zip",
+    "sha256": "65669965699342c7c2533528633ae373cedd5a8a5211cb71c3179ec5315cda3f",
+    "committed": false
+  },
+  "sources": [
+    {
+      "name": "RuVector",
+      "upstream": "https://github.com/ruvnet/ruvector",
+      "archive_sha256": "909ace0f85164b17ac1b6f708d3221de9cb8fb343b8ffc0fa2ee19eaf07bcc5f",
+      "observed_version": "0.1.2",
+      "license": "MIT",
+      "role": "retrieval_sidecar_after_gate_a",
+      "runtime_enabled": false
+    },
+    {
+      "name": "Graphiti",
+      "upstream": "https://github.com/getzep/graphiti",
+      "archive_sha256": "82a036f3b64717b31d6e1861613df1efc48745a958c00e4c7c9a442f8f13c0bf",
+      "observed_version": "0.29.3",
+      "license": "Apache-2.0",
+      "role": "temporal_graph_after_retrieval_qualification",
+      "runtime_enabled": false
+    },
+    {
+      "name": "AgentDB",
+      "upstream": "https://github.com/ruvnet/agentdb",
+      "archive_sha256": "8b18ab16de577fbd2976049fe5d1f54fecc95d0b9e00479e35704c500a217edc",
+      "observed_version": "3.0.0-alpha.20",
+      "license": "MIT OR Apache-2.0",
+      "role": "experimental_procedural_feedback_only",
+      "runtime_enabled": false
+    },
+    {
+      "name": "Infini-Memory",
+      "upstream": "https://github.com/infinigence/Infini-Memory",
+      "archive_sha256": "b3d6c391aaa89e80c775a13034e9ddd450918e8b8e326cf4bccc35330ffea894",
+      "observed_version": "dynamic",
+      "license": "Apache-2.0",
+      "role": "topic_consolidation_design_after_initial_retrieval",
+      "runtime_enabled": false
+    },
+    {
+      "name": "DiffMem",
+      "upstream": "https://github.com/Growth-Kinetics/DiffMem",
+      "archive_sha256": "889888fde784d62ce096edf2efe645d4907e6c89eb0d85f42c83b152fbf8e924",
+      "observed_version": "0.4.0-pyproject_0.5.0-readme",
+      "license": "MIT",
+      "role": "git_versioning_for_consolidated_markdown",
+      "runtime_enabled": false
+    },
+    {
+      "name": "PixelRAG",
+      "upstream": "https://github.com/StarTrail-org/PixelRAG",
+      "archive_sha256": "c13668653305627ff9778cce79d11f42e0c32eddd42d4f572a01a21affed74a8",
+      "observed_version": "0.4.0",
+      "license": "Apache-2.0",
+      "role": "late_visual_source_adapter",
+      "runtime_enabled": false
+    },
+    {
+      "name": "LongMemEval",
+      "upstream": "https://github.com/xiaowu0162/LongMemEval",
+      "archive_sha256": "2a2316a0ebbb5d3360cf9d09f6b5d583965fed9b0aabb9b3a9743f7eec4c94b0",
+      "observed_version": "dataset_evaluation_snapshot",
+      "license": "upstream",
+      "role": "external_evaluation_only",
+      "runtime_enabled": false
+    },
+    {
+      "name": "Awesome-AI-Memory",
+      "upstream": "https://github.com/IAAR-Shanghai/Awesome-AI-Memory",
+      "archive_sha256": "3dbebfc1223f9fb06ad1f8e4fef467e7709de05451eab6865ebd66c5ce7c4a60",
+      "observed_version": "reference_snapshot",
+      "license": "upstream",
+      "role": "reference_only",
+      "runtime_enabled": false
+    }
+  ]
+}
