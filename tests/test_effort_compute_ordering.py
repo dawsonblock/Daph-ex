@@ -15,6 +15,7 @@ from daph.qwen_exfusion import (
     prepare_exfusion_for_training,
 )
 from daph.pretrained import save_adapted_checkpoint
+from daph.counterfactual import CounterfactualCollector, _tensor_raw_bytes, full_state_dict_digest
 from daph.train_real import (
     RealTrainConfig, TrainingStageConfig, apply_training_stage,
     distillation_loss, train_adapt,
@@ -139,6 +140,63 @@ def test_parameter_provenance_is_exact_names():
         ids = torch.randint(0, 96, (1, 6))
         assert torch.equal(model(ids, effort_mode="fixed_2"), loaded(ids, effort_mode="fixed_2"))
         assert loaded.parameter_provenance == provenance
+
+
+def test_scalar_digest_and_qwen_counterfactual_probe_are_end_to_end():
+    """Scalar ExFusion scales must not prevent canonical collection."""
+    _, model = _model()
+    assert _tensor_raw_bytes(torch.tensor(0.0)) == _tensor_raw_bytes(torch.tensor(0.0))
+    assert full_state_dict_digest(model)
+    task = {
+        "task_id": "scalar-digest-regression",
+        "input_ids": torch.tensor([[1, 2, 3, 4, 5]]),
+        "attention_mask": torch.tensor([[1, 1, 1, 1, 1]]),
+        "labels": torch.tensor([[1, 2, 3, 4, 5]]),
+    }
+    with CounterfactualCollector(model) as collector:
+        record = collector.collect_one(task)
+    assert len(record.probe_hidden) == model.hidden_size
+    assert record.compute[0] < record.compute[1] < record.compute[2] < record.compute[3]
+    assert record.compute_receipts is not None
+
+
+def test_adaptive_qwen_dispatch_reuses_internal_probe_and_executes_selected_arm():
+    _, model = _model()
+    ids = torch.randint(0, 96, (1, 7))
+    mask = torch.ones_like(ids)
+    embedding = model.embed(ids)
+    probe_h, _, decision = model.compute_effort_probe(embedding, mask)
+    assert decision.source_position == "post_qwen_block_0"
+    assert not torch.equal(probe_h, embedding)
+
+    adaptive_e0 = model(
+        ids, attention_mask=mask, effort_mode="adaptive",
+        effort_levels_override=torch.tensor([0]), return_compute_receipt=True,
+    )
+    fixed_e0 = model(ids, attention_mask=mask, effort_mode="fixed_0", return_compute_receipt=True)
+    assert torch.equal(adaptive_e0["logits"], fixed_e0["logits"])
+    assert adaptive_e0["effort_decision"]["levels"] == [0]
+    assert adaptive_e0["compute_stats"]["executed_layer_count"] == fixed_e0["compute_stats"]["executed_layer_count"]
+
+    adaptive_e3 = model(
+        ids, attention_mask=mask, effort_mode="adaptive",
+        effort_levels_override=torch.tensor([3]), return_compute_receipt=True,
+    )
+    fixed_e3 = model(ids, attention_mask=mask, effort_mode="fixed_3", return_compute_receipt=True)
+    assert torch.equal(adaptive_e3["logits"], fixed_e3["logits"])
+    assert adaptive_e3["effort_decision"]["levels"] == [3]
+    assert adaptive_e3["compute_stats"]["latent_steps"] == fixed_e3["compute_stats"]["latent_steps"]
+
+
+def test_adaptive_qwen_partitions_mixed_batch_by_selected_effort():
+    _, model = _model()
+    ids = torch.randint(0, 96, (2, 6))
+    out = model(
+        ids, effort_mode="adaptive", effort_levels_override=torch.tensor([0, 3]),
+        return_compute_receipt=True,
+    )
+    assert out["effort_decision"]["levels"] == [0, 3]
+    assert out["compute_stats"]["per_sample_compute"][0] < out["compute_stats"]["per_sample_compute"][1]
 
 
 def test_explicit_stage_groups_and_gradient_remainder_resume():

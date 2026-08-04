@@ -28,6 +28,8 @@ from .latent_refine import LatentRefineBlock
 from .attn_res import BlockAttnRes
 from .norms import RMSNorm
 from .compute import EffortComputeReceipt, estimate_compute
+from .effort import EffortController
+from .effort_decision import EffortDecision, decide_from_probs
 
 
 @dataclass(frozen=True)
@@ -248,6 +250,8 @@ class QwenExFusionModel(nn.Module):
         use_shallow_continuation: bool = False,
         continuation_bottleneck_size: Optional[int] = None,
         latent_scale_limit: float = 0.01,
+        effort_controller_hidden_size: int = 128,
+        enable_effort_controller: bool = True,
     ) -> None:
         super().__init__()
         self.embed = nn.Embedding(vocab_size, hidden_size)
@@ -290,6 +294,16 @@ class QwenExFusionModel(nn.Module):
         self.continuation_bottleneck_size = continuation_bottleneck_size
         self.use_shallow_continuation = use_shallow_continuation
         self.latent_scale_limit = float(latent_scale_limit)
+        self.effort_controller_hidden_size = int(effort_controller_hidden_size)
+        self.enable_effort_controller = bool(enable_effort_controller)
+        # The first pretrained Qwen block is a mandatory shared probe. It is
+        # part of every E0–E3 path, so its physical cost is already included in
+        # every effort receipt rather than being an unaccounted side network.
+        self.effort_probe_layer_count = 1
+        self.effort_controller = (
+            EffortController(hidden_size, num_levels=4, hidden_router=self.effort_controller_hidden_size)
+            if self.enable_effort_controller else None
+        )
         self.e0_continuation = CheapContinuation(hidden_size, continuation_bottleneck_size) if use_shallow_continuation else None
         self.e1_continuation = CheapContinuation(hidden_size, continuation_bottleneck_size) if use_shallow_continuation else None
         self.depth_fractions = (e0_depth_fraction, e1_depth_fraction, e2_depth_fraction, e3_depth_fraction)
@@ -335,8 +349,92 @@ class QwenExFusionModel(nn.Module):
     @staticmethod
     def _effort_index(effort_mode: str) -> int:
         aliases = {"fixed_0": 0, "e0": 0, "0": 0, "fixed_1": 1, "e1": 1, "1": 1,
-                   "fixed_2": 2, "e2": 2, "2": 2, "fixed_3": 3, "e3": 3, "3": 3}
-        return aliases.get(str(effort_mode).lower(), 2)
+                   "fixed_2": 2, "e2": 2, "2": 2, "disabled": 2, "full": 2,
+                   "fixed_3": 3, "e3": 3, "3": 3}
+        key = str(effort_mode).lower()
+        if key not in aliases:
+            raise ValueError(f"Unknown effort mode {effort_mode!r}. Use fixed_0..fixed_3 or adaptive.")
+        return aliases[key]
+
+    def compute_effort_probe(
+        self, hidden: Tensor, attention_mask: Optional[Tensor] = None,
+    ) -> Tuple[Tensor, None, EffortDecision]:
+        """Run the shared first Qwen block and choose an effort from its state.
+
+        The returned hidden state is exactly the layer-0 state reused by
+        adaptive execution. It is an internal model representation, not a
+        pooled token embedding or an extra unaccounted computation.
+        """
+        if not self.layers:
+            raise RuntimeError("QwenExFusion requires at least one layer for its effort probe")
+        probe_h, _, _, _ = self.layers[0](
+            hidden, attention_mask=attention_mask, use_recurrent=False,
+            use_routed_moe=False, use_attn_res=False, latent_steps=0,
+        )
+        anchor = EffortController.pool_last_valid(probe_h, attention_mask)
+        if self.effort_controller is None:
+            # Older checkpoints may collect genuine internal probe features,
+            # but require a controller installation before adaptive routing.
+            probs = torch.zeros(anchor.size(0), 4, device=anchor.device, dtype=anchor.dtype)
+            probs[:, 2] = 1.0
+        else:
+            probs = self.effort_controller(anchor)["effort_probs"]
+        return probe_h, None, decide_from_probs(
+            probs, source_layer=0, source_position="post_qwen_block_0", hidden_anchor=anchor.detach(),
+        )
+
+    def _run_layers(
+        self, hidden: Tensor, attention_mask: Optional[Tensor], effort: int,
+        *, start_layer: int = 0, layer_count: Optional[int] = None,
+    ) -> Tensor:
+        """Execute a fixed arm, optionally reusing a completed shared probe."""
+        count = self._layer_count(effort) if layer_count is None else layer_count
+        flags = self._effort_flags(f"fixed_{effort}")
+        for layer_index in range(start_layer, count):
+            latent_steps = int(flags["latent_steps"]) if effort == 3 and layer_index == count - 1 else 0
+            hidden, _, _, _ = self.layers[layer_index](
+                hidden, attention_mask=attention_mask,
+                use_recurrent=bool(flags["use_recurrent"]),
+                use_routed_moe=bool(flags["use_routed_moe"]),
+                use_attn_res=bool(flags["use_attn_res"]), latent_steps=latent_steps,
+            )
+        if effort == 0 and self.e0_continuation is not None:
+            hidden = self.e0_continuation(hidden)
+        elif effort == 1 and self.e1_continuation is not None:
+            hidden = self.e1_continuation(hidden)
+        return hidden
+
+    def _adaptive_receipt_stats(
+        self, levels: Tensor, *, batch_size: int, sequence_length: int,
+    ) -> Tuple[List[EffortComputeReceipt], Dict[str, Any]]:
+        """Aggregate exact per-sample receipts for a partitioned adaptive batch."""
+        per_sample = [
+            self._compute_receipt(
+                effort_mode=f"fixed_{int(level)}", layer_count=self._layer_count(int(level)),
+                batch_size=1, sequence_length=sequence_length,
+                flags=self._effort_flags(f"fixed_{int(level)}"),
+            ) for level in levels.tolist()
+        ]
+        raw = [r.raw_compute_units for r in per_sample]
+        normalized = [r.normalized_compute_cost for r in per_sample]
+        stats: Dict[str, Any] = {
+            "effort_mode": "adaptive", "effort_levels": levels.tolist(),
+            "chosen_effort_levels": levels.tolist(),
+            "chosen_effort_level": int(levels[0]) if bool(torch.all(levels == levels[0])) else levels.tolist(),
+            "per_sample_compute": normalized, "per_sample_raw_compute_units": raw,
+            "raw_compute_units": float(sum(raw)), "estimated_compute_units": float(sum(raw)),
+            "normalized_compute_cost": float(sum(normalized) / max(batch_size, 1)),
+            "executed_layer_count": int(sum(r.executed_layer_count for r in per_sample)),
+            "skipped_layer_count": int(sum(r.skipped_layer_count for r in per_sample)),
+            "attention_calls": int(sum(r.attention_calls for r in per_sample)),
+            "ffn_calls": int(sum(r.ffn_calls for r in per_sample)),
+            "recurrent_steps": int(sum(r.recurrent_steps for r in per_sample)),
+            "latent_steps": int(sum(r.latent_steps for r in per_sample)),
+            "routed_expert_calls": int(sum(r.routed_expert_calls for r in per_sample)),
+            "token_count": batch_size * sequence_length,
+            "probe_layer_count": self.effort_probe_layer_count,
+        }
+        return per_sample, stats
 
     def forward(
         self,
@@ -347,31 +445,60 @@ class QwenExFusionModel(nn.Module):
         max_layers: Optional[int] = None,
         return_compute_receipt: bool = False,
         return_hidden_state: bool = False,
+        effort_levels_override: Optional[Tensor] = None,
     ) -> Union[Tensor, Dict[str, Any]]:
+        mode = str(effort_mode).lower()
+        if mode == "adaptive" or effort_levels_override is not None:
+            if max_layers is not None:
+                raise ValueError("max_layers is incompatible with adaptive effort dispatch")
+            if self.effort_controller is None and effort_levels_override is None:
+                raise RuntimeError("This checkpoint has no effort controller; install one before adaptive execution")
+            h0 = self.embed(input_ids)
+            probe_h, _, decision = self.compute_effort_probe(h0, attention_mask)
+            levels = decision.levels
+            if effort_levels_override is not None:
+                levels = torch.as_tensor(effort_levels_override, device=input_ids.device, dtype=torch.long)
+                if levels.dim() != 1 or levels.numel() != input_ids.size(0):
+                    raise ValueError("effort_levels_override must have shape (batch_size,)")
+                if bool(torch.any((levels < 0) | (levels > 3))):
+                    raise ValueError("effort_levels_override values must be in [0, 3]")
+                probs = torch.zeros(input_ids.size(0), 4, device=input_ids.device, dtype=probe_h.dtype)
+                probs.scatter_(1, levels.unsqueeze(1), 1.0)
+                decision = decide_from_probs(
+                    probs, source_layer=0, source_position="override_post_qwen_block_0",
+                    hidden_anchor=decision.hidden_anchor,
+                )
+            # Partition active samples; layer 0 was already completed by the
+            # shared probe and is never re-run by a selected suffix.
+            h = torch.empty_like(probe_h)
+            for level in levels.unique(sorted=True).tolist():
+                indices = (levels == int(level)).nonzero(as_tuple=False).squeeze(1)
+                sub_hidden = probe_h.index_select(0, indices)
+                sub_mask = attention_mask.index_select(0, indices) if attention_mask is not None else None
+                h.index_copy_(0, indices, self._run_layers(sub_hidden, sub_mask, int(level), start_layer=1))
+            h = self.norm(h)
+            logits = self.lm_head(h)
+            receipts, stats = self._adaptive_receipt_stats(
+                levels, batch_size=input_ids.shape[0], sequence_length=input_ids.shape[1]
+            )
+            if return_compute_receipt or return_hidden_state:
+                result: Dict[str, Any] = {
+                    "logits": logits, "effort_decision": decision.to_dict(), "compute_stats": stats,
+                }
+                if return_compute_receipt:
+                    result["compute_receipt"] = receipts[0] if len(receipts) == 1 else receipts
+                if return_hidden_state:
+                    result["hidden_state"] = h
+                return result
+            return logits
+
         effort = self._effort_index(effort_mode)
         flags = self._effort_flags(effort_mode)
         layer_count = self._layer_count(effort) if max_layers is None else max(1, min(len(self.layers), max_layers))
         if effort in (2, 3) and layer_count != len(self.layers):
             raise ValueError("E2/E3 cannot use a partial-depth override")
         h = self.embed(input_ids)
-        for layer_index, layer in enumerate(self.layers[:layer_count]):
-            latent_steps = (
-                int(flags["latent_steps"])
-                if effort == 3 and layer_index == layer_count - 1
-                else 0
-            )
-            h, _, _, _ = layer(
-                h,
-                attention_mask=attention_mask,
-                use_recurrent=bool(flags["use_recurrent"]),
-                use_routed_moe=bool(flags["use_routed_moe"]),
-                use_attn_res=bool(flags["use_attn_res"]),
-                latent_steps=latent_steps,
-            )
-        if effort == 0 and self.e0_continuation is not None:
-            h = self.e0_continuation(h)
-        elif effort == 1 and self.e1_continuation is not None:
-            h = self.e1_continuation(h)
+        h = self._run_layers(h, attention_mask, effort, layer_count=layer_count)
         h = self.norm(h)
         logits = self.lm_head(h)
         receipt = self._compute_receipt(
@@ -445,12 +572,15 @@ class QwenExFusionModel(nn.Module):
         total_raw = 0.0
         last_logits: Optional[Tensor] = None
         last_receipt: Optional[EffortComputeReceipt] = None
+        last_stats: Optional[Dict[str, Any]] = None
         generated = 0
         for _ in range(max_new_tokens):
             out = self(ids, attention_mask=mask, effort_mode=effort_mode, return_compute_receipt=True)
             last_logits = out["logits"]
-            last_receipt = out["compute_receipt"]
-            total_raw += last_receipt.raw_compute_units
+            raw_receipt = out["compute_receipt"]
+            last_receipt = raw_receipt if isinstance(raw_receipt, EffortComputeReceipt) else None
+            last_stats = dict(out["compute_stats"])
+            total_raw += float(last_stats["raw_compute_units"])
             token = last_logits[:, -1].argmax(dim=-1, keepdim=True)
             ids = torch.cat((ids, token), dim=1)
             mask = torch.cat((mask, torch.ones_like(token)), dim=1)
@@ -458,11 +588,13 @@ class QwenExFusionModel(nn.Module):
             if eos_token_id is not None and bool(torch.all(token == eos_token_id)):
                 break
         if last_receipt is None:
-            last_receipt = self.compute_receipt(ids, effort_mode)
-            last_logits = self(ids, attention_mask=mask, effort_mode=effort_mode)
-        stats = last_receipt.to_dict()
-        stats["estimated_flops"] = total_raw
+            if last_stats is None:
+                last_receipt = self.compute_receipt(ids, effort_mode)
+                last_stats = last_receipt.to_dict()
+                last_logits = self(ids, attention_mask=mask, effort_mode=effort_mode)
+        stats = dict(last_stats or last_receipt.to_dict())
         stats["raw_compute_units"] = total_raw
+        stats["estimated_compute_units"] = total_raw
         stats["generated_tokens"] = generated
         result: Dict[str, Any] = {"sequences": ids, "logits": last_logits, "compute_stats": stats}
         if tokenizer is not None:
@@ -496,6 +628,7 @@ def augment_qwen_compat_model(
     use_shallow_continuation: bool = False,
     continuation_bottleneck_size: Optional[int] = None,
     latent_scale_limit: float = 0.01,
+    effort_controller_hidden_size: int = 128,
 ) -> QwenExFusionModel:
     """
     Convert a loaded QwenCompatModel into QwenExFusionModel.
@@ -533,6 +666,7 @@ def augment_qwen_compat_model(
         use_shallow_continuation=use_shallow_continuation,
         continuation_bottleneck_size=continuation_bottleneck_size,
         latent_scale_limit=latent_scale_limit,
+        effort_controller_hidden_size=effort_controller_hidden_size,
     )
 
     # Copy embed / norm / lm_head
@@ -604,6 +738,10 @@ def load_qwen_exfusion_checkpoint(path: str, *, map_location: str = "cpu") -> Qw
         raise ValueError(f"Not a canonical QwenExFusion checkpoint: {cfg.get('architecture')}")
     fractions = cfg.get("depth_fractions") or (0.5, 0.75, 1.0, 1.0)
     overrides = cfg.get("layer_count_overrides") or (None, None, None, None)
+    state_dict = payload.get("state_dict", payload.get("model"))
+    # Artifacts written before adaptive runtime lack controller tensors and
+    # remain loadable for fixed E0–E3 use.
+    has_controller = any(key.startswith("effort_controller.") for key in state_dict)
     model = QwenExFusionModel(
         vocab_size=int(cfg["vocab_size"]), hidden_size=int(cfg["hidden_size"]),
         num_layers=int(cfg["num_layers"]), num_heads=int(cfg["num_heads"]),
@@ -624,8 +762,10 @@ def load_qwen_exfusion_checkpoint(path: str, *, map_location: str = "cpu") -> Qw
         use_shallow_continuation=bool(cfg.get("use_shallow_continuation", False)),
         continuation_bottleneck_size=cfg.get("continuation_bottleneck_size"),
         latent_scale_limit=float(cfg.get("latent_scale_limit") or 0.01),
+        effort_controller_hidden_size=int(cfg.get("effort_controller_hidden_size") or 128),
+        enable_effort_controller=bool(cfg.get("enable_effort_controller", has_controller)) and has_controller,
     )
-    model.load_state_dict(payload.get("state_dict", payload.get("model")))
+    model.load_state_dict(state_dict)
     p = payload.get("parameter_provenance")
     if p:
         model.parameter_provenance = ExFusionParameterProvenance(

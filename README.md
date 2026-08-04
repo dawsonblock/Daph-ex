@@ -15,13 +15,15 @@ Pretrained-compatible adaptive computation with a physically ordered four-level 
 | E0 | first `ceil(0.50 × layers)` blocks → final RMSNorm/head | cheapest approximation |
 | E1 | first `ceil(0.75 × layers)` blocks → final RMSNorm/head | intermediate approximation |
 | E2 | every imported block → unchanged final RMSNorm/head | full pretrained anchor |
-| E3 | E2 plus enabled recurrent/MoE and latent delta refinement | additional difficult-input compute |
+| E3 | E2 plus final-layer bounded latent delta refinement | additional difficult-input compute |
 
 E0/E1 optionally enable a small zero-residual bottleneck continuation for frozen-backbone distillation; it is off by default so the direct shallow-exit baseline remains measurable.
 
 Deterministic `EffortComputeReceipt` accounting proves, for supported backbones with at least three resolvable depths:
 
 `C(E0) < C(E1) < C(E2) < C(E3)` and `C_norm(E2) = 1.0`.
+
+`effort_mode="adaptive"` runs the first imported Qwen block as a shared probe, pools its post-block hidden state, and dispatches each sample to E0–E3 without re-running that block. The probe is common work already included in every fixed-arm receipt. A controller must be trained and installed before adaptive results are scientifically interpreted; fixed-arm qualification remains the prerequisite for policy training.
 
 At conversion time all augmentation scales are exactly zero, preserving:
 
@@ -99,4 +101,4 @@ See [`docs/QUALITY_CORRECTION_REPORT.md`](docs/QUALITY_CORRECTION_REPORT.md) for
 
 ## Status
 
-The canonical Qwen path and legacy hybrid path coexist. AttnRes is deliberately disabled in the first canonical pretrained experiment until model-level cross-layer history is implemented. The full local suite currently passes 97 tests.
+The canonical Qwen path and legacy hybrid path coexist. AttnRes is deliberately disabled in the first canonical pretrained experiment until model-level cross-layer history is implemented. The full local suite currently passes 100 tests.

@@ -30,7 +30,9 @@ class EffortComputeReceipt:
     def to_dict(self) -> Dict[str, Any]:
         out = asdict(self)
         out["estimated_compute"] = self.estimated_compute
-        out["estimated_flops"] = self.raw_compute_units
+        # This is a deterministic operator-family proxy, not measured device
+        # FLOPs.  Keep the name precise so reports do not overclaim accuracy.
+        out["estimated_compute_units"] = self.raw_compute_units
         out["layers_executed"] = self.executed_layer_count
         out["layers_skipped"] = self.skipped_layer_count
         return out

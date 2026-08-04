@@ -44,7 +44,11 @@ QualityFn = Callable[[Dict[str, Any], Dict[str, Any]], Tuple[float, str]]
 
 def _tensor_raw_bytes(t: Tensor) -> bytes:
     """Bit-exact bytes for any dtype including bfloat16."""
-    t = t.detach().cpu().contiguous()
+    # ``Tensor.view(dtype)`` cannot reinterpret a zero-dimensional tensor when
+    # the element sizes differ.  ExFusion intentionally has scalar residual
+    # scales, so normalize every tensor to a one-dimensional byte-addressable
+    # layout before hashing it.
+    t = t.detach().cpu().contiguous().reshape(-1)
     # view as uint8 avoids numpy bfloat16 limitation
     return bytes(t.view(torch.uint8).numpy())
 
@@ -331,7 +335,13 @@ class CounterfactualCollector:
             outs.append(out)
             stats = out["compute_stats"]
             receipts.append(dict(stats))
-            flops = float(stats.get("raw_compute_units") or stats.get("estimated_flops") or 0.0)
+            flops = float(
+                stats.get("raw_compute_units")
+                or stats.get("estimated_compute_units")
+                # Backward-compatible read for legacy collectors only.
+                or stats.get("estimated_flops")
+                or 0.0
+            )
             nominal = float((stats.get("per_sample_compute") or [stats.get("normalized_compute_cost", 0.3)])[0] if isinstance(stats.get("per_sample_compute") or [0.3], list) else stats.get("normalized_compute_cost", 0.3))
             raw_costs.append(flops if self.cost_mode == "flops" and flops > 0 else nominal)
 
@@ -436,7 +446,12 @@ class CounterfactualCollector:
                 eos_token_id=eos_token_id,
                 tokenizer=self.tokenizer,
             )
-            flops = float(gen["compute_stats"].get("estimated_flops") or 0.0)
+            flops = float(
+                gen["compute_stats"].get("raw_compute_units")
+                or gen["compute_stats"].get("estimated_compute_units")
+                or gen["compute_stats"].get("estimated_flops")
+                or 0.0
+            )
             raw_costs.append(flops if flops > 0 else float(e + 1))
             if self.quality_fn is not None:
                 q, status = self.quality_fn(gen, task)

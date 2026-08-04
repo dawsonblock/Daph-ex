@@ -58,7 +58,7 @@ def _tensor_digest(t: Tensor) -> str:
     h = hashlib.sha256()
     h.update(str(tuple(x.shape)).encode())
     h.update(str(x.dtype).encode())
-    h.update(bytes(x.view(torch.uint8).numpy()))
+    h.update(bytes(x.reshape(-1).view(torch.uint8).numpy()))
     return h.hexdigest()[:16]
 
 
@@ -595,6 +595,9 @@ def save_adapted_checkpoint(
             "use_shallow_continuation": getattr(model, "use_shallow_continuation", False),
             "continuation_bottleneck_size": getattr(model, "continuation_bottleneck_size", None),
             "latent_scale_limit": getattr(model, "latent_scale_limit", None),
+            "effort_probe_layer_count": getattr(model, "effort_probe_layer_count", None),
+            "effort_controller_hidden_size": getattr(model, "effort_controller_hidden_size", None),
+            "enable_effort_controller": getattr(model, "enable_effort_controller", False),
         }
     payload: Dict[str, Any] = {"state_dict": model.state_dict(), "model_config": model_config}
     provenance = getattr(model, "parameter_provenance", None)

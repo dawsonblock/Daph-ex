@@ -130,6 +130,24 @@ trainer = EffortPolicyTrainer(controller, PolicyTrainingConfig(epochs=20, batch_
 metrics, receipt = trainer.fit(records, mode="hidden")
 print(metrics)
 print(receipt.to_dict())
+artifact, policy_state = trainer.build_artifact(
+    base_model_digest=records[0].model_digest,
+    train_records=records,
+    metrics=metrics,
+)
+
+# Only after the fixed-arm and oracle gates pass, install the verified state
+# into the canonical model and let its shared first-Qwen-block probe dispatch
+# physical E0–E3 execution.
+from daph import load_qwen_exfusion_checkpoint, install_effort_policy
+model = load_qwen_exfusion_checkpoint("runs/adapt/model_final.pt")
+install_effort_policy(
+    model.effort_controller, artifact, policy_state,
+    base_model_digest=records[0].model_digest,
+)
+batch_ids = torch.tensor([[1, 2, 3]])
+out = model(batch_ids, effort_mode="adaptive", return_compute_receipt=True)
+print(out["effort_decision"], out["compute_stats"])
 PY
 ```
 
