@@ -7,7 +7,14 @@ import torch
 
 from daph.counterfactual import CounterfactualCollector, _tensor_raw_bytes, full_state_dict_digest
 from daph.e3_architecture import E3RefinementConfig, resolve_e3_region, sparse_profile_indices
-from daph.e3_experiment import dose_response_variants, location_ablation_variants
+from daph.e3_experiment import (
+    active_refinement_layer,
+    dose_response_variants,
+    E2DifficultyBandConfig,
+    location_ablation_variants,
+    select_mixed_success_tasks,
+    set_refinement_steps,
+)
 from daph.e3_metrics import E3QualificationConfig, e3_pair_metrics, qualify_e3_pairs
 from daph.e3_training import E3StageConfig, configure_e3_training, e3_verified_objective
 from daph.hard_case import E3HardCaseMiner, HardCaseMiningConfig
@@ -17,7 +24,7 @@ from daph.pretrained import save_adapted_checkpoint
 from daph.qwen_compat import QwenCompatModel
 from daph.qwen_exfusion import augment_qwen_compat_model, gate0b_exact_parity, load_qwen_exfusion_checkpoint
 from daph.verifiers import ExactMatchVerifier, make_quality_fn
-from scripts.run_e3_hardcase_ablation import _active_refinement_layer, _set_refinement_steps
+from daph.train_real import TextBatcher, load_jsonl_training_records
 
 
 def make_model(e3_config=None, layers=10):
@@ -343,13 +350,48 @@ def test_dose_and_location_ablation_contracts_are_explicit():
 def test_real_ablation_harness_targets_active_location_and_step_count():
     _, middle = make_model(E3RefinementConfig(e3_refinement_mode="middle_recurrent", e3_refine_steps=1))
     _, final = make_model(E3RefinementConfig(e3_refinement_mode="final_refine", e3_refine_steps=1))
-    assert _active_refinement_layer(middle) == middle.e3_region.insertion_layer
-    assert _active_refinement_layer(final) == len(final.layers) - 1
-    assert _active_refinement_layer(middle) != _active_refinement_layer(final)
-    _set_refinement_steps(middle, 4)
+    assert active_refinement_layer(middle) == middle.e3_region.insertion_layer
+    assert active_refinement_layer(final) == len(final.layers) - 1
+    assert active_refinement_layer(middle) != active_refinement_layer(final)
+    set_refinement_steps(middle, 4)
     out = middle(torch.randint(0, 80, (1, 5)), effort_mode="fixed_3", return_compute_receipt=True)
     assert middle.e3_config.e3_refine_steps == 4
     assert out["compute_receipt"].middle_refinement_steps == 4
+
+
+def test_answer_only_batcher_masks_every_prompt_and_padding_token(tmp_path):
+    path = tmp_path / "answer-only.jsonl"
+    path.write_text(json.dumps({"prompt": "abc", "answer": "de"}) + "\n")
+    records = load_jsonl_training_records(str(path), answer_only_loss=True)
+
+    class TinyTokenizer:
+        pad_token = "<pad>"
+        eos_token = "<eos>"
+        pad_token_id = 0
+
+        def __call__(self, text, add_special_tokens=False):
+            return {"input_ids": [{"a": 1, "b": 2, "c": 3, "d": 4, "e": 5}[char] for char in text]}
+
+    batcher = TextBatcher(
+        records, tokenizer=TinyTokenizer(), seq_len=8, batch_size=1,
+        device=torch.device("cpu"), answer_only_loss=True,
+    )
+    ids, labels, mask = next(batcher)
+    assert ids.tolist() == [[1, 2, 3, 4, 5, 0, 0, 0]]
+    assert labels.tolist() == [[-100, -100, -100, 4, 5, -100, -100, -100]]
+    assert mask.tolist() == [[1, 1, 1, 1, 1, 0, 0, 0]]
+
+
+def test_mixed_success_calibration_is_deterministic_and_non_degenerate():
+    tasks = [{"task_id": f"t{i}"} for i in range(10)]
+    outcomes = [{"task_id": f"t{i}", "e2_correct": i < 5} for i in range(10)]
+    config = E2DifficultyBandConfig(target_size=6, seed=7)
+    selected, report = select_mixed_success_tasks(tasks, outcomes, config)
+    repeated, repeated_report = select_mixed_success_tasks(tasks, outcomes, config)
+    assert selected == repeated and report == repeated_report
+    assert report["selected_successes"] == 3
+    assert report["selected_failures"] == 3
+    assert report["selected_e2_accuracy"] == 0.5
 
 
 def test_e3_stage_a_freezes_e2_and_task_loss_is_primary():

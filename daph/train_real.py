@@ -21,7 +21,7 @@ import time
 import copy
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
-from typing import Any, Dict, Iterator, List, Optional, Sequence, Tuple, Union
+from typing import Any, Dict, Iterator, List, Mapping, Optional, Sequence, Tuple, Union
 
 import torch
 import torch.nn.functional as F
@@ -93,6 +93,7 @@ class RealTrainConfig:
     save_final_checkpoint: bool = True
     save_model_artifact: bool = True
     fail_on_nonfinite: bool = True
+    answer_only_loss: bool = False
 
 
 def load_jsonl_texts(path: str) -> List[str]:
@@ -114,16 +115,43 @@ def load_jsonl_texts(path: str) -> List[str]:
     return texts
 
 
+def load_jsonl_training_records(
+    path: str, *, answer_only_loss: bool = False,
+) -> List[Union[str, Dict[str, str]]]:
+    """Load ordinary text rows or explicit prompt/answer supervision rows."""
+    if not answer_only_loss:
+        return load_jsonl_texts(path)
+    records: List[Union[str, Dict[str, str]]] = []
+    with open(path, encoding="utf-8") as handle:
+        for line_number, line in enumerate(handle, start=1):
+            line = line.strip()
+            if not line:
+                continue
+            obj = json.loads(line)
+            prompt = obj.get("prompt")
+            answer = obj.get("answer", obj.get("expected"))
+            if prompt is None or not str(prompt) or answer is None:
+                raise ValueError(
+                    "Answer-only training requires prompt plus answer/expected; "
+                    f"missing at {path}:{line_number}"
+                )
+            records.append({"prompt": str(prompt), "answer": str(answer)})
+    if not records:
+        raise ValueError(f"No answer-only training records in {path}")
+    return records
+
+
 class TextBatcher:
     def __init__(
         self,
-        texts: Sequence[str],
+        texts: Sequence[Union[str, Mapping[str, str]]],
         *,
         tokenizer: Any,
         seq_len: int,
         batch_size: int,
         device: torch.device,
         seed: int = 0,
+        answer_only_loss: bool = False,
     ) -> None:
         self.texts = list(texts)
         self.tokenizer = tokenizer
@@ -131,20 +159,24 @@ class TextBatcher:
         self.batch_size = batch_size
         self.device = device
         self.rng = torch.Generator().manual_seed(seed)
+        self.answer_only_loss = bool(answer_only_loss)
         self._i = 0
 
     def __iter__(self) -> "TextBatcher":
         return self
 
     def __next__(self) -> Tuple[Tensor, Tensor, Tensor]:
-        batch_txt = []
+        batch_records: List[Union[str, Mapping[str, str]]] = []
         for _ in range(self.batch_size):
             if self._i >= len(self.texts):
                 self._i = 0
                 perm = torch.randperm(len(self.texts), generator=self.rng).tolist()
                 self.texts = [self.texts[j] for j in perm]
-            batch_txt.append(self.texts[self._i])
+            batch_records.append(self.texts[self._i])
             self._i += 1
+        if self.answer_only_loss:
+            return self._answer_only_batch(batch_records)
+        batch_txt = [str(record) for record in batch_records]
         if self.tokenizer is None:
             ids_list = []
             for text in batch_txt:
@@ -171,6 +203,48 @@ class TextBatcher:
             labels[mask == 0] = -100
         # training uses causal shift inside the loop
         return ids, labels, mask
+
+    def _answer_only_batch(
+        self, batch_records: Sequence[Union[str, Mapping[str, str]]],
+    ) -> Tuple[Tensor, Tensor, Tensor]:
+        rows: List[List[int]] = []
+        label_rows: List[List[int]] = []
+        masks: List[List[int]] = []
+        pad_id = 0
+        if self.tokenizer is not None:
+            if getattr(self.tokenizer, "pad_token", None) is None:
+                self.tokenizer.pad_token = self.tokenizer.eos_token
+            pad_id = int(getattr(self.tokenizer, "pad_token_id", 0) or 0)
+
+        def encode(text: str) -> List[int]:
+            if self.tokenizer is None:
+                return [ord(char) % 100 for char in text]
+            encoded = self.tokenizer(text, add_special_tokens=False)["input_ids"]
+            if encoded and isinstance(encoded[0], list):
+                encoded = encoded[0]
+            return [int(token) for token in encoded]
+
+        for record in batch_records:
+            if not isinstance(record, Mapping) or "prompt" not in record or "answer" not in record:
+                raise ValueError("Answer-only batches require prompt/answer mappings")
+            prompt_ids = encode(str(record["prompt"]))
+            answer_ids = encode(str(record["answer"]))
+            if not answer_ids:
+                raise ValueError("Answer-only training requires at least one answer token")
+            answer_ids = answer_ids[: self.seq_len]
+            prompt_budget = max(0, self.seq_len - len(answer_ids))
+            prompt_ids = prompt_ids[-prompt_budget:] if prompt_budget else []
+            combined = prompt_ids + answer_ids
+            valid = len(combined)
+            padding = self.seq_len - valid
+            rows.append(combined + [pad_id] * padding)
+            label_rows.append([-100] * len(prompt_ids) + answer_ids + [-100] * padding)
+            masks.append([1] * valid + [0] * padding)
+        return (
+            torch.tensor(rows, dtype=torch.long, device=self.device),
+            torch.tensor(label_rows, dtype=torch.long, device=self.device),
+            torch.tensor(masks, dtype=torch.long, device=self.device),
+        )
 
 
 def _param_groups(model: torch.nn.Module, cfg: RealTrainConfig) -> List[Dict[str, Any]]:
@@ -412,17 +486,23 @@ def train_adapt(
     )
     if not cfg.data_path:
         raise ValueError("RealTrainConfig.data_path is required")
-    texts = load_jsonl_texts(cfg.data_path)
+    texts = load_jsonl_training_records(
+        cfg.data_path, answer_only_loss=cfg.answer_only_loss,
+    )
     batcher = TextBatcher(
         texts, tokenizer=tok, seq_len=cfg.seq_len,
         batch_size=cfg.batch_size, device=device, seed=cfg.seed,
+        answer_only_loss=cfg.answer_only_loss,
     )
     val_batcher = None
     if cfg.val_path:
-        val_texts = load_jsonl_texts(cfg.val_path)
+        val_texts = load_jsonl_training_records(
+            cfg.val_path, answer_only_loss=cfg.answer_only_loss,
+        )
         val_batcher = TextBatcher(
             val_texts, tokenizer=tok, seq_len=cfg.seq_len,
             batch_size=cfg.batch_size, device=device, seed=cfg.seed + 1,
+            answer_only_loss=cfg.answer_only_loss,
         )
 
     start_step = 0

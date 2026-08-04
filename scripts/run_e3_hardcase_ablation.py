@@ -13,7 +13,6 @@ import copy
 import hashlib
 import json
 import platform
-import re
 import sys
 from dataclasses import asdict
 from pathlib import Path
@@ -21,17 +20,16 @@ from typing import Any, Dict, List, Sequence
 
 import torch
 import torch.nn.functional as F
-from transformers import AutoConfig, AutoModelForCausalLM, AutoTokenizer
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from daph.e3_metrics import e3_pair_metrics
+from daph.e3_metrics import E3QualificationConfig, e3_pair_metrics, qualify_e3_pairs
 from daph.e3_architecture import E3RefinementConfig
+from daph.e3_experiment import active_refinement_layer, numeric_answer_correct, set_refinement_steps
 from daph.pretrained import import_into_qwen_compat
 from daph.qwen_exfusion import augment_qwen_compat_model, gate0b_exact_parity, prepare_exfusion_for_training
 from daph.train_real import RealTrainConfig, TrainingStageConfig, train_adapt
-from scripts.run_phase0_retention import build_compat_from_hf
 
 
 def _sha256(path: Path) -> str:
@@ -51,20 +49,13 @@ def _load_tasks(path: Path) -> List[Dict[str, Any]]:
     return rows
 
 
-def _write_training_text(tasks: Sequence[Dict[str, Any]], path: Path) -> None:
+def _write_answer_only_training_data(tasks: Sequence[Dict[str, Any]], path: Path) -> None:
     with path.open("w", encoding="utf-8") as handle:
         for task in tasks:
-            handle.write(json.dumps({"text": f"{task['prompt']}{task['expected']}"}) + "\n")
-
-
-def _numeric_correct(text: str, expected: Any) -> bool:
-    values = re.findall(r"[-+]?\d+(?:\.\d+)?", text)
-    if not values:
-        return False
-    try:
-        return float(values[-1]) == float(expected)
-    except (TypeError, ValueError):
-        return text.strip() == str(expected).strip()
+            handle.write(json.dumps({
+                "prompt": str(task["prompt"]),
+                "answer": str(task["expected"]),
+            }) + "\n")
 
 
 @torch.no_grad()
@@ -97,11 +88,13 @@ def _task_eval(model: Any, tokenizer: Any, tasks: Sequence[Dict[str, Any]], *, d
         for mode in ("fixed_2", "fixed_3"):
             generated_out = model.generate(prompt_ids, attention_mask=torch.ones_like(prompt_ids), effort_mode=mode, max_new_tokens=max_new_tokens)
             completion = tokenizer.decode(generated_out["sequences"][0, prompt_ids.size(1):], skip_special_tokens=True)
-            generated[mode], correct[mode] = completion, _numeric_correct(completion, task["expected"])
+            generated[mode], correct[mode] = completion, numeric_answer_correct(completion, task["expected"])
         pairs.append({
             "task_id": task["task_id"], "task_family": task["task_family"], "difficulty_bucket": task["difficulty_bucket"],
             "e2_correct": correct["fixed_2"], "e3_correct": correct["fixed_3"],
             "e2_completion": generated["fixed_2"], "e3_completion": generated["fixed_3"],
+            "refinement_steps": int(model.e3_config.e3_refine_steps),
+            "profiled_region": f"{model.e3_region.region_start}-{model.e3_region.region_end}",
         })
     report = e3_pair_metrics(pairs)
     report.update({
@@ -152,20 +145,10 @@ def _build_e3_config(mode: str, steps: int, profile_dir: Path | None) -> tuple[E
     ), None
 
 
-def _active_refinement_layer(model: Any) -> int:
-    return (
-        len(model.layers) - 1
-        if model.e3_config.e3_refinement_mode == "final_refine"
-        else model.e3_region.insertion_layer
-    )
-
-
-def _set_refinement_steps(model: Any, steps: int) -> None:
-    model.e3_config.e3_refine_steps = int(steps)
-    model.default_e3_steps = int(steps)
-
-
 def main() -> None:
+    from transformers import AutoConfig, AutoModelForCausalLM, AutoTokenizer
+    from scripts.run_phase0_retention import build_compat_from_hf
+
     parser = argparse.ArgumentParser()
     parser.add_argument("--model", default="Qwen/Qwen2.5-0.5B")
     parser.add_argument("--revision", required=True)
@@ -188,6 +171,11 @@ def main() -> None:
     parser.add_argument("--max-new-tokens", type=int, default=12)
     parser.add_argument("--latent-size", type=int, default=64)
     parser.add_argument("--seed", type=int, default=20260803)
+    parser.add_argument("--min-e2-accuracy", type=float, default=0.30)
+    parser.add_argument("--max-e2-accuracy", type=float, default=0.70)
+    parser.add_argument("--bootstrap-samples", type=int, default=2000)
+    parser.add_argument("--confidence", type=float, default=0.95)
+    parser.add_argument("--heldout-steps", type=int, help="Force a common held-out dose across locations")
     parser.add_argument("--device", default="auto")
     args = parser.parse_args()
     counts, output = _parse_counts(args.latent_step_counts), Path(args.output)
@@ -196,8 +184,8 @@ def main() -> None:
     )
     output.mkdir(parents=True, exist_ok=True)
     train_tasks, selection_tasks, test_tasks = _load_tasks(Path(args.hard_train)), _load_tasks(Path(args.selection)), _load_tasks(Path(args.test))
-    train_jsonl = output / "hard_train_causal_lm.jsonl"
-    _write_training_text(train_tasks, train_jsonl)
+    train_jsonl = output / "hard_train_answer_only.jsonl"
+    _write_answer_only_training_data(train_tasks, train_jsonl)
     device = torch.device("mps" if args.device == "auto" and torch.backends.mps.is_available() else ("cpu" if args.device == "auto" else args.device))
     tokenizer = AutoTokenizer.from_pretrained(args.model, revision=args.revision)
     if tokenizer.pad_token is None:
@@ -222,7 +210,7 @@ def main() -> None:
         raise RuntimeError(f"Gate 0B failed: {phase0b}")
     init = prepare_exfusion_for_training(model, gate0b_passed=True, epsilon=args.e3_scale)
     model, compat = model.to(device), None
-    refinement_layer = _active_refinement_layer(model)
+    refinement_layer = active_refinement_layer(model)
     active_layer = model.layers[refinement_layer]
     active_layer.latent_refine.load_state_dict(copy.deepcopy(model.layers[0].latent_refine.state_dict()))
     initial_refinement = copy.deepcopy(active_layer.latent_refine.state_dict())
@@ -233,7 +221,7 @@ def main() -> None:
         active_layer.latent_refine.load_state_dict(initial_refinement)
         with torch.no_grad():
             active_layer.latent_scale.copy_(initial_scale)
-        _set_refinement_steps(model, latent_steps)
+        set_refinement_steps(model, latent_steps)
         stage = TrainingStageConfig(
             name=f"e3_hardcase_{latent_steps}_steps", steps=args.steps,
             train_parameter_groups=("e3_refinement", "e3_scale"), freeze_parameter_groups=(),
@@ -246,6 +234,7 @@ def main() -> None:
             effort_schedule=("fixed_3",), data_path=str(train_jsonl), tokenizer_name=args.model, tokenizer_revision=args.revision,
             output_dir=str(output / f"latent_{latent_steps}"), stages=(stage,), save_periodic_checkpoints=False,
             save_final_checkpoint=False, save_model_artifact=False,
+            answer_only_loss=True,
         )
         result, selection = train_adapt(model, cfg), _task_eval(model, tokenizer, selection_tasks, device=device, max_new_tokens=args.max_new_tokens)
         e2_unchanged = torch.equal(_e2_logits(model, tokenizer, str(selection_tasks[0]["prompt"]), device), e2_anchor)
@@ -257,13 +246,34 @@ def main() -> None:
             "effective_latent_scale": float((model.latent_scale_limit * torch.tanh(active_layer.latent_scale / model.latent_scale_limit)).detach().cpu()), "e2_anchor_unchanged": e2_unchanged,
         }
         candidate_states[latent_steps] = {"refinement": copy.deepcopy(active_layer.latent_refine.state_dict()), "scale": active_layer.latent_scale.detach().clone()}
-    winner = max(counts, key=lambda step: (variants[str(step)]["selection"]["net_rescue_rate"], variants[str(step)]["selection"]["e3_accuracy"], -variants[str(step)]["selection"]["e3_completion_ce"]))
-    active_layer.latent_refine.load_state_dict(candidate_states[winner]["refinement"])
+    selection_winner = max(counts, key=lambda step: (variants[str(step)]["selection"]["net_rescue_rate"], variants[str(step)]["selection"]["e3_accuracy"], -variants[str(step)]["selection"]["e3_completion_ce"]))
+    heldout_steps = int(args.heldout_steps) if args.heldout_steps is not None else selection_winner
+    if heldout_steps not in candidate_states:
+        raise ValueError(f"--heldout-steps={heldout_steps} must be included in --latent-step-counts")
+    active_layer.latent_refine.load_state_dict(candidate_states[heldout_steps]["refinement"])
     with torch.no_grad():
-        active_layer.latent_scale.copy_(candidate_states[winner]["scale"])
-    _set_refinement_steps(model, winner)
+        active_layer.latent_scale.copy_(candidate_states[heldout_steps]["scale"])
+    set_refinement_steps(model, heldout_steps)
     heldout = _task_eval(model, tokenizer, test_tasks, device=device, max_new_tokens=args.max_new_tokens)
-    qualified = heldout["net_rescue_rate"] > 0.0 and heldout["e3_accuracy"] > heldout["e2_accuracy"]
+    paired_qualification = qualify_e3_pairs(
+        heldout["task_outcomes"],
+        E3QualificationConfig(
+            bootstrap_samples=args.bootstrap_samples,
+            confidence=args.confidence,
+            seed=args.seed,
+        ),
+    )
+    e2_band_passed = args.min_e2_accuracy <= heldout["e2_accuracy"] <= args.max_e2_accuracy
+    e2_frozen = all(value["e2_anchor_unchanged"] for value in variants.values())
+    qualified = bool(e2_frozen and e2_band_passed and paired_qualification["qualified"])
+    qualification = {
+        **paired_qualification,
+        "e2_frozen": e2_frozen,
+        "e2_difficulty_band_passed": e2_band_passed,
+        "e2_accuracy_band": [args.min_e2_accuracy, args.max_e2_accuracy],
+        "qualified": qualified,
+        "policy_training_allowed": qualified,
+    }
     report = {
         "experiment": "frozen-e2-hardcase-e3-location-dose-ablation", "model": {"id": args.model, "revision": args.revision, "source_exact_coverage_percent": import_report.exact_coverage_percent},
         "architecture": {
@@ -276,9 +286,14 @@ def main() -> None:
         },
         "environment": {"torch": torch.__version__, "platform": platform.platform(), "device": str(device)},
         "datasets": {key: {"path": path, "sha256": _sha256(Path(path)), "tasks": len(tasks)} for key, path, tasks in (("train", args.hard_train, train_tasks), ("selection", args.selection, selection_tasks), ("test", args.test, test_tasks))},
-        "phase0b": phase0b, "post_gate0b_initialization": asdict(init), "variants": variants, "selected_latent_steps": winner, "heldout": heldout,
-        "qualification": {"e2_frozen": all(value["e2_anchor_unchanged"] for value in variants.values()), "positive_heldout_net_rescue": heldout["net_rescue_rate"] > 0.0, "heldout_e3_accuracy_above_e2": heldout["e3_accuracy"] > heldout["e2_accuracy"], "qualified": qualified},
-        "limitations": ["This is a targeted task-loss ablation, not a general-language capability claim.", "Causal-LM training currently supervises prompt tokens as well as answer tokens.", "Do not train or claim an effort router unless this result replicates on independent hard-task families."],
+        "phase0b": phase0b, "post_gate0b_initialization": asdict(init), "variants": variants,
+        "selection_winner_steps": selection_winner,
+        "selected_latent_steps": heldout_steps,
+        "heldout_step_policy": "forced_matched" if args.heldout_steps is not None else "selection_winner",
+        "heldout": heldout,
+        "qualification": qualification,
+        "training_objective": {"name": "answer_token_only_causal_ce", "prompt_tokens_supervised": False},
+        "limitations": ["This is a targeted task-loss ablation, not a general-language capability claim.", "Do not train or claim an effort router unless this result replicates on independent hard-task families."],
     }
     (output / "e3_hardcase_ablation_report.json").write_text(json.dumps(report, indent=2, default=str))
     print(json.dumps(report["qualification"], indent=2))
