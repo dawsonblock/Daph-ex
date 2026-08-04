@@ -97,7 +97,7 @@ python scripts/calibrate_e2_task_band.py \
   --target-e2-accuracy 0.50
 ```
 
-For the enforced qualification run use `--candidates runs/e3-multifamily/calibration_candidates.jsonl --train-count 500 --selection-count 200 --test-count 500` instead of `--candidate-dir`. Family-stratified calibration is enabled by default and fails if any included family cannot supply its allocated E2 successes/failures. The untouched `runs/e3-multifamily/natural_test.jsonl` is created before either arm is evaluated and remains disjoint.
+For the enforced qualification run use `--candidates runs/e3-multifamily/calibration_candidates.jsonl --train-count 500 --selection-count 200 --test-count 500 --min-calibrated-families 5 --resume` instead of `--candidate-dir`. Family-stratified calibration is enabled by default. It deterministically uses the largest E2-mixed feasible family subset, records every excluded family and its capacity, and fails unless at least five families can supply all three split allocations. The untouched `runs/e3-multifamily/natural_test.jsonl` is created before either arm is evaluated, remains disjoint, and retains all nine families.
 
 Then run the three locations with identical training, evaluation, and held-out refinement dose:
 
@@ -156,7 +156,7 @@ python scripts/qualify_e3_results.py \
   --experiment-tier QUALIFICATION \
   --training-seeds 20260803,20260817,20260831 \
   --placement middle_recurrent \
-  --test-count 167 --pytest-output runs/e3/pytest_output.txt \
+  --test-count 168 --pytest-output runs/e3/pytest_output.txt \
   --model-id Qwen/Qwen2.5-0.5B \
   --model-revision 060db6499f32faf8b98477b0a26969ef7d8b9987
 ```

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from collections import defaultdict
 import hashlib
+import itertools
 import json
 import random
 from typing import Any, Dict, Mapping, Sequence
@@ -118,6 +119,7 @@ def natural_heldout_split(
 def calibrated_sensitivity_split(
     tasks: Sequence[Mapping[str, Any]], e2_outcomes: Sequence[Mapping[str, Any]], *,
     count: int, target_e2_accuracy: float = 0.5, seed: int,
+    included_families: Sequence[str] | None = None,
 ) -> tuple[list[Dict[str, Any]], Dict[str, Any]]:
     """Select an E2 mixed-success sensitivity set without consulting E3."""
     if not 0 <= target_e2_accuracy <= 1:
@@ -125,6 +127,11 @@ def calibrated_sensitivity_split(
     outcome_by_id = {str(row["task_id"]): bool(row["e2_correct"]) for row in e2_outcomes}
     if any(str(task["task_id"]) not in outcome_by_id for task in tasks):
         raise ValueError("Every calibration candidate needs an E2 outcome")
+    if included_families is not None:
+        allowed = {str(family) for family in included_families}
+        tasks = [task for task in tasks if str(task["task_family"]) in allowed]
+        if not tasks:
+            raise ValueError("included_families selected no calibration tasks")
     if count < 1 or count > len(tasks):
         raise ValueError("Calibrated split count must be within the available task count")
     rng = random.Random(seed)
@@ -180,4 +187,91 @@ def calibrated_sensitivity_split(
         "family_stratified": True,
         "family_allocation": "balanced_equal",
         "per_task_family": per_family,
+        "included_families": families,
+    }
+
+
+def choose_calibration_families(
+    tasks: Sequence[Mapping[str, Any]], e2_outcomes: Sequence[Mapping[str, Any]], *,
+    split_counts: Sequence[int], target_e2_accuracy: float = 0.5,
+    minimum_families: int = 5,
+) -> tuple[tuple[str, ...], Dict[str, Any]]:
+    """Choose the largest E2-mixed family subset by a predeclared capacity rule."""
+    if not 0 <= target_e2_accuracy <= 1:
+        raise ValueError("target_e2_accuracy must be in [0, 1]")
+    if not split_counts or any(int(count) < 1 for count in split_counts):
+        raise ValueError("split_counts must contain positive counts")
+    outcome_by_id = {str(row["task_id"]): bool(row["e2_correct"]) for row in e2_outcomes}
+    by_family: Dict[str, Dict[bool, int]] = defaultdict(lambda: {True: 0, False: 0})
+    for task in tasks:
+        task_id = str(task["task_id"])
+        if task_id not in outcome_by_id:
+            raise ValueError("Every calibration candidate needs an E2 outcome")
+        by_family[str(task["task_family"])][outcome_by_id[task_id]] += 1
+    families = sorted(by_family)
+    if not 1 <= minimum_families <= len(families):
+        raise ValueError("minimum_families must be within the available family count")
+
+    def requirements(subset: tuple[str, ...]) -> Dict[str, Dict[bool, int]]:
+        needed = {family: {True: 0, False: 0} for family in subset}
+        for split_count in split_counts:
+            base, extra = divmod(int(split_count), len(subset))
+            quotas = {family: base + int(index < extra) for index, family in enumerate(subset)}
+            ideals = {family: quotas[family] * target_e2_accuracy for family in subset}
+            successes = {family: int(ideals[family]) for family in subset}
+            remaining = round(int(split_count) * target_e2_accuracy) - sum(successes.values())
+            for family in sorted(
+                subset, key=lambda key: (-(ideals[key] - successes[key]), key),
+            )[:remaining]:
+                successes[family] += 1
+            for family in subset:
+                needed[family][True] += successes[family]
+                needed[family][False] += quotas[family] - successes[family]
+        return needed
+
+    feasible: list[tuple[float, tuple[str, ...], Dict[str, Dict[bool, int]]]] = []
+    for size in range(len(families), minimum_families - 1, -1):
+        for subset in itertools.combinations(families, size):
+            needed = requirements(subset)
+            if all(
+                by_family[family][outcome] >= needed[family][outcome]
+                for family in subset for outcome in (True, False)
+            ):
+                # Prefer the subset with the largest minimum supply margin;
+                # ties are deterministic. This inspects only E2 calibration
+                # capacity, never E3 outcomes.
+                margin = min(
+                    by_family[family][outcome] - needed[family][outcome]
+                    for family in subset for outcome in (True, False)
+                )
+                feasible.append((float(margin), subset, needed))
+        if feasible:
+            break
+    if not feasible:
+        raise ValueError(
+            f"No family-stratified calibration subset with at least {minimum_families} families "
+            "can supply the requested E2 success/failure counts"
+        )
+    _, selected, needed = max(feasible, key=lambda item: (item[0], item[1]))
+    excluded = [family for family in families if family not in selected]
+    return selected, {
+        "selection_rule": "largest_feasible_family_subset_then_maximum_minimum_supply_margin",
+        "selection_inputs": ["task_family", "e2_correct", "predeclared_split_counts"],
+        "e3_outcomes_inspected": False,
+        "minimum_families": minimum_families,
+        "split_counts": [int(count) for count in split_counts],
+        "included_families": list(selected),
+        "excluded_families": excluded,
+        "available_by_family": {
+            family: {
+                "e2_successes": by_family[family][True],
+                "e2_failures": by_family[family][False],
+            } for family in families
+        },
+        "required_by_included_family": {
+            family: {
+                "e2_successes": needed[family][True],
+                "e2_failures": needed[family][False],
+            } for family in selected
+        },
     }

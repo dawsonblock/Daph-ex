@@ -85,6 +85,7 @@ from .e3_protocol import (
 )
 from .verified_tasks import (
     generate_verified_tasks, natural_heldout_split, calibrated_sensitivity_split,
+    choose_calibration_families,
 )
 from .counterfactual import (
     EffortCounterfactual,
@@ -219,6 +220,7 @@ __all__ = [
     "generate_verified_tasks",
     "natural_heldout_split",
     "calibrated_sensitivity_split",
+    "choose_calibration_families",
     "PretrainedImportReport",
     "import_state_dict",
     "load_pretrained_into_exfusion",

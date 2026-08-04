@@ -21,7 +21,7 @@ from daph.e3_experiment import (
     numeric_answer_correct,
     select_mixed_success_tasks,
 )
-from daph.verified_tasks import calibrated_sensitivity_split
+from daph.verified_tasks import calibrated_sensitivity_split, choose_calibration_families
 
 
 def load_tasks(path: Path) -> List[Dict[str, Any]]:
@@ -80,6 +80,8 @@ def main() -> None:
         "--family-stratified", action=argparse.BooleanOptionalAction, default=True,
         help="Balance E2 successes/failures within each task family (default: enabled).",
     )
+    parser.add_argument("--min-calibrated-families", type=int, default=5)
+    parser.add_argument("--resume", action="store_true", help="Reuse a complete cached E2 outcome file")
     parser.add_argument("--max-new-tokens", type=int, default=6)
     parser.add_argument("--seed", type=int, default=20260803)
     parser.add_argument("--device", default="auto")
@@ -96,9 +98,27 @@ def main() -> None:
     output.mkdir(parents=True, exist_ok=True)
     reports: Dict[str, Any] = {}
     shared_tasks = load_tasks(Path(args.candidates)) if args.candidates else None
-    shared_outcomes = evaluate_e2(
-        model, tokenizer, shared_tasks, device=device, max_new_tokens=args.max_new_tokens,
-    ) if shared_tasks is not None else None
+    outcome_cache = output / "e2_outcomes.jsonl"
+    if shared_tasks is not None and args.resume and outcome_cache.exists():
+        shared_outcomes = load_tasks(outcome_cache)
+        expected_ids = {str(task["task_id"]) for task in shared_tasks}
+        observed_ids = {str(row["task_id"]) for row in shared_outcomes}
+        if observed_ids != expected_ids:
+            raise ValueError("Cached E2 outcomes do not match the current candidate task IDs")
+    else:
+        shared_outcomes = evaluate_e2(
+            model, tokenizer, shared_tasks, device=device, max_new_tokens=args.max_new_tokens,
+        ) if shared_tasks is not None else None
+        if shared_outcomes is not None:
+            outcome_cache.write_text("".join(json.dumps(row, sort_keys=True) + "\n" for row in shared_outcomes))
+    calibrated_families, family_selection = None, None
+    if shared_tasks is not None and args.family_stratified:
+        calibrated_families, family_selection = choose_calibration_families(
+            shared_tasks, shared_outcomes,
+            split_counts=(args.train_count, args.selection_count, args.test_count),
+            target_e2_accuracy=args.target_e2_accuracy,
+            minimum_families=args.min_calibrated_families,
+        )
     remaining_ids = {str(task["task_id"]) for task in shared_tasks} if shared_tasks is not None else None
     for offset, (split, count) in enumerate((
         ("train", args.train_count),
@@ -118,6 +138,7 @@ def main() -> None:
             selected, split_manifest = calibrated_sensitivity_split(
                 tasks, outcomes, count=count,
                 target_e2_accuracy=args.target_e2_accuracy, seed=args.seed + offset,
+                included_families=calibrated_families,
             )
             selected_accuracy = float(split_manifest["selected_e2_accuracy"])
             if not args.min_e2_accuracy <= selected_accuracy <= args.max_e2_accuracy:
@@ -162,10 +183,12 @@ def main() -> None:
             "max_e2_accuracy": args.max_e2_accuracy,
             "target_e2_accuracy": args.target_e2_accuracy,
             "family_stratified": args.family_stratified,
+            "minimum_calibrated_families": args.min_calibrated_families,
             "max_new_tokens": args.max_new_tokens,
             "seed": args.seed,
         },
         "splits": reports,
+        "family_selection": family_selection,
     }
     (output / "calibration_manifest.json").write_text(json.dumps(manifest, indent=2))
     print(json.dumps({split: {key: value for key, value in report.items() if key.startswith("selected_")} for split, report in reports.items()}, indent=2))

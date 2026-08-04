@@ -117,4 +117,4 @@ The answer-only follow-up calibrated every split to 50% E2 accuracy and compared
 
 ## Status
 
-The canonical Qwen path, legacy hybrid path, and standalone marginal-utility research package coexist. Engineering acceptance is covered by 167 tests. Experiment tiers, unique-task counts, seed replication, natural-test promotion, and stable-profile promotion are enforced in executable paths. A real but low-budget sparse profile, matched answer-only location study, and negative controller oracle smoke are bundled. Neither E3 task utility nor a learned controller is scientifically qualified.
+The canonical Qwen path, legacy hybrid path, and standalone marginal-utility research package coexist. Engineering acceptance is covered by 168 tests. Experiment tiers, unique-task counts, seed replication, natural-test promotion, and stable-profile promotion are enforced in executable paths. A real but low-budget sparse profile, matched answer-only location study, and negative controller oracle smoke are bundled. Neither E3 task utility nor a learned controller is scientifically qualified.

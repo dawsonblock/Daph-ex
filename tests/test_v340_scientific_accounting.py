@@ -25,6 +25,7 @@ from daph.effort_frontier import build_effort_frontier, qualify_oracle_opportuni
 from daph.hard_case import E3HardCaseMiner, HardCaseMiningConfig, HardCaseRecord
 from daph.verified_tasks import (
     calibrated_sensitivity_split,
+    choose_calibration_families,
     generate_verified_tasks,
     natural_heldout_split,
 )
@@ -178,6 +179,23 @@ def test_calibrated_split_is_family_stratified_not_globally_class_sampled():
     assert {item["selected_tasks"] for item in manifest["per_task_family"].values()} == {2}
     assert sum(item["selected_e2_successes"] for item in manifest["per_task_family"].values()) == 9
     assert len(selected) == 18
+
+
+def test_calibration_family_fallback_excludes_infeasible_family_without_e3_outcomes():
+    tasks = generate_verified_tasks(count_per_family=12, seed=31)
+    outcomes = []
+    for task in tasks:
+        index = int(task["task_id"].rsplit("-", 1)[1])
+        correct = index % 2 == 0
+        if task["task_family"] == "code_output":
+            correct = False
+        outcomes.append({"task_id": task["task_id"], "e2_correct": correct})
+    selected, manifest = choose_calibration_families(
+        tasks, outcomes, split_counts=(18,), minimum_families=5,
+    )
+    assert len(selected) == 8
+    assert "code_output" in manifest["excluded_families"]
+    assert not manifest["e3_outcomes_inspected"]
 
 
 def test_natural_test_selection_does_not_inspect_e3_outcomes():

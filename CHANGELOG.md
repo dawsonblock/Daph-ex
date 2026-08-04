@@ -9,6 +9,7 @@
 - Corrected profile stability to rank only layers shared by every seed and added a multi-seed profile aggregation command.
 - Added final-tier predeclared sample-size enforcement and fail-fast CLI validation before model loading or GPU training.
 - Made the multi-seed location study resumable and removed duplicated receipt records from summary payloads for long qualification runs.
+- Cached expensive E2 calibration outcomes and added a declared largest-feasible-family rule (minimum five families) when an arm cannot supply a mixed-success sensitivity band; the natural test still retains all nine families.
 
 This release changes qualification enforcement, not the scientific result. The historical one-rescue result remains `MECHANISM_SIGNAL`; router training remains blocked.
 

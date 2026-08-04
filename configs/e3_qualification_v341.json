@@ -30,6 +30,7 @@
     "calibrated_sensitivity_count": 500,
     "natural_heldout_count": 500,
     "family_stratified_calibration": true,
+    "calibrated_family_selection_rule": "largest_feasible_family_subset_then_maximum_minimum_supply_margin",
     "templates_per_family": 3,
     "grouped_bootstrap_key": "template_id",
     "bootstrap_samples": 10000,
