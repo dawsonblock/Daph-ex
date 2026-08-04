@@ -100,9 +100,10 @@ def test_training_init_is_explicit_and_enables_augmentation_gradients():
     assert receipt.backbone_unchanged and receipt.changed_scale_names
     ids = torch.randint(0, 96, (2, 7))
     model(ids, effort_mode="fixed_3").sum().backward()
-    assert receipt.changed_scale_names == ("layers.3.latent_scale",)
-    assert model.layers[-1].latent_refine.fc2.weight.grad is not None
-    assert model.layers[-1].latent_refine.fc2.weight.grad.abs().sum() > 0
+    insertion = model.e3_region.insertion_layer
+    assert receipt.changed_scale_names == (f"layers.{insertion}.latent_scale",)
+    assert model.layers[insertion].latent_refine.fc2.weight.grad is not None
+    assert model.layers[insertion].latent_refine.fc2.weight.grad.abs().sum() > 0
     assert model.layers[0].latent_refine.fc2.weight.grad is None
 
 
@@ -133,8 +134,9 @@ def test_parameter_provenance_is_exact_names():
     assert set(provenance.imported_parameter_names).isdisjoint(provenance.new_parameter_names)
     assert set(provenance.imported_parameter_names) | set(provenance.new_parameter_names) == names
     assert all(name.endswith("_scale") for name in provenance.scale_parameter_names)
-    assert provenance.e3_scale_parameter_names == ("layers.3.latent_scale",)
-    assert all(name.startswith("layers.3.latent_refine.") for name in provenance.e3_refinement_parameter_names)
+    insertion = model.e3_region.insertion_layer
+    assert provenance.e3_scale_parameter_names == (f"layers.{insertion}.latent_scale",)
+    assert all(name.startswith(f"layers.{insertion}.latent_refine.") for name in provenance.e3_refinement_parameter_names)
     with tempfile.TemporaryDirectory() as td:
         path = os.path.join(td, "canonical.pt")
         save_adapted_checkpoint(model, path)
@@ -168,7 +170,7 @@ def test_adaptive_qwen_dispatch_reuses_internal_probe_and_executes_selected_arm(
     mask = torch.ones_like(ids)
     embedding = model.embed(ids)
     probe_h, _, decision = model.compute_effort_probe(embedding, mask)
-    assert decision.source_position == "post_qwen_block_0"
+    assert decision.source_position == "post_qwen_probe"
     assert not torch.equal(probe_h, embedding)
 
     adaptive_e0 = model(

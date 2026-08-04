@@ -1,5 +1,9 @@
 # Technical implementation report
 
+> Historical v3.1 report. For the current middle-layer research build, see
+> `docs/IMPLEMENTATION_REPORT_V320.md`, `docs/LAYER_CONTRIBUTION_DESIGN.md`, and
+> `docs/E3_MIDDLE_ARCHITECTURE.md`.
+
 ## Changed architecture
 
 - `daph/qwen_exfusion.py`: partial-depth E0/E1, exact E2, delta-semantics E3, branch gating, training initialization, parameter provenance, and structured receipts.

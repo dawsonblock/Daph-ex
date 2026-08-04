@@ -1,0 +1,15 @@
+{
+  "version": "3.2.0",
+  "branch": "research/middle-layer-e3-v4",
+  "base_commit": "64c36712f05e78a841f6e056df981fdf0461d7a6",
+  "paper": {
+    "title": "Is One Layer Enough? Training a Single Transformer Layer Can Match Full-Parameter RL Training",
+    "identifier": "arXiv:2607.01232v2",
+    "use": "structural prior only"
+  },
+  "engineering_status": "PASS",
+  "scientific_status": "NOT_QUALIFIED_NO_NEW_REAL_MODEL_EXPERIMENT",
+  "canonical_e3": "middle_recurrent",
+  "gate0b_invariant": "E2_INITIAL_EQUALS_PRETRAINED_QWEN",
+  "compute_invariant": "E0_LT_E1_LT_E2_LT_E3"
+}

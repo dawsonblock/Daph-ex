@@ -34,6 +34,38 @@ python scripts/run_small_real_adaptation.py \
 
 The harness pins the tokenizer revision, trains and validation-selects E0/E1/E3 separately, freezes imported E2 weights, rejects non-finite loss/gradients, skips large checkpoint serialization, and writes `experiment_report.json`.
 
+## Layer-contribution profile
+
+The profiler CLI consumes tokenized JSONL rows containing `input_ids`. Its bundled objective is supervised CE and is labeled accordingly.
+
+```bash
+# C. sparse profile (recommended first real scan)
+python scripts/profile_layer_contribution.py \
+  --checkpoint runs/phase0/qwen_exfusion_gate0b.pt \
+  --train data/profile-train-tokenized.jsonl \
+  --validation data/profile-validation-tokenized.jsonl \
+  --profile-mode sparse --steps 100 \
+  --output artifacts/layer_profile/sparse
+
+# D. full profile (only after cost review)
+python scripts/profile_layer_contribution.py \
+  --checkpoint runs/phase0/qwen_exfusion_gate0b.pt \
+  --train data/profile-train-tokenized.jsonl \
+  --validation data/profile-validation-tokenized.jsonl \
+  --profile-mode full --steps 100 \
+  --output artifacts/layer_profile/full
+
+# E. direct single-layer reproduction-style run
+python scripts/profile_layer_contribution.py \
+  --checkpoint runs/phase0/qwen_exfusion_gate0b.pt \
+  --train data/profile-train-tokenized.jsonl \
+  --validation data/profile-validation-tokenized.jsonl \
+  --layers 12 --steps 100 \
+  --output artifacts/layer_profile/layer12
+```
+
+For verified reward/GRPO, call `LayerContributionProfiler.run()` with a `LayerAdaptationObjective(kind="verified_reward", verified_reward=True)` and an external adaptation callback. The repository intentionally does not describe the CE CLI as RLVR.
+
 ## Frozen-E2 hard-case E3 ablation
 
 ```bash
@@ -48,7 +80,20 @@ python scripts/run_e3_hardcase_ablation.py \
   --latent-step-counts 1,2,4 --steps 200 --e3-scale 1e-3
 ```
 
-This keeps E2 frozen, trains only the final latent refinement and its scale after Gate 0B, and evaluates exact numeric E2/E3 outcomes. The report includes rescues, regressions, net rescue rate, completion CE, hidden-state delta magnitude, and receipt-backed compute overhead. The supplied arithmetic generator is only a reproducible smoke curriculum; qualify a policy only after independent hard-task-family replication.
+This keeps E2 frozen, trains only the configured E3 refiner and scale after Gate 0B, and evaluates exact numeric E2/E3 outcomes. New checkpoints default to middle refinement; historical checkpoints retain final refinement. The report includes rescues, regressions, net rescue rate, completion CE, hidden-state delta magnitude, and receipt-backed compute overhead. The supplied arithmetic generator is only a reproducible smoke curriculum; qualify a policy only after independent hard-task-family replication.
+
+## E3 architecture, dose, and location contracts
+
+```bash
+python - <<'PY'
+from daph import canonical_variant_matrix, dose_response_variants, location_ablation_variants
+print("F/J profile-vs-heuristic matrix:", canonical_variant_matrix())
+print("I dose response:", dose_response_variants((0, 1, 2, 4, 8)))
+print("J location ablation:", location_ablation_variants(steps=2))
+PY
+```
+
+Use `run_variant_study(variants, evaluate_callback, output_dir)` to emit one compatible JSON/CSV schema. The callback must hold data, steps, optimizer, seed, and metric definition fixed. `configure_e3_training()` implements E3-A and controlled E3-B parameter opening; `E3HardCaseMiner` writes the hard-case mining manifest for G/H.
 
 ## Staged multi-effort adaptation
 
@@ -143,6 +188,9 @@ from daph import EffortController, EffortCounterfactual, EffortPolicyTrainer, Po
 records = [EffortCounterfactual(**json.loads(line)) for line in open("runs/counterfactuals.jsonl")]
 controller = EffortController(hidden_size=len(records[0].probe_hidden), num_levels=4)
 trainer = EffortPolicyTrainer(controller, PolicyTrainingConfig(epochs=20, batch_size=32))
+effort_report = qualify_effort_hierarchy(records)
+oracle_report = oracle_analysis(records)
+trainer.authorize_policy_training(effort_report, oracle_report)
 metrics, receipt = trainer.fit(records, mode="hidden")
 print(metrics)
 print(receipt.to_dict())
@@ -153,12 +201,12 @@ artifact, policy_state = trainer.build_artifact(
 )
 
 # Only after the fixed-arm and oracle gates pass, install the verified state
-# into the canonical model and let its shared first-Qwen-block probe dispatch
+# into the canonical model and let its shared early-Qwen probe dispatch
 # physical E0–E3 execution.
-from daph import load_qwen_exfusion_checkpoint, install_effort_policy
+from daph import load_qwen_exfusion_checkpoint
 model = load_qwen_exfusion_checkpoint("runs/adapt/model_final.pt")
-install_effort_policy(
-    model.effort_controller, artifact, policy_state,
+model.install_effort_policy(
+    artifact, policy_state,
     base_model_digest=records[0].model_digest,
 )
 batch_ids = torch.tensor([[1, 2, 3]])
@@ -168,3 +216,23 @@ PY
 ```
 
 Policy claims must still be evaluated against best-fixed, prompt-sham, effort-frequency random, raw-compute-matched random, oracle, IID test, and leave-family-out OOD controls.
+
+## A–O workflow map
+
+| Stage | Command/API | Mandatory stop gate |
+|---|---|---|
+| A | `run_phase0_retention.py --phase 0a` | source import/parity |
+| B | `run_phase0_retention.py --phase both` | exact Gate 0B |
+| C | `profile_layer_contribution.py --profile-mode sparse` | partial result labeled partial |
+| D | same with `--profile-mode full` | cost review first |
+| E | same with `--layers K` | single imported layer only |
+| F | `E3RefinementConfig(e3_region_selection="middle_heuristic")` | compare final control |
+| G | `E3HardCaseMiner.mine()/save()` | verifier required |
+| H | `configure_e3_training()` + external verified loss | stop if regressions dominate |
+| I | `dose_response_variants()` + `run_variant_study()` | no monotonicity assumption |
+| J | `location_ablation_variants()` | equal capacity/budget |
+| K | `qualify_effort_hierarchy()` | arms must qualify |
+| L | `CounterfactualCollector.collect_many()` | frozen model/digests |
+| M | `oracle_analysis()` | LCB95 gap > 0 and non-collapse |
+| N | `authorize_policy_training()` then `fit()` | both K and M pass |
+| O | IID + leave-family-out evaluation and sham/random controls | untouched test |

@@ -166,6 +166,9 @@ def test_policy_artifact_and_install():
     ctrl = EffortController(64, num_levels=4)
     cfg = PolicyTrainingConfig(seed=3, epochs=4, batch_size=8, feature_spec="hidden", lr=1e-2)
     trainer = EffortPolicyTrainer(ctrl, config=cfg)
+    trainer.authorize_policy_training(
+        {"qualified": True}, {"has_routing_opportunity": True}
+    )
     m, receipt = trainer.fit(train, val)
     assert isinstance(receipt, type(trainer._last_receipt))
     assert receipt.epochs_requested == 4

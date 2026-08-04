@@ -22,6 +22,14 @@ class EffortComputeReceipt:
     wall_clock_latency_ms: Optional[float] = None
     peak_memory_bytes: Optional[int] = None
     depth_fraction: float = 1.0
+    refinement_insertion_layer: Optional[int] = None
+    refinement_region_start: Optional[int] = None
+    refinement_region_end: Optional[int] = None
+    middle_refinement_steps: int = 0
+    repeated_pretrained_layer_calls: int = 0
+    middle_refiner_calls: int = 0
+    selected_profile_digest: Optional[str] = None
+    e3_variant: Optional[str] = None
 
     @property
     def estimated_compute(self) -> float:

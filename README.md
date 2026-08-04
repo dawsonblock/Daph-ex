@@ -1,4 +1,4 @@
-# DAPH / ExFusion v3
+# DAPH / ExFusion v3.2
 
 Pretrained-compatible adaptive computation with a physically ordered four-level effort hierarchy.
 
@@ -15,7 +15,7 @@ Pretrained-compatible adaptive computation with a physically ordered four-level 
 | E0 | first `ceil(0.50 × layers)` blocks → final RMSNorm/head | cheapest approximation |
 | E1 | first `ceil(0.75 × layers)` blocks → final RMSNorm/head | intermediate approximation |
 | E2 | every imported block → unchanged final RMSNorm/head | full pretrained anchor |
-| E3 | E2 plus final-layer bounded latent delta refinement | additional difficult-input compute |
+| E3 | full backbone plus bounded recurrent refinement around a configured/profiled middle region | additional difficult-input compute |
 
 E0/E1 optionally enable a small zero-residual bottleneck continuation for frozen-backbone distillation; it is off by default so the direct shallow-exit baseline remains measurable.
 
@@ -23,7 +23,9 @@ Deterministic `EffortComputeReceipt` accounting proves, for supported backbones 
 
 `C(E0) < C(E1) < C(E2) < C(E3)` and `C_norm(E2) = 1.0`.
 
-`effort_mode="adaptive"` runs the first imported Qwen block as a shared probe, pools its post-block hidden state, and dispatches each sample to E0–E3 without re-running that block. The probe is common work already included in every fixed-arm receipt. A controller must be trained and installed before adaptive results are scientifically interpreted; fixed-arm qualification remains the prerequisite for policy training.
+`effort_mode="adaptive"` runs a configurable shallow imported-Qwen prefix as a shared probe, pools its internal hidden state, and dispatches each sample to E0–E3 without re-running the prefix. Adaptive execution refuses to run without an installed `VERIFIED_FIT` controller. Policy training itself is blocked until both effort-arm and oracle-opportunity gates pass.
+
+The former final-state E3 remains available as `final_refine`. Canonical `middle_recurrent`, experimental zero-gated `middle_repeat`, and profile-guided selection are research variants. The attached single-layer-RL study motivates the middle-depth prior; it does not establish that recurrence or layer reuse will improve this model. The repository therefore measures contributions on the exact checkpoint and preserves negative findings.
 
 At conversion time all augmentation scales are exactly zero, preserving:
 
@@ -87,7 +89,7 @@ python scripts/run_phase0_retention.py --synthetic --output runs/phase0_syntheti
 
 The immutable experiment sequence is:
 
-HF checkpoint → Gate 0A → QwenCompat → QwenExFusion conversion → exact Gate 0B → staged multi-effort adaptation → effort qualification → freeze → counterfactual collection → oracle gate → hidden policy → sham/random controls → IID test → leave-family-out OOD test.
+HF checkpoint → Gate 0A → QwenCompat → exact Gate 0B → layer profile → E3 hard-case training/ablations → effort qualification → freeze → counterfactual collection → oracle gate → hidden policy → sham/random controls → IID test → leave-family-out OOD test.
 
 See [`docs/PIPELINE_COMMANDS.md`](docs/PIPELINE_COMMANDS.md) for executable examples for every stage.
 
@@ -103,4 +105,4 @@ The subsequent frozen-E2 hard-case ablation found a teacher-forced E3 CE dose re
 
 ## Status
 
-The canonical Qwen path and legacy hybrid path coexist. AttnRes is deliberately disabled in the first canonical pretrained experiment until model-level cross-layer history is implemented. The full local suite currently passes 102 tests.
+The canonical Qwen path and legacy hybrid path coexist. Engineering acceptance is covered by 116 tests. No new real-model profile or statistically positive E3 result is bundled, so the middle-layer hypothesis and policy remain scientifically unqualified.

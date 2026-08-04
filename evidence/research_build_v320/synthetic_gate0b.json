@@ -1,0 +1,11 @@
+{
+  "evidence_class": "SYNTHETIC_ONLY",
+  "phase0a_exact_coverage_percent": 100.0,
+  "phase0b_decision": "PASS_EXACT",
+  "phase0b_ce_difference": 0.0,
+  "phase0b_logit_mae": 0.0,
+  "phase0b_logit_max_abs": 0.0,
+  "phase0b_top1_agreement": 1.0,
+  "source_backbone_parameter_identity": true,
+  "scientific_qualification": false
+}

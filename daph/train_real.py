@@ -48,6 +48,7 @@ class TrainingStageConfig:
     distill_e1: bool = True
     train_e3: bool = True
     teacher_mode: str = "fixed_2"
+    e3_regression_guard_weight: float = 0.0
 
 
 @dataclass
@@ -208,6 +209,7 @@ def apply_training_stage(model: torch.nn.Module, stage: TrainingStageConfig) -> 
         "continuation": set(provenance.continuation_parameter_names),
         "e3_refinement": set(provenance.e3_refinement_parameter_names),
         "e3_scale": set(provenance.e3_scale_parameter_names),
+        "e3_middle_layers": set(provenance.e3_middle_layer_parameter_names),
     }
     unknown = (set(stage.train_parameter_groups) | set(stage.freeze_parameter_groups)) - set(groups)
     if unknown:
@@ -538,6 +540,25 @@ def train_adapt(
                 shift_logits.reshape(-1, shift_logits.size(-1)),
                 shift_labels.reshape(-1), ignore_index=-100,
             )
+            if (
+                isinstance(model, QwenExFusionModel)
+                and effort_idx == 3
+                and active_stage is not None
+                and active_stage.e3_regression_guard_weight > 0.0
+            ):
+                with torch.no_grad():
+                    anchor_logits = model(ids, attention_mask=mask, effort_mode="fixed_2")
+                valid = shift_labels.reshape(-1) != -100
+                e3_flat = shift_logits.reshape(-1, shift_logits.size(-1))[valid]
+                e2_flat = anchor_logits[:, :-1].reshape(-1, anchor_logits.size(-1))[valid]
+                regression_kl = F.kl_div(
+                    F.log_softmax(e3_flat.float(), dim=-1),
+                    F.softmax(e2_flat.float(), dim=-1),
+                    reduction="batchmean",
+                )
+                loss = loss + active_stage.e3_regression_guard_weight * regression_kl
+                details["e3_task_ce"] = float((loss - active_stage.e3_regression_guard_weight * regression_kl).detach())
+                details["e3_regression_kl"] = float(regression_kl.detach())
         if cfg.fail_on_nonfinite and not bool(torch.isfinite(loss).item()):
             raise FloatingPointError(
                 f"Non-finite loss at micro-step {step} for effort {emode}"

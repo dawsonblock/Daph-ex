@@ -598,6 +598,13 @@ def save_adapted_checkpoint(
             "effort_probe_layer_count": getattr(model, "effort_probe_layer_count", None),
             "effort_controller_hidden_size": getattr(model, "effort_controller_hidden_size", None),
             "enable_effort_controller": getattr(model, "enable_effort_controller", False),
+            "effort_probe_fraction": getattr(model, "effort_probe_fraction", None),
+            "e3_config": (
+                model.e3_config.to_dict() if getattr(model, "e3_config", None) is not None else None
+            ),
+            "e3_region": (
+                model.e3_region.to_dict() if getattr(model, "e3_region", None) is not None else None
+            ),
         }
     payload: Dict[str, Any] = {"state_dict": model.state_dict(), "model_config": model_config}
     provenance = getattr(model, "parameter_provenance", None)

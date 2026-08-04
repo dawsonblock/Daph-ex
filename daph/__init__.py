@@ -34,7 +34,20 @@ from .qwen_exfusion import (
     QwenExFusionModel, QwenExFusionBlock, augment_qwen_compat_model,
     gate0b_exact_parity, prepare_exfusion_for_training,
     load_qwen_exfusion_checkpoint, ExFusionParameterProvenance, TrainingInitReceipt,
+    EffortProbeResult,
 )
+from .e3_architecture import E3RefinementConfig, E3RegionSelection, resolve_e3_region
+from .layer_contribution import (
+    LayerAdaptationObjective, LayerContributionConfig, LayerContributionResult,
+    LayerContributionReport, LayerContributionProfiler,
+    profile_selection_payload,
+)
+from .hard_case import HardCaseMiningConfig, HardCaseRecord, E3HardCaseMiner
+from .e3_experiment import (
+    E3ExperimentVariant, canonical_variant_matrix, dose_response_variants,
+    location_ablation_variants, run_variant_study,
+)
+from .e3_training import E3StageConfig, configure_e3_training, e3_verified_objective
 from .compute import EffortComputeReceipt, estimate_compute
 from .effort_decision import EffortDecision, ComputeStats, decide_from_probs
 from .policy_trainer import (
@@ -56,7 +69,7 @@ from .train_real import (
     eval_per_effort, distillation_loss, apply_training_stage,
 )
 from .verifiers import ExactMatchVerifier, FinalAnswerVerifier, NumericVerifier, make_quality_fn
-from .e3_metrics import e3_pair_metrics
+from .e3_metrics import E3QualificationConfig, e3_pair_metrics, qualify_e3_pairs
 from .counterfactual import (
     EffortCounterfactual,
     CounterfactualCollector,
@@ -96,7 +109,7 @@ from .merge import (
     is_ssm_core_param,
 )
 
-__version__ = "3.1.4"
+__version__ = "3.2.0"
 __all__ = [
     "DAPHConfigV3",
     "LatentMoE",
@@ -129,6 +142,27 @@ __all__ = [
     "load_qwen_exfusion_checkpoint",
     "ExFusionParameterProvenance",
     "TrainingInitReceipt",
+    "EffortProbeResult",
+    "E3RefinementConfig",
+    "E3RegionSelection",
+    "resolve_e3_region",
+    "LayerAdaptationObjective",
+    "LayerContributionConfig",
+    "LayerContributionResult",
+    "LayerContributionReport",
+    "LayerContributionProfiler",
+    "profile_selection_payload",
+    "HardCaseMiningConfig",
+    "HardCaseRecord",
+    "E3HardCaseMiner",
+    "E3ExperimentVariant",
+    "canonical_variant_matrix",
+    "dose_response_variants",
+    "location_ablation_variants",
+    "run_variant_study",
+    "E3StageConfig",
+    "configure_e3_training",
+    "e3_verified_objective",
     "EffortComputeReceipt",
     "estimate_compute",
     "EffortDecision",
@@ -145,6 +179,8 @@ __all__ = [
     "NumericVerifier",
     "make_quality_fn",
     "e3_pair_metrics",
+    "E3QualificationConfig",
+    "qualify_e3_pairs",
     "PretrainedImportReport",
     "import_state_dict",
     "load_pretrained_into_exfusion",

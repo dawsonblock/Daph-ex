@@ -30,6 +30,7 @@ from .norms import RMSNorm
 from .compute import EffortComputeReceipt, estimate_compute
 from .effort import EffortController
 from .effort_decision import EffortDecision, decide_from_probs
+from .e3_architecture import E3RefinementConfig, E3RegionSelection, resolve_e3_region
 
 
 @dataclass(frozen=True)
@@ -41,6 +42,7 @@ class ExFusionParameterProvenance:
     continuation_parameter_names: Tuple[str, ...] = ()
     e3_refinement_parameter_names: Tuple[str, ...] = ()
     e3_scale_parameter_names: Tuple[str, ...] = ()
+    e3_middle_layer_parameter_names: Tuple[str, ...] = ()
 
     @staticmethod
     def _digest(names: Tuple[str, ...]) -> str:
@@ -60,6 +62,23 @@ class TrainingInitReceipt:
     epsilon: float
     changed_scale_names: Tuple[str, ...]
     backbone_unchanged: bool
+
+
+@dataclass
+class EffortProbeResult:
+    probe_hidden: Tensor
+    probe_layer: int
+    executed_layers: int
+    partial_hidden_state: Tensor
+    compute_receipt: EffortComputeReceipt
+    decision: EffortDecision
+    policy_logits: Optional[Tensor] = None
+
+    def __iter__(self):
+        # Backward-compatible unpacking used by the existing collector.
+        yield self.probe_hidden
+        yield None
+        yield self.decision
 
 
 class QwenExFusionBlock(nn.Module):
@@ -215,7 +234,7 @@ class QwenExFusionModel(nn.Module):
 
     Effort modes (initial semantics):
       E2: base only (all scales effectively zero at init) — Qwen-equivalent
-      E3: full base + bounded final-layer latent refinement
+      E3: full base + configured bounded middle/final refinement experiment
       E1: configurable intermediate-depth exit
       E0: configurable shallow exit
     """
@@ -254,6 +273,9 @@ class QwenExFusionModel(nn.Module):
         latent_scale_limit: float = 0.01,
         effort_controller_hidden_size: int = 128,
         enable_effort_controller: bool = True,
+        effort_probe_layer: Optional[int] = None,
+        effort_probe_fraction: float = 0.125,
+        e3_config: Optional[E3RefinementConfig] = None,
     ) -> None:
         super().__init__()
         self.embed = nn.Embedding(vocab_size, hidden_size)
@@ -277,6 +299,9 @@ class QwenExFusionModel(nn.Module):
         if tie_word_embeddings:
             self.lm_head.weight = self.embed.weight
         self.default_e3_steps = default_e3_steps
+        self.e3_config = e3_config or E3RefinementConfig(e3_refine_steps=default_e3_steps)
+        self.e3_config.validate(num_layers)
+        self.e3_region: E3RegionSelection = resolve_e3_region(self.e3_config, num_layers)
         self.vocab_size = vocab_size
         self.hidden_size = hidden_size
         self.intermediate_size = intermediate_size
@@ -298,10 +323,13 @@ class QwenExFusionModel(nn.Module):
         self.latent_scale_limit = float(latent_scale_limit)
         self.effort_controller_hidden_size = int(effort_controller_hidden_size)
         self.enable_effort_controller = bool(enable_effort_controller)
-        # The first pretrained Qwen block is a mandatory shared probe. It is
-        # part of every E0–E3 path, so its physical cost is already included in
-        # every effort receipt rather than being an unaccounted side network.
-        self.effort_probe_layer_count = 1
+        requested_probe = (
+            int(effort_probe_layer) + 1
+            if effort_probe_layer is not None
+            else max(1, int(math.ceil(num_layers * effort_probe_fraction)))
+        )
+        self.effort_probe_fraction = float(effort_probe_fraction)
+        self.effort_probe_layer_count = requested_probe
         self.effort_controller = (
             EffortController(hidden_size, num_levels=4, hidden_router=self.effort_controller_hidden_size)
             if self.enable_effort_controller else None
@@ -311,6 +339,8 @@ class QwenExFusionModel(nn.Module):
         self.depth_fractions = (e0_depth_fraction, e1_depth_fraction, e2_depth_fraction, e3_depth_fraction)
         self.layer_count_overrides = (e0_layer_count, e1_layer_count, None, None)
         self.parameter_provenance: Optional[ExFusionParameterProvenance] = None
+        self._verified_effort_policy = False
+        self._effort_policy_artifact_digest: Optional[str] = None
         self._validate_depths()
 
     def _layer_count(self, effort: int) -> int:
@@ -330,17 +360,26 @@ class QwenExFusionModel(nn.Module):
             )
         if counts[2] != len(self.layers) or counts[3] != len(self.layers):
             raise ValueError("E2 and E3 must execute the complete pretrained backbone")
+        if not 1 <= self.effort_probe_layer_count <= counts[0]:
+            raise ValueError(
+                "Probe depth must satisfy 1 <= probe_layers <= E0 layers; "
+                f"got probe={self.effort_probe_layer_count}, E0={counts[0]}"
+            )
 
     def _effort_flags(self, effort_mode: str) -> Dict[str, object]:
         # At init all scales are 0, so flags only matter after training.
         if effort_mode in ("fixed_2", "e2", "2"):
             return dict(use_recurrent=False, use_routed_moe=False, use_attn_res=False, latent_steps=0)
         if effort_mode in ("fixed_3", "e3", "3"):
-            # The canonical E3 correction is a final-layer latent refinement.
-            # Per-layer recurrent/MoE branches were empirically unstable on the
-            # preserved Qwen anchor and are retained only as experimental modules.
+            steps = (
+                self.e3_config.e3_refine_steps
+                if self.e3_config.e3_refinement_mode in {
+                    "final_refine", "middle_recurrent", "profiled_middle_recurrent"
+                }
+                else 0
+            )
             return dict(use_recurrent=False, use_routed_moe=False, use_attn_res=False,
-                        latent_steps=self.default_e3_steps)
+                        latent_steps=steps)
         if effort_mode in ("fixed_1", "e1", "1"):
             return dict(use_recurrent=False, use_routed_moe=False, use_attn_res=False, latent_steps=0)
         if effort_mode in ("fixed_0", "e0", "0"):
@@ -358,31 +397,77 @@ class QwenExFusionModel(nn.Module):
             raise ValueError(f"Unknown effort mode {effort_mode!r}. Use fixed_0..fixed_3 or adaptive.")
         return aliases[key]
 
-    def compute_effort_probe(
-        self, hidden: Tensor, attention_mask: Optional[Tensor] = None,
-    ) -> Tuple[Tensor, None, EffortDecision]:
-        """Run the shared first Qwen block and choose an effort from its state.
+    def install_effort_policy(
+        self, artifact: Any, state_dict: Dict[str, Tensor], *,
+        base_model_digest: str, research_override: bool = False,
+    ) -> None:
+        if self.effort_controller is None:
+            raise RuntimeError("This model was created without an effort controller")
+        from .policy_trainer import install_effort_policy
+        install_effort_policy(
+            self.effort_controller, artifact, state_dict,
+            base_model_digest=base_model_digest,
+            require_verified_fit=not research_override,
+        )
+        verified = getattr(artifact, "training_status", None) == "VERIFIED_FIT"
+        if not verified and not research_override:
+            raise ValueError("Adaptive installation requires a VERIFIED_FIT policy artifact")
+        self._verified_effort_policy = verified
+        self._effort_policy_artifact_digest = getattr(artifact, "state_dict_digest", None)
 
-        The returned hidden state is exactly the layer-0 state reused by
+    def remove_effort_policy(self) -> None:
+        self._verified_effort_policy = False
+        self._effort_policy_artifact_digest = None
+
+    def has_verified_effort_policy(self) -> bool:
+        return bool(self._verified_effort_policy and self.effort_controller is not None)
+
+    def compute_effort_probe(
+        self, input_ids: Tensor, attention_mask: Optional[Tensor] = None,
+    ) -> EffortProbeResult:
+        """Run the shared early Qwen prefix and return continuable internal state.
+
+        The returned hidden state is exactly the configured early-prefix state reused by
         adaptive execution. It is an internal model representation, not a
         pooled token embedding or an extra unaccounted computation.
         """
         if not self.layers:
             raise RuntimeError("QwenExFusion requires at least one layer for its effort probe")
-        probe_h, _, _, _ = self.layers[0](
-            hidden, attention_mask=attention_mask, use_recurrent=False,
-            use_routed_moe=False, use_attn_res=False, latent_steps=0,
-        )
+        hidden = self.embed(input_ids) if input_ids.dim() == 2 else input_ids
+        if hidden.dim() != 3:
+            raise ValueError("compute_effort_probe expects token ids (B,L) or hidden states (B,L,H)")
+        probe_h = hidden
+        for layer_index in range(self.effort_probe_layer_count):
+            probe_h, _, _, _ = self.layers[layer_index](
+                probe_h, attention_mask=attention_mask, use_recurrent=False,
+                use_routed_moe=False, use_attn_res=False, latent_steps=0,
+            )
         anchor = EffortController.pool_last_valid(probe_h, attention_mask)
-        if self.effort_controller is None:
-            # Older checkpoints may collect genuine internal probe features,
-            # but require a controller installation before adaptive routing.
+        if self.effort_controller is None or not self.has_verified_effort_policy():
             probs = torch.zeros(anchor.size(0), 4, device=anchor.device, dtype=anchor.dtype)
             probs[:, 2] = 1.0
+            policy_logits = None
         else:
-            probs = self.effort_controller(anchor)["effort_probs"]
-        return probe_h, None, decide_from_probs(
-            probs, source_layer=0, source_position="post_qwen_block_0", hidden_anchor=anchor.detach(),
+            policy_output = self.effort_controller(anchor)
+            probs = policy_output["effort_probs"]
+            policy_logits = policy_output["effort_logits"]
+        decision = decide_from_probs(
+            probs, source_layer=self.effort_probe_layer_count - 1,
+            source_position="post_qwen_probe", hidden_anchor=anchor.detach(),
+        )
+        receipt = self._compute_receipt(
+            effort_mode="probe", layer_count=self.effort_probe_layer_count,
+            batch_size=hidden.shape[0], sequence_length=hidden.shape[1],
+            flags=self._effort_flags("fixed_2"),
+        )
+        return EffortProbeResult(
+            probe_hidden=probe_h,
+            probe_layer=self.effort_probe_layer_count - 1,
+            executed_layers=self.effort_probe_layer_count,
+            partial_hidden_state=probe_h,
+            compute_receipt=receipt,
+            decision=decision,
+            policy_logits=policy_logits,
         )
 
     def _run_layers(
@@ -392,14 +477,37 @@ class QwenExFusionModel(nn.Module):
         """Execute a fixed arm, optionally reusing a completed shared probe."""
         count = self._layer_count(effort) if layer_count is None else layer_count
         flags = self._effort_flags(f"fixed_{effort}")
+        mode = self.e3_config.e3_refinement_mode
+        insertion_layer = self.e3_region.insertion_layer
         for layer_index in range(start_layer, count):
-            latent_steps = int(flags["latent_steps"]) if effort == 3 and layer_index == count - 1 else 0
+            latent_steps = 0
+            if effort == 3:
+                if mode == "final_refine" and layer_index == count - 1:
+                    latent_steps = int(flags["latent_steps"])
+                elif mode in {"middle_recurrent", "profiled_middle_recurrent"} and layer_index == insertion_layer:
+                    latent_steps = int(flags["latent_steps"])
             hidden, _, _, _ = self.layers[layer_index](
                 hidden, attention_mask=attention_mask,
                 use_recurrent=bool(flags["use_recurrent"]),
                 use_routed_moe=bool(flags["use_routed_moe"]),
                 use_attn_res=bool(flags["use_attn_res"]), latent_steps=latent_steps,
             )
+            if effort == 3 and mode == "middle_repeat" and layer_index == self.e3_region.region_end:
+                reuse_layers = self.e3_config.e3_reuse_layers or list(self.e3_region.selected_layers)
+                repeated_hidden = hidden
+                for _ in range(self.e3_config.e3_repeat_count):
+                    for reuse_index in reuse_layers:
+                        repeated_hidden, _, _, _ = self.layers[reuse_index](
+                            repeated_hidden, attention_mask=attention_mask, use_recurrent=False,
+                            use_routed_moe=False, use_attn_res=False, latent_steps=0,
+                        )
+                # The repeated modules share the exact pretrained parameters.
+                # A bounded zero-initialized gate preserves E3==E2 at Gate 0B.
+                gate_block = self.layers[self.e3_region.insertion_layer]
+                scale = gate_block.latent_scale_limit * torch.tanh(
+                    gate_block.latent_scale / gate_block.latent_scale_limit
+                )
+                hidden = hidden + scale * (repeated_hidden - hidden)
         if effort == 0 and self.e0_continuation is not None:
             hidden = self.e0_continuation(hidden)
         elif effort == 1 and self.e1_continuation is not None:
@@ -435,6 +543,10 @@ class QwenExFusionModel(nn.Module):
             "routed_expert_calls": int(sum(r.routed_expert_calls for r in per_sample)),
             "token_count": batch_size * sequence_length,
             "probe_layer_count": self.effort_probe_layer_count,
+            "probe_compute_included": True,
+            "e3_variants": [r.e3_variant for r in per_sample],
+            "middle_refinement_steps": int(sum(r.middle_refinement_steps for r in per_sample)),
+            "repeated_pretrained_layer_calls": int(sum(r.repeated_pretrained_layer_calls for r in per_sample)),
         }
         return per_sample, stats
 
@@ -448,15 +560,34 @@ class QwenExFusionModel(nn.Module):
         return_compute_receipt: bool = False,
         return_hidden_state: bool = False,
         effort_levels_override: Optional[Tensor] = None,
+        allow_unverified_policy: bool = False,
+        precomputed_probe: Optional[EffortProbeResult] = None,
     ) -> Union[Tensor, Dict[str, Any]]:
         mode = str(effort_mode).lower()
         if mode == "adaptive" or effort_levels_override is not None:
             if max_layers is not None:
                 raise ValueError("max_layers is incompatible with adaptive effort dispatch")
+            if effort_levels_override is None and not self.has_verified_effort_policy() and not allow_unverified_policy:
+                raise RuntimeError(
+                    "Adaptive execution requires an installed VERIFIED_FIT effort policy; "
+                    "use an explicit effort override for architecture research"
+                )
             if self.effort_controller is None and effort_levels_override is None:
-                raise RuntimeError("This checkpoint has no effort controller; install one before adaptive execution")
+                raise RuntimeError("This checkpoint has no effort controller")
             h0 = self.embed(input_ids)
-            probe_h, _, decision = self.compute_effort_probe(h0, attention_mask)
+            probe_result = self.compute_effort_probe(h0, attention_mask)
+            probe_h, decision = probe_result.partial_hidden_state, probe_result.decision
+            policy_logits = probe_result.policy_logits
+            if allow_unverified_policy and not self.has_verified_effort_policy() and self.effort_controller is not None:
+                policy_output = self.effort_controller(decision.hidden_anchor)
+                probs = policy_output["effort_probs"]
+                policy_logits = policy_output["effort_logits"]
+                decision = decide_from_probs(
+                    probs, source_layer=probe_result.probe_layer,
+                    source_position="post_qwen_probe_research_override",
+                    hidden_anchor=decision.hidden_anchor,
+                )
+                policy_logits = None
             levels = decision.levels
             if effort_levels_override is not None:
                 levels = torch.as_tensor(effort_levels_override, device=input_ids.device, dtype=torch.long)
@@ -470,14 +601,19 @@ class QwenExFusionModel(nn.Module):
                     probs, source_layer=0, source_position="override_post_qwen_block_0",
                     hidden_anchor=decision.hidden_anchor,
                 )
-            # Partition active samples; layer 0 was already completed by the
-            # shared probe and is never re-run by a selected suffix.
+            # Partition active samples; the shared prefix is never re-run.
             h = torch.empty_like(probe_h)
             for level in levels.unique(sorted=True).tolist():
                 indices = (levels == int(level)).nonzero(as_tuple=False).squeeze(1)
                 sub_hidden = probe_h.index_select(0, indices)
                 sub_mask = attention_mask.index_select(0, indices) if attention_mask is not None else None
-                h.index_copy_(0, indices, self._run_layers(sub_hidden, sub_mask, int(level), start_layer=1))
+                h.index_copy_(
+                    0, indices,
+                    self._run_layers(
+                        sub_hidden, sub_mask, int(level),
+                        start_layer=self.effort_probe_layer_count,
+                    ),
+                )
             h = self.norm(h)
             logits = self.lm_head(h)
             receipts, stats = self._adaptive_receipt_stats(
@@ -486,6 +622,9 @@ class QwenExFusionModel(nn.Module):
             if return_compute_receipt or return_hidden_state:
                 result: Dict[str, Any] = {
                     "logits": logits, "effort_decision": decision.to_dict(), "compute_stats": stats,
+                    "chosen_effort": int(levels[0]) if len(levels) == 1 else levels.tolist(),
+                    "policy_logits": policy_logits,
+                    "probe_hidden": decision.hidden_anchor,
                 }
                 if return_compute_receipt:
                     result["compute_receipt"] = receipts[0] if len(receipts) == 1 else receipts
@@ -499,8 +638,23 @@ class QwenExFusionModel(nn.Module):
         layer_count = self._layer_count(effort) if max_layers is None else max(1, min(len(self.layers), max_layers))
         if effort in (2, 3) and layer_count != len(self.layers):
             raise ValueError("E2/E3 cannot use a partial-depth override")
-        h = self.embed(input_ids)
-        h = self._run_layers(h, attention_mask, effort, layer_count=layer_count)
+        h = self.embed(input_ids) if precomputed_probe is None else precomputed_probe.partial_hidden_state
+        start_layer = 0
+        if precomputed_probe is not None:
+            if precomputed_probe.partial_hidden_state.shape[:2] != input_ids.shape:
+                raise ValueError("precomputed_probe does not match input batch/sequence shape")
+            if precomputed_probe.executed_layers != self.effort_probe_layer_count:
+                raise ValueError("precomputed_probe depth does not match this model")
+            if effort == 3:
+                mode = self.e3_config.e3_refinement_mode
+                earliest_extra = (
+                    self.e3_region.region_end if mode == "middle_repeat"
+                    else self.e3_region.insertion_layer
+                )
+                if mode not in {"none", "final_refine"} and earliest_extra < self.effort_probe_layer_count:
+                    raise ValueError("E3 extra computation occurs inside the probe prefix and cannot be reused")
+            start_layer = precomputed_probe.executed_layers
+        h = self._run_layers(h, attention_mask, effort, start_layer=start_layer, layer_count=layer_count)
         h = self.norm(h)
         logits = self.lm_head(h)
         receipt = self._compute_receipt(
@@ -520,18 +674,35 @@ class QwenExFusionModel(nn.Module):
         self, *, effort_mode: str, layer_count: int, batch_size: int,
         sequence_length: int, flags: Mapping[str, object],
     ) -> EffortComputeReceipt:
+        is_e3 = effort_mode == "fixed_3"
+        e3_mode = self.e3_config.e3_refinement_mode if is_e3 else None
+        repeated_calls = 0
+        if is_e3 and e3_mode == "middle_repeat":
+            reuse_layers = self.e3_config.e3_reuse_layers or list(self.e3_region.selected_layers)
+            repeated_calls = len(reuse_layers) * self.e3_config.e3_repeat_count
+        middle_steps = int(flags["latent_steps"]) if is_e3 and e3_mode in {
+            "middle_recurrent", "profiled_middle_recurrent"
+        } else 0
         rec = EffortComputeReceipt(
             effort_mode=effort_mode,
             executed_layer_count=layer_count,
             skipped_layer_count=len(self.layers) - layer_count,
-            attention_calls=layer_count,
-            ffn_calls=layer_count,
+            attention_calls=layer_count + repeated_calls,
+            ffn_calls=layer_count + repeated_calls,
             recurrent_steps=(layer_count if flags["use_recurrent"] else 0)
             + (1 if self.use_shallow_continuation and effort_mode in ("fixed_0", "fixed_1") else 0),
             latent_steps=int(flags["latent_steps"]),
             routed_expert_calls=layer_count * self.layers[0].routed_moe.top_k if flags["use_routed_moe"] else 0,
             token_count=batch_size * sequence_length,
             depth_fraction=layer_count / len(self.layers),
+            refinement_insertion_layer=(self.e3_region.insertion_layer if is_e3 and e3_mode != "none" else None),
+            refinement_region_start=(self.e3_region.region_start if is_e3 and e3_mode != "none" else None),
+            refinement_region_end=(self.e3_region.region_end if is_e3 and e3_mode != "none" else None),
+            middle_refinement_steps=middle_steps,
+            repeated_pretrained_layer_calls=repeated_calls,
+            middle_refiner_calls=(1 if middle_steps > 0 else 0),
+            selected_profile_digest=(self.e3_region.source_profile_digest if is_e3 else None),
+            e3_variant=e3_mode,
         )
         rec.raw_compute_units = estimate_compute(
             rec, hidden_size=self.hidden_size, intermediate_size=self.intermediate_size,
@@ -631,6 +802,9 @@ def augment_qwen_compat_model(
     continuation_bottleneck_size: Optional[int] = None,
     latent_scale_limit: float = 0.01,
     effort_controller_hidden_size: int = 128,
+    effort_probe_layer: Optional[int] = None,
+    effort_probe_fraction: float = 0.125,
+    e3_config: Optional[E3RefinementConfig] = None,
 ) -> QwenExFusionModel:
     """
     Convert a loaded QwenCompatModel into QwenExFusionModel.
@@ -669,6 +843,9 @@ def augment_qwen_compat_model(
         continuation_bottleneck_size=continuation_bottleneck_size,
         latent_scale_limit=latent_scale_limit,
         effort_controller_hidden_size=effort_controller_hidden_size,
+        effort_probe_layer=effort_probe_layer,
+        effort_probe_fraction=effort_probe_fraction,
+        e3_config=e3_config,
     )
 
     # Copy embed / norm / lm_head
@@ -692,16 +869,25 @@ def augment_qwen_compat_model(
     augmentation = all_names - imported
     continuation = {n for n in all_names if "_continuation." in n}
     final_layer = len(model.layers) - 1
+    refinement_layer = (
+        final_layer
+        if model.e3_config.e3_refinement_mode == "final_refine"
+        else model.e3_region.insertion_layer
+    )
     # Keep the refinement LayerNorm at identity for the first E3 study. It is
     # not part of the learned transformation, and this avoids an observed MPS
     # LayerNorm-scale backward instability while fc1/fc2 and residual scale
     # remain fully trainable.
     e3_refinement = {
         n for n in all_names
-        if n.startswith(f"layers.{final_layer}.latent_refine.")
+        if n.startswith(f"layers.{refinement_layer}.latent_refine.")
         and ".latent_refine.norm." not in n
     }
-    e3_scales = {f"layers.{final_layer}.latent_scale"} & all_names
+    e3_scales = {f"layers.{refinement_layer}.latent_scale"} & all_names
+    e3_middle = {
+        n for n in imported
+        if any(n.startswith(f"layers.{layer}.base.") for layer in model.e3_region.selected_layers)
+    }
     model.parameter_provenance = ExFusionParameterProvenance(
         imported_parameter_names=tuple(sorted(imported)),
         new_parameter_names=tuple(sorted(all_names - imported)),
@@ -710,6 +896,7 @@ def augment_qwen_compat_model(
         continuation_parameter_names=tuple(sorted(continuation)),
         e3_refinement_parameter_names=tuple(sorted(e3_refinement)),
         e3_scale_parameter_names=tuple(sorted(e3_scales)),
+        e3_middle_layer_parameter_names=tuple(sorted(e3_middle)),
     )
     return model
 
@@ -728,9 +915,9 @@ def prepare_exfusion_for_training(
         raise ValueError("epsilon must be non-negative")
     before = {n: p.detach().clone() for n, p in model.named_parameters() if ".base." in n or n in {"embed.weight", "norm.weight", "lm_head.weight"}}
     changed: List[str] = []
-    # Canonical E3 activates only the final layer's latent refinement. Explicit
-    # suffixes retain the old experimental opt-in for other branches.
-    active_names = {f"layers.{len(model.layers) - 1}.latent_scale"}
+    active_names = set(model.parameter_provenance.e3_scale_parameter_names) if model.parameter_provenance else {
+        f"layers.{model.e3_region.insertion_layer}.latent_scale"
+    }
     with torch.no_grad():
         for name, p in model.named_parameters():
             enabled = (
@@ -757,6 +944,11 @@ def load_qwen_exfusion_checkpoint(path: str, *, map_location: str = "cpu") -> Qw
     # Artifacts written before adaptive runtime lack controller tensors and
     # remain loadable for fixed E0–E3 use.
     has_controller = any(key.startswith("effort_controller.") for key in state_dict)
+    e3_payload = cfg.get("e3_config")
+    e3_config = E3RefinementConfig(**e3_payload) if e3_payload else E3RefinementConfig(
+        e3_refinement_mode="final_refine",
+        e3_refine_steps=int(cfg.get("default_e3_steps") or 2),
+    )
     model = QwenExFusionModel(
         vocab_size=int(cfg["vocab_size"]), hidden_size=int(cfg["hidden_size"]),
         num_layers=int(cfg["num_layers"]), num_heads=int(cfg["num_heads"]),
@@ -779,6 +971,9 @@ def load_qwen_exfusion_checkpoint(path: str, *, map_location: str = "cpu") -> Qw
         latent_scale_limit=float(cfg.get("latent_scale_limit") or 0.01),
         effort_controller_hidden_size=int(cfg.get("effort_controller_hidden_size") or 128),
         enable_effort_controller=bool(cfg.get("enable_effort_controller", has_controller)) and has_controller,
+        effort_probe_layer=(int(cfg["effort_probe_layer_count"]) - 1 if cfg.get("effort_probe_layer_count") else None),
+        effort_probe_fraction=float(cfg.get("effort_probe_fraction") or 0.125),
+        e3_config=e3_config,
     )
     model.load_state_dict(state_dict)
     p = payload.get("parameter_provenance")
@@ -791,6 +986,7 @@ def load_qwen_exfusion_checkpoint(path: str, *, map_location: str = "cpu") -> Qw
             continuation_parameter_names=tuple(p.get("continuation_parameter_names", ())),
             e3_refinement_parameter_names=tuple(p.get("e3_refinement_parameter_names", ())),
             e3_scale_parameter_names=tuple(p.get("e3_scale_parameter_names", ())),
+            e3_middle_layer_parameter_names=tuple(p.get("e3_middle_layer_parameter_names", ())),
         )
     return model
 

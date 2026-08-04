@@ -19,7 +19,7 @@ import math
 import random
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple
+from typing import Any, Callable, Dict, List, Mapping, Optional, Sequence, Tuple
 
 import torch
 import torch.nn as nn
@@ -101,7 +101,7 @@ class EffortPolicyArtifact:
 def _state_dict_digest(sd: Dict[str, Tensor]) -> str:
     h = hashlib.sha256()
     for k in sorted(sd.keys()):
-        t = sd[k].detach().cpu().contiguous()
+        t = sd[k].detach().cpu().contiguous().reshape(-1)
         h.update(k.encode())
         h.update(str(t.dtype).encode())
         h.update(str(tuple(t.shape)).encode())
@@ -266,6 +266,8 @@ class EffortPolicyTrainer:
         seed: Optional[int] = None,
         weight_decay: Optional[float] = None,
         batch_size: Optional[int] = None,
+        arm_qualification_report: Optional[Mapping[str, Any]] = None,
+        oracle_opportunity_report: Optional[Mapping[str, Any]] = None,
     ) -> None:
         # Authoritative config — kwargs override defaults for convenience
         cfg = config or PolicyTrainingConfig()
@@ -298,6 +300,21 @@ class EffortPolicyTrainer:
         self.initial_state_dict_digest = _state_dict_digest(
             {k: v.detach().cpu().clone() for k, v in self.controller.state_dict().items()}
         )
+        self._policy_training_authorized = False
+        if arm_qualification_report is not None or oracle_opportunity_report is not None:
+            self.authorize_policy_training(arm_qualification_report, oracle_opportunity_report)
+
+    def authorize_policy_training(
+        self,
+        arm_qualification_report: Optional[Mapping[str, Any]],
+        oracle_opportunity_report: Optional[Mapping[str, Any]],
+    ) -> None:
+        """Open the policy gate only after both scientific prerequisites pass."""
+        if not arm_qualification_report or not bool(arm_qualification_report.get("qualified")):
+            raise RuntimeError("Policy training blocked: effort arms are not qualified")
+        if not oracle_opportunity_report or not bool(oracle_opportunity_report.get("has_routing_opportunity")):
+            raise RuntimeError("Policy training blocked: oracle opportunity gate did not pass")
+        self._policy_training_authorized = True
 
     def _batch_from_records(
         self,
@@ -444,6 +461,11 @@ class EffortPolicyTrainer:
         Official training API: runs exactly config.epochs epochs at config.batch_size.
         Returns final train metrics and an execution receipt.
         """
+        if not self._policy_training_authorized:
+            raise RuntimeError(
+                "Policy training blocked: call authorize_policy_training() with passing "
+                "effort-arm and oracle-opportunity reports"
+            )
         epochs = int(self.config.epochs)
         bs = int(self.config.batch_size)
         steps = 0
@@ -534,7 +556,7 @@ class EffortPolicyTrainer:
         env = {
             "python": sys.version.split()[0],
             "torch": torch.__version__,
-            "daph_version": "3.1.4",
+            "daph_version": "3.2.0",
             "device": self.device,
             "source_digest": src,
         }

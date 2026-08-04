@@ -11,7 +11,7 @@ IMPORTANT: use projection_dim=None when collecting data to train the
 runtime EffortController (expects full hidden_size). Projection is for
 diagnostic offline datasets only until a matching runtime projection exists.
 
-v3.1.4 hardening:
+v3.2 hardening:
   - full state_dict digest (not first-param sample)
   - causal LM CE shift + pad masking in default quality proxy
   - projection metadata recorded
@@ -102,6 +102,9 @@ class EffortCounterfactual:
     template_id: Optional[str] = None
     difficulty_bucket: Optional[str] = None
     generator_version: Optional[str] = None
+    probe_source: str = "unspecified"
+    profile_digest: Optional[str] = None
+    e2_e3_outcome: Optional[str] = None
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
@@ -231,6 +234,9 @@ class CounterfactualCollector:
                 "architecture": "QwenExFusionModel", "hidden_size": model.hidden_size,
                 "num_layers": len(model.layers), "depth_fractions": model.depth_fractions,
                 "default_e3_steps": model.default_e3_steps,
+                "effort_probe_layer_count": model.effort_probe_layer_count,
+                "e3_config": asdict(model.e3_config),
+                "e3_region": asdict(model.e3_region),
             }
         else:
             config_obj = {"architecture": type(model).__name__}
@@ -311,16 +317,20 @@ class CounterfactualCollector:
             td_parts.append(_digest_obj(task["verifier_spec"]))
         task_digest = hashlib.sha256("".join(td_parts).encode()).hexdigest()[:16]
 
-        hidden = self.model.embed(ids)
         if hasattr(self.model, "compute_effort_probe"):
-            probe_h, _, decision = self.model.compute_effort_probe(hidden, mask)
+            probe_input = ids if isinstance(self.model, QwenExFusionModel) else self.model.embed(ids)
+            probe_result = self.model.compute_effort_probe(probe_input, mask)
+            probe_h, _, decision = probe_result
             anchor = decision.hidden_anchor
             if anchor is None:
                 from .effort import EffortController
                 anchor = EffortController.pool_last_valid(probe_h, mask)
+            probe_source = "internal_qwen_probe"
         else:
             from .effort import EffortController
+            hidden = self.model.embed(ids)
             anchor = EffortController.pool_last_valid(hidden, mask)
+            probe_source = "prompt_embedding_fallback"
         probe_vec = self._project(anchor[0])
 
         qualities: List[float] = []
@@ -330,7 +340,10 @@ class CounterfactualCollector:
         receipts: List[Dict[str, Any]] = []
         outs = []
         for e in range(4):
-            kwargs = {"return_compute_receipt": True} if isinstance(self.model, QwenExFusionModel) else {}
+            kwargs = (
+                {"return_compute_receipt": True, "precomputed_probe": probe_result}
+                if isinstance(self.model, QwenExFusionModel) else {}
+            )
             out = self.model(ids, attention_mask=mask, effort_mode=f"fixed_{e}", **kwargs)
             outs.append(out)
             stats = out["compute_stats"]
@@ -362,6 +375,14 @@ class CounterfactualCollector:
         utilities, best, argmax = compute_utility(
             qualities, costs, self.lambda_cost, self.tie_epsilon
         )
+        e2_correct = statuses[2] == "CORRECT"
+        e3_correct = statuses[3] == "CORRECT"
+        outcome = (
+            "RESCUE" if not e2_correct and e3_correct else
+            "REGRESSION" if e2_correct and not e3_correct else
+            "BOTH_CORRECT" if e2_correct and e3_correct else
+            "BOTH_WRONG"
+        ) if statuses[2] in ("CORRECT", "INCORRECT") and statuses[3] in ("CORRECT", "INCORRECT") else None
 
         return EffortCounterfactual(
             task_id=task_id,
@@ -387,6 +408,9 @@ class CounterfactualCollector:
             difficulty_bucket=task.get("difficulty_bucket"),
             generator_version=task.get("generator_version"),
             compute_receipts=(receipts[0], receipts[1], receipts[2], receipts[3]),
+            probe_source=probe_source,
+            profile_digest=getattr(getattr(self.model, "e3_region", None), "source_profile_digest", None),
+            e2_e3_outcome=outcome,
         )
 
 
@@ -424,16 +448,20 @@ class CounterfactualCollector:
             td_parts.append(_digest_obj(task["verifier_spec"]))
         task_digest = hashlib.sha256("".join(td_parts).encode()).hexdigest()[:16]
 
-        hidden = self.model.embed(ids)
         if hasattr(self.model, "compute_effort_probe"):
-            probe_h, _, decision = self.model.compute_effort_probe(hidden, mask)
+            probe_input = ids if isinstance(self.model, QwenExFusionModel) else self.model.embed(ids)
+            probe_result = self.model.compute_effort_probe(probe_input, mask)
+            probe_h, _, decision = probe_result
             anchor = decision.hidden_anchor
             if anchor is None:
                 from .effort import EffortController
                 anchor = EffortController.pool_last_valid(probe_h, mask)
+            probe_source = "internal_qwen_probe"
         else:
             from .effort import EffortController
+            hidden = self.model.embed(ids)
             anchor = EffortController.pool_last_valid(hidden, mask)
+            probe_source = "prompt_embedding_fallback"
         probe_vec = self._project(anchor[0])
 
         qualities, costs, statuses, raw_costs, texts = [], [], [], [], []
@@ -472,6 +500,14 @@ class CounterfactualCollector:
         utilities, best, argmax = compute_utility(
             qualities, costs, self.lambda_cost, self.tie_epsilon
         )
+        e2_correct = statuses[2] == "CORRECT"
+        e3_correct = statuses[3] == "CORRECT"
+        outcome = (
+            "RESCUE" if not e2_correct and e3_correct else
+            "REGRESSION" if e2_correct and not e3_correct else
+            "BOTH_CORRECT" if e2_correct and e3_correct else
+            "BOTH_WRONG"
+        ) if statuses[2] in ("CORRECT", "INCORRECT") and statuses[3] in ("CORRECT", "INCORRECT") else None
         return EffortCounterfactual(
             task_id=task_id,
             input_digest=_digest_tensor(ids),
@@ -496,6 +532,9 @@ class CounterfactualCollector:
             difficulty_bucket=task.get("difficulty_bucket"),
             generator_version=task.get("generator_version"),
             generated_texts=(texts[0], texts[1], texts[2], texts[3]),
+            probe_source=probe_source,
+            profile_digest=getattr(getattr(self.model, "e3_region", None), "source_profile_digest", None),
+            e2_e3_outcome=outcome,
         )
 
 
@@ -601,6 +640,9 @@ def qualify_effort_hierarchy(
     *,
     min_e0_quality_ratio: float = 0.25,
     min_e3_quality_delta: float = 0.0,
+    bootstrap_samples: int = 2000,
+    confidence: float = 0.95,
+    seed: int = 42,
 ) -> Dict[str, Any]:
     """Qualify physical modes before any oracle/policy training is allowed."""
     if not records:
@@ -620,7 +662,26 @@ def qualify_effort_hierarchy(
                 dominated.append(e)
                 break
     e0_useful = quality[0] >= min_e0_quality_ratio * max(quality[2], 1e-12)
-    e3_improves = quality[3] - quality[2] > min_e3_quality_delta
+    from .e3_metrics import E3QualificationConfig, qualify_e3_pairs
+    verified_pairs = []
+    for record in records:
+        if record.verifier_status[2] in ("CORRECT", "INCORRECT") and record.verifier_status[3] in ("CORRECT", "INCORRECT"):
+            verified_pairs.append({
+                "e2_correct": record.verifier_status[2] == "CORRECT",
+                "e3_correct": record.verifier_status[3] == "CORRECT",
+                "verified_utility_e2": record.quality[2],
+                "verified_utility_e3": record.quality[3],
+                "task_family": record.task_family,
+                "difficulty_bucket": record.difficulty_bucket,
+            })
+    e3_report = qualify_e3_pairs(verified_pairs, E3QualificationConfig(
+        bootstrap_samples=bootstrap_samples, confidence=confidence,
+        min_verified_utility_delta=min_e3_quality_delta, seed=seed,
+    )) if verified_pairs else {
+        "qualified": False, "policy_training_allowed": False,
+        "reason": "NO_PAIRED_VERIFIED_E2_E3_OUTCOMES",
+    }
+    e3_improves = bool(e3_report["qualified"])
     qualified = physical and e0_useful and e3_improves and not dominated
     return {
         "qualified": qualified,
@@ -633,4 +694,12 @@ def qualify_effort_hierarchy(
         "dominated_efforts": [f"E{e}" for e in sorted(set(dominated))],
         "e0_useful": e0_useful,
         "e3_improves": e3_improves,
+        "e3_verified_qualification": e3_report,
+        "policy_training_allowed": qualified,
+        "recommended_action": (
+            "DROP_OR_IMPROVE_DOMINATED_ARMS" if dominated else
+            "IMPROVE_E3_BEFORE_POLICY" if not e3_improves else
+            "IMPROVE_E0" if not e0_useful else
+            "PROCEED_TO_ORACLE_GATE"
+        ),
     }
