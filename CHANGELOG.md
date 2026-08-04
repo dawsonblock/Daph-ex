@@ -1,5 +1,16 @@
 # Changelog
 
+## 3.4.1 — qualification-tier enforcement
+
+- Bound `SMOKE`, `PILOT`, `QUALIFICATION`, and `FINAL` sample/group/seed minimums to the executable E3 qualification paths; a two-task result can no longer promote an arm.
+- Added a separate placement-promotion decision requiring tier validation, natural-test success, at least two-of-three seed replication, and stable `PROFILE_PILOT`/`PROFILE_FULL` evidence for profiled placements.
+- Made calibrated sensitivity sampling family-stratified and recorded per-family success/failure availability and realized balance.
+- Expanded every verified task family to three distinct prompt templates and labeled generator-scale difficulty separately from empirical/model difficulty.
+- Corrected profile stability to rank only layers shared by every seed and added a multi-seed profile aggregation command.
+- Added final-tier predeclared sample-size enforcement and fail-fast CLI validation before model loading or GPU training.
+
+This release changes qualification enforcement, not the scientific result. The historical one-rescue result remains `MECHANISM_SIGNAL`; router training remains blocked.
+
 ## 3.4.0 — receipt-backed E3 scientific accounting
 
 - Replaced the correctness-as-utility fallback with mandatory per-task quality and actual E2/E3 execution compute.

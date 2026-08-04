@@ -19,6 +19,16 @@ class ExperimentTier(str, Enum):
     FINAL = "FINAL"
 
 
+EXPERIMENT_TIER_REQUIREMENTS = {
+    # Smoke validates the pipeline and may produce a mechanism signal, never a
+    # scientific promotion. Pilot and later tiers require genuine replication.
+    ExperimentTier.SMOKE: {"heldout_examples": 24, "groups": 2, "training_seeds": 1},
+    ExperimentTier.PILOT: {"heldout_examples": 200, "groups": 5, "training_seeds": 3},
+    ExperimentTier.QUALIFICATION: {"heldout_examples": 500, "groups": 5, "training_seeds": 3},
+    ExperimentTier.FINAL: {"heldout_examples": 500, "groups": 5, "training_seeds": 3},
+}
+
+
 class ProfileTier(str, Enum):
     PROFILE_SMOKE = "PROFILE_SMOKE"
     PROFILE_PILOT = "PROFILE_PILOT"
@@ -60,16 +70,67 @@ class ExperimentScale:
     training_seeds: tuple[int, ...]
     evaluation_seed: int
     predeclared: bool = True
+    predeclared_heldout_examples: int | None = None
+
+    def requirements(self) -> Dict[str, int]:
+        return dict(EXPERIMENT_TIER_REQUIREMENTS[self.tier])
+
+    def validation_report(
+        self, *, observed_tasks: int | None = None, observed_groups: int | None = None,
+        observed_training_seeds: Sequence[int] | None = None,
+    ) -> Dict[str, Any]:
+        """Return the declared and observed tier checks without silently promoting."""
+        required = self.requirements()
+        declared_seeds = tuple(sorted(set(int(seed) for seed in self.training_seeds)))
+        observed_seeds = tuple(sorted(set(int(seed) for seed in (observed_training_seeds or ()))))
+        declared = {
+            "heldout_examples": self.heldout_examples,
+            "training_seeds": list(declared_seeds),
+            "training_seed_count": len(declared_seeds),
+            "predeclared": self.predeclared,
+            "predeclared_heldout_examples": self.predeclared_heldout_examples,
+        }
+        observed = {
+            "tasks": observed_tasks,
+            "groups": observed_groups,
+            "training_seeds": list(observed_seeds),
+            "training_seed_count": len(observed_seeds),
+        }
+        failures = []
+        if self.heldout_examples < required["heldout_examples"]:
+            failures.append("DECLARED_HELDOUT_BELOW_TIER_MINIMUM")
+        if len(declared_seeds) < required["training_seeds"]:
+            failures.append("DECLARED_TRAINING_SEEDS_BELOW_TIER_MINIMUM")
+        if self.tier == ExperimentTier.FINAL:
+            if not self.predeclared or self.predeclared_heldout_examples is None:
+                failures.append("FINAL_NOT_PREDECLARED")
+            elif self.heldout_examples != self.predeclared_heldout_examples:
+                failures.append("FINAL_DECLARED_SIZE_MISMATCH")
+        if observed_tasks is not None and observed_tasks < required["heldout_examples"]:
+            failures.append("OBSERVED_HELDOUT_BELOW_TIER_MINIMUM")
+        if observed_groups is not None and observed_groups < required["groups"]:
+            failures.append("OBSERVED_GROUPS_BELOW_TIER_MINIMUM")
+        if observed_training_seeds is not None and len(observed_seeds) < required["training_seeds"]:
+            failures.append("OBSERVED_TRAINING_SEEDS_BELOW_TIER_MINIMUM")
+        return {
+            "tier": self.tier.value,
+            "required": required,
+            "declared": declared,
+            "observed": observed,
+            "passed": not failures,
+            "failures": failures,
+        }
 
     def validate(self) -> None:
         if self.heldout_examples < 1:
             raise ValueError("heldout_examples must be positive")
         if not self.training_seeds:
             raise ValueError("At least one independent training seed is required")
-        if self.tier == ExperimentTier.QUALIFICATION and self.heldout_examples < 500:
-            raise ValueError("QUALIFICATION requires at least 500 held-out examples")
-        if self.tier == ExperimentTier.FINAL and not self.predeclared:
-            raise ValueError("FINAL sample size must be predeclared")
+        report = self.validation_report()
+        if not report["passed"]:
+            raise ValueError(
+                f"{self.tier.value} experiment scale is invalid: {', '.join(report['failures'])}"
+            )
 
 
 def _rank(values: Mapping[int, float]) -> Dict[int, float]:
@@ -124,12 +185,17 @@ def profile_stability(
     pairwise_spearman, top_overlaps = [], []
     rankings: Dict[int, list[int]] = {}
     regions: Dict[int, tuple[int, ...]] = {}
+    shared_profiles = {
+        seed: {layer: float(profiles[seed][layer]) for layer in layers} for seed in seeds
+    }
     for seed in seeds:
-        rankings[seed] = sorted(layers, key=lambda layer: (-float(profiles[seed][layer]), layer))
-        regions[seed] = _best_region(profiles[seed], contiguous_width)
+        rankings[seed] = sorted(layers, key=lambda layer: (-shared_profiles[seed][layer], layer))
+        regions[seed] = _best_region(shared_profiles[seed], contiguous_width)
     for left_index, left_seed in enumerate(seeds):
         for right_seed in seeds[left_index + 1:]:
-            left_rank, right_rank = _rank(profiles[left_seed]), _rank(profiles[right_seed])
+            # Rank only the shared layer set. Extra layers evaluated by one seed
+            # must not shift ranks for the common comparison population.
+            left_rank, right_rank = _rank(shared_profiles[left_seed]), _rank(shared_profiles[right_seed])
             pairwise_spearman.append(_pearson(
                 [left_rank[layer] for layer in layers], [right_rank[layer] for layer in layers],
             ))
@@ -181,6 +247,9 @@ def profile_stability(
 
 def promote_e3_placement(
     candidates: Sequence[Mapping[str, Any]], *, profile_stable: bool,
+    profile_tier_passed: bool = False,
+    experiment_scale_passed: bool = False,
+    natural_test_passed: bool = False,
 ) -> Dict[str, Any]:
     """Promote only replicated, cost-effective candidates; prefer heuristic on unstable profiles."""
     if not candidates:
@@ -191,21 +260,32 @@ def promote_e3_placement(
         missing = [field for field in required if field not in candidate]
         if missing:
             raise ValueError(f"Placement candidate is missing: {', '.join(missing)}")
-        profile_candidate = str(candidate["name"]).startswith("PROFILED")
+        profile_candidate = str(candidate["name"]).upper().startswith("PROFILED")
+        candidate_natural_passed = bool(candidate.get("natural_test_passed", natural_test_passed))
         if (
             float(candidate["quality_lcb95"]) > 0
             and float(candidate["utility_lcb95"]) > 0
             and int(candidate["rescues"]) > int(candidate["regressions"])
             and float(candidate["seed_pass_rate"]) >= 2 / 3
-            and (not profile_candidate or profile_stable)
+            and experiment_scale_passed
+            and candidate_natural_passed
+            and (not profile_candidate or (profile_stable and profile_tier_passed))
         ):
             eligible.append(candidate)
     if not eligible:
-        fallback = "HEURISTIC_MIDDLE" if any(item["name"] == "HEURISTIC_MIDDLE" for item in candidates) else "FINAL"
+        heuristic = next(
+            (str(item["name"]) for item in candidates
+             if str(item["name"]).upper() in {"HEURISTIC_MIDDLE", "MIDDLE_RECURRENT"}),
+            None,
+        )
+        fallback = heuristic or "FINAL"
         return {
             "promoted": False, "canonical": fallback,
             "reason": "NO_REPLICATED_QUALITY_AND_UTILITY_PASS",
             "profile_stable": profile_stable,
+            "profile_tier_passed": profile_tier_passed,
+            "experiment_scale_passed": experiment_scale_passed,
+            "natural_test_passed": natural_test_passed,
         }
     winner = max(eligible, key=lambda item: (
         float(item["utility_lcb95"]), float(item["quality_lcb95"]),
@@ -216,6 +296,9 @@ def promote_e3_placement(
         "promoted": True, "canonical": winner["name"],
         "reason": "PREDECLARED_PROMOTION_RULE_PASS",
         "profile_stable": profile_stable,
+        "profile_tier_passed": profile_tier_passed,
+        "experiment_scale_passed": experiment_scale_passed,
+        "natural_test_passed": natural_test_passed,
     }
 
 

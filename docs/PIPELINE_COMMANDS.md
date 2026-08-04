@@ -44,7 +44,7 @@ python scripts/profile_layer_contribution.py \
   --checkpoint runs/phase0/qwen_exfusion_gate0b.pt \
   --train data/profile-train-tokenized.jsonl \
   --validation data/profile-validation-tokenized.jsonl \
-  --profile-mode sparse --steps 100 \
+  --profile-mode sparse --profile-tier PROFILE_SMOKE --steps 100 \
   --output artifacts/layer_profile/sparse
 
 # D. full profile (only after cost review)
@@ -64,6 +64,16 @@ python scripts/profile_layer_contribution.py \
   --output artifacts/layer_profile/layer12
 ```
 
+A profile-guided arm cannot promote from one run. Run the predeclared profile on three seeds into separate directories, then bind its tier and stability evidence:
+
+```bash
+python scripts/analyze_profile_stability.py \
+  --profile-dirs artifacts/layer_profile/seed_20260803,artifacts/layer_profile/seed_20260817,artifacts/layer_profile/seed_20260831 \
+  --output artifacts/layer_profile/stability \
+  --profile-tier PROFILE_PILOT \
+  --training-examples 200 --validation-examples 200 --updates 20
+```
+
 For verified reward/GRPO, call `LayerContributionProfiler.run()` with a `LayerAdaptationObjective(kind="verified_reward", verified_reward=True)` and an external adaptation callback. The repository intentionally does not describe the CE CLI as RLVR.
 
 ## Frozen-E2 hard-case E3 ablation
@@ -72,7 +82,7 @@ First construct disjoint candidates and calibrate each split to a non-degenerate
 
 ```bash
 python scripts/make_e3_multifamily_tasks.py \
-  --output runs/e3-multifamily --count-per-family 200 \
+  --output runs/e3-multifamily --count-per-family 400 \
   --natural-count 500 --seed 20260901
 
 python scripts/make_e3_calibration_pool.py \
@@ -87,7 +97,7 @@ python scripts/calibrate_e2_task_band.py \
   --target-e2-accuracy 0.50
 ```
 
-For the new multi-family pool use `--candidates runs/e3-multifamily/calibration_candidates.jsonl` instead of `--candidate-dir`. The untouched `runs/e3-multifamily/natural_test.jsonl` is created before either arm is evaluated and remains disjoint.
+For the enforced qualification run use `--candidates runs/e3-multifamily/calibration_candidates.jsonl --train-count 500 --selection-count 200 --test-count 500` instead of `--candidate-dir`. Family-stratified calibration is enabled by default and fails if any included family cannot supply its allocated E2 successes/failures. The untouched `runs/e3-multifamily/natural_test.jsonl` is created before either arm is evaluated and remains disjoint.
 
 Then run the three locations with identical training, evaluation, and held-out refinement dose:
 
@@ -98,11 +108,15 @@ python scripts/run_e3_location_study.py \
   --hard-train runs/e3-calibration/calibrated/train.jsonl \
   --selection runs/e3-calibration/calibrated/selection.jsonl \
   --test runs/e3-calibration/calibrated/test.jsonl \
-  --natural-test runs/e3-calibration/natural_test.jsonl \
+  --natural-test runs/e3-multifamily/natural_test.jsonl \
   --profile-dir artifacts/layer_profile/sparse \
+  --profile-stability-dir artifacts/layer_profile/stability \
   --output runs/e3-location-study \
   --latent-step-counts 1,2,4 --heldout-steps 4 \
   --steps 200 --e3-scale 1e-3 \
+  --training-seeds 20260803,20260817,20260831 \
+  --experiment-tier QUALIFICATION \
+  --bootstrap-samples 10000 \
   --lambda-compute 1.0 --lambda-sweep 0,0.1,0.25,0.5,1,2
 ```
 
@@ -117,12 +131,14 @@ python scripts/run_e3_hardcase_ablation.py \
   --hard-train runs/e3-calibration/calibrated/train.jsonl \
   --selection runs/e3-calibration/calibrated/selection.jsonl \
   --test runs/e3-calibration/calibrated/test.jsonl \
-  --natural-test runs/e3-calibration/natural_test.jsonl \
+  --natural-test runs/e3-multifamily/natural_test.jsonl \
   --output runs/e3-location-study/middle_recurrent \
   --e3-mode middle_recurrent \
   --latent-step-counts 1,2,4 --heldout-steps 4 \
   --steps 200 --e3-scale 1e-3 \
-  --lambda-compute 1.0
+  --training-seeds 20260803,20260817,20260831 \
+  --experiment-tier QUALIFICATION \
+  --bootstrap-samples 10000 --lambda-compute 1.0
 ```
 
 This keeps E2 frozen, trains only the configured E3 refiner and scale after Gate 0B, masks prompt and padding tokens from the task loss, and evaluates exact numeric E2/E3 outcomes. Use `--e3-mode final_refine` for the matched final-state control. Use `--e3-mode profiled_middle_recurrent --profile-dir artifacts/layer_profile/sparse` to bind the run to a measured profile; partial profiles remain labeled partial in the report. The report includes the actual refinement layer, selected region, rescues, regressions, net rescue rate, completion CE, hidden-state delta magnitude, receipt-backed compute, both confidence gates, and the lambda sweep. The supplied arithmetic calibration pool is only a reproducible smoke curriculum; qualification requires multi-family replication and an untouched natural test.
@@ -136,7 +152,10 @@ python scripts/qualify_e3_results.py \
   --output evidence/e3_run_001 \
   --lambda-compute 1.0 --lambda-sweep 0,0.1,0.25,0.5,1,2 \
   --group-key template_id --bootstrap-samples 10000 \
-  --test-count 158 --pytest-output runs/e3/pytest_output.txt \
+  --experiment-tier QUALIFICATION \
+  --training-seeds 20260803,20260817,20260831 \
+  --placement middle_recurrent \
+  --test-count 167 --pytest-output runs/e3/pytest_output.txt \
   --model-id Qwen/Qwen2.5-0.5B \
   --model-revision 060db6499f32faf8b98477b0a26969ef7d8b9987
 ```

@@ -263,13 +263,17 @@ def test_layer_profiler_rejects_non_improving_full_reference():
 
 
 def test_rescue_regression_metrics_and_statistical_gate():
-    pairs = [
+    prototype_pairs = [
         {"task_id": "a", "e2_correct": False, "e3_correct": True, "quality_e2": 0.0, "quality_e3": 1.0, "compute_e2": 1.0, "compute_e3": 1.0, "task_family": "math", "template_id": "math-a", "difficulty_bucket": "hard"},
         {"task_id": "b", "e2_correct": False, "e3_correct": True, "quality_e2": 0.0, "quality_e3": 1.0, "compute_e2": 1.0, "compute_e3": 1.0, "task_family": "math", "template_id": "math-b", "difficulty_bucket": "hard"},
         {"task_id": "c", "e2_correct": False, "e3_correct": True, "quality_e2": 0.0, "quality_e3": 1.0, "compute_e2": 1.0, "compute_e3": 1.0, "task_family": "code", "template_id": "code-a", "difficulty_bucket": "easy"},
     ]
+    pairs = [
+        {**prototype_pairs[index % len(prototype_pairs)], "task_id": f"{prototype_pairs[index % len(prototype_pairs)]['task_id']}-{index}", "template_id": f"template-{index}"}
+        for index in range(24)
+    ]
     metrics = e3_pair_metrics(pairs)
-    assert metrics["rescue_count"] == 3 and metrics["regression_count"] == 0
+    assert metrics["rescue_count"] == 24 and metrics["regression_count"] == 0
     qualified = qualify_e3_pairs(pairs, E3QualificationConfig(bootstrap_samples=100, seed=1))
     assert qualified["qualified"] and qualified["quality_lcb95"] > 0
 

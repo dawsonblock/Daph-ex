@@ -1,4 +1,4 @@
-# DAPH / ExFusion v3.4.0
+# DAPH / ExFusion v3.4.1
 
 Pretrained-compatible adaptive computation with a physically ordered four-level effort hierarchy.
 
@@ -93,7 +93,7 @@ HF checkpoint → Gate 0A → QwenCompat → exact Gate 0B → layer profile →
 
 See [`docs/PIPELINE_COMMANDS.md`](docs/PIPELINE_COMMANDS.md) for executable examples for every stage.
 
-E3 scientific accounting is specified in [`docs/UTILITY_ACCOUNTING_REPORT.md`](docs/UTILITY_ACCOUNTING_REPORT.md), with the replicated protocol in [`docs/E3_EXPERIMENT_PROTOCOL_V340.md`](docs/E3_EXPERIMENT_PROTOCOL_V340.md) and immutable artifact contract in [`docs/EVIDENCE_SCHEMA_V340.md`](docs/EVIDENCE_SCHEMA_V340.md).
+E3 scientific accounting is specified in [`docs/UTILITY_ACCOUNTING_REPORT.md`](docs/UTILITY_ACCOUNTING_REPORT.md), with the enforced replicated protocol in [`docs/E3_EXPERIMENT_PROTOCOL_V341.md`](docs/E3_EXPERIMENT_PROTOCOL_V341.md), enforcement audit in [`docs/QUALIFICATION_ENFORCEMENT_REPORT_V341.md`](docs/QUALIFICATION_ENFORCEMENT_REPORT_V341.md), and immutable artifact contract in [`docs/EVIDENCE_SCHEMA_V340.md`](docs/EVIDENCE_SCHEMA_V340.md).
 
 ## Standalone marginal-utility controller
 
@@ -117,4 +117,4 @@ The answer-only follow-up calibrated every split to 50% E2 accuracy and compared
 
 ## Status
 
-The canonical Qwen path, legacy hybrid path, and standalone marginal-utility research package coexist. Engineering acceptance is covered by 158 tests. A real but low-budget sparse profile, matched answer-only location study, and negative controller oracle smoke are bundled. Neither E3 task utility nor a learned controller is scientifically qualified.
+The canonical Qwen path, legacy hybrid path, and standalone marginal-utility research package coexist. Engineering acceptance is covered by 167 tests. Experiment tiers, unique-task counts, seed replication, natural-test promotion, and stable-profile promotion are enforced in executable paths. A real but low-budget sparse profile, matched answer-only location study, and negative controller oracle smoke are bundled. Neither E3 task utility nor a learned controller is scientifically qualified.

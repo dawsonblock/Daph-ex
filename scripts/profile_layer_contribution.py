@@ -25,6 +25,7 @@ from daph.layer_contribution import (
     LayerContributionConfig,
     LayerContributionProfiler,
 )
+from daph.e3_protocol import ProfileTier, validate_profile_tier
 from daph.qwen_exfusion import load_qwen_exfusion_checkpoint
 
 
@@ -67,6 +68,7 @@ def main() -> None:
     parser.add_argument("--steps", type=int, default=100)
     parser.add_argument("--lr", type=float, default=1e-5)
     parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument("--profile-tier", choices=tuple(tier.value for tier in ProfileTier), default="PROFILE_SMOKE")
     parser.add_argument("--score-full", type=float, help="Pre-measured full-training score; score is negative CE")
     parser.add_argument("--device", default="cpu")
     args = parser.parse_args()
@@ -100,12 +102,22 @@ def main() -> None:
                           full_reference_adapter=adapt if args.score_full is None else None,
                           score_full=args.score_full)
     profiler.save(report, args.output)
+    # This command runs one profile seed. A multi-seed profile must aggregate
+    # separate runs before it can truthfully claim PILOT/FULL tier status.
+    tier_report = validate_profile_tier(
+        ProfileTier(args.profile_tier), training_examples=len(train),
+        validation_examples=len(validation), seeds=1, updates=args.steps,
+    )
+    (Path(args.output) / "profile_tier_validation.json").write_text(
+        json.dumps(tier_report, indent=2) + "\n"
+    )
     print(json.dumps({
         "profile_status": report.profile_status,
         "profile_digest": report.digest(),
         "ranking": report.ranking,
         "best_contiguous_region": report.best_contiguous_region,
         "middle_concentration_observed": report.middle_concentration_observed,
+        "profile_tier": tier_report,
     }, indent=2))
 
 

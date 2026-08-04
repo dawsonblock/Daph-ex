@@ -4,7 +4,7 @@
 
 Use [`configs/e3_qualification_v340.json`](../configs/e3_qualification_v340.json). Record model/revision, source and tokenizer digests, training and evaluation seeds, placement/dose arms, split IDs, lambda values, bootstrap group, sample size, promotion thresholds, and expected claim level before training.
 
-Tiers are configurable. `SMOKE` validates mechanics, `PILOT` estimates effects, `QUALIFICATION` requires at least 500 held-out tasks, and `FINAL` requires a predeclared size. Profile tiers separately distinguish `PROFILE_SMOKE`, `PROFILE_PILOT`, and `PROFILE_FULL`.
+Tiers are configurable. As of v3.4.1, the executable paths enforce their task, group, and independent-seed minimums before a result is promotable. `SMOKE` validates mechanics, `PILOT` estimates effects, `QUALIFICATION` requires at least 500 held-out tasks and three seeds, and `FINAL` requires an exact predeclared size. Profile tiers separately distinguish `PROFILE_SMOKE`, `PROFILE_PILOT`, and `PROFILE_FULL`. See the superseding [`E3_EXPERIMENT_PROTOCOL_V341.md`](E3_EXPERIMENT_PROTOCOL_V341.md).
 
 ## Data
 

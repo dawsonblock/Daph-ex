@@ -12,7 +12,9 @@ from dataclasses import asdict, dataclass
 import math
 import random
 import statistics
-from typing import Any, Dict, Iterable, Mapping, Sequence
+from typing import Any, Dict, Iterable, Mapping, Optional, Sequence
+
+from .e3_protocol import ExperimentScale
 
 
 REQUIRED_PAIR_FIELDS = (
@@ -32,9 +34,12 @@ class E3QualificationConfig:
     min_quality_delta: float = 0.0
     min_utility_delta: float = 0.0
     min_net_rescue_rate: float = 0.0
-    min_tasks: int = 2
+    # A smoke study needs enough examples to be a meaningful smoke result. A
+    # stronger tier raises this through ``experiment_scale``.
+    min_tasks: int = 24
     min_groups: int = 2
     seed: int = 42
+    experiment_scale: Optional[ExperimentScale] = None
 
     def validate(self) -> None:
         if self.lambda_compute < 0 or not math.isfinite(self.lambda_compute):
@@ -47,6 +52,8 @@ class E3QualificationConfig:
             raise ValueError("min_tasks and min_groups must be positive")
         if not self.group_key:
             raise ValueError("group_key must be non-empty")
+        if self.experiment_scale is not None and not isinstance(self.experiment_scale, ExperimentScale):
+            raise TypeError("experiment_scale must be an ExperimentScale or None")
 
 
 def _validate_pairs(rows: Sequence[Mapping[str, Any]]) -> None:
@@ -197,10 +204,29 @@ def qualify_e3_pairs(
         rows, "delta_utility", group_key=config.group_key,
         samples=config.bootstrap_samples, confidence=config.confidence, seed=config.seed + 1,
     )
-    sufficiently_powered = (
-        len(rows) >= config.min_tasks
+    unique_task_count = len({str(row["task_id"]) for row in rows})
+    local_power = (
+        unique_task_count >= config.min_tasks
         and quality["group_count"] >= config.min_groups
     )
+    scale_report = None
+    if config.experiment_scale is not None:
+        # Validate the predeclared scale before a result can be promotable.  A
+        # short or under-replicated result stays reportable as INSUFFICIENT_POWER
+        # instead of being allowed to masquerade as a qualification pass.
+        try:
+            config.experiment_scale.validate()
+        except ValueError:
+            pass
+        observed_seeds = sorted({
+            int(row["training_seed"]) for row in rows
+            if row.get("training_seed") is not None
+        })
+        scale_report = config.experiment_scale.validation_report(
+            observed_tasks=unique_task_count, observed_groups=quality["group_count"],
+            observed_training_seeds=observed_seeds,
+        )
+    sufficiently_powered = local_power and (scale_report is None or bool(scale_report["passed"]))
     rescue_condition = (
         summary["rescue_count"] > summary["regression_count"]
         and summary["net_rescue_rate"] > config.min_net_rescue_rate
@@ -239,7 +265,10 @@ def qualify_e3_pairs(
         "quality_gate": {"name": "E3-Q", "passed": quality_pass, "bootstrap": quality},
         "utility_gate": {"name": "E3-U", "passed": utility_pass, "bootstrap": utility},
         "qualification_status": status,
+        "unique_task_count": unique_task_count,
         "sufficiently_powered": sufficiently_powered,
+        "local_power_passed": local_power,
+        "experiment_scale": scale_report,
         "qualified": status == "PASS_QUALITY_AND_UTILITY",
         "policy_training_allowed": False,
         "requires_oracle_opportunity_gate": True,

@@ -26,6 +26,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from daph.e3_metrics import E3QualificationConfig, e3_pair_metrics, lambda_sweep, qualify_e3_pairs
+from daph.e3_protocol import ExperimentScale, ExperimentTier
 from daph.e3_architecture import E3RefinementConfig
 from daph.e3_experiment import active_refinement_layer, numeric_answer_correct, set_refinement_steps
 from daph.pretrained import import_into_qwen_compat
@@ -70,7 +71,10 @@ def _e2_logits(model: Any, tokenizer: Any, prompt: str, device: torch.device) ->
 
 
 @torch.no_grad()
-def _task_eval(model: Any, tokenizer: Any, tasks: Sequence[Dict[str, Any]], *, device: torch.device, max_new_tokens: int) -> Dict[str, Any]:
+def _task_eval(
+    model: Any, tokenizer: Any, tasks: Sequence[Dict[str, Any]], *,
+    device: torch.device, max_new_tokens: int, training_seed: int,
+) -> Dict[str, Any]:
     pairs: List[Dict[str, Any]] = []
     e2_losses, e3_losses, deltas, costs = [], [], [], []
     model.eval()
@@ -109,6 +113,7 @@ def _task_eval(model: Any, tokenizer: Any, tasks: Sequence[Dict[str, Any]], *, d
             "difficulty_bucket": task["difficulty_bucket"],
             "generator_version": task["generator_version"], "verifier_version": task["verifier_version"],
             "seed": task.get("generation_seed"),
+            "training_seed": int(training_seed),
             "e2_correct": correct["fixed_2"], "e3_correct": correct["fixed_3"],
             "quality_e2": float(correct["fixed_2"]), "quality_e3": float(correct["fixed_3"]),
             "compute_e2": compute_e2, "compute_e3": compute_e3,
@@ -139,7 +144,16 @@ def _parse_counts(value: str) -> List[int]:
     return counts
 
 
-def _load_profile_selection(profile_dir: Path) -> tuple[List[int], str, str]:
+def _parse_seeds(value: str, fallback: int) -> tuple[int, ...]:
+    seeds = tuple(sorted(set(int(part) for part in value.split(",") if part.strip()))) if value.strip() else (int(fallback),)
+    if not seeds:
+        raise ValueError("--training-seeds must contain at least one integer seed")
+    return seeds
+
+
+def _load_profile_selection(
+    profile_dir: Path, profile_stability_dir: Path | None = None,
+) -> tuple[List[int], str, str, Dict[str, Any]]:
     manifest = json.loads((profile_dir / "manifest.json").read_text())
     rankings = json.loads((profile_dir / "rankings.json").read_text())
     selected = [int(layer) for layer in rankings.get("best_contiguous_region", [])]
@@ -149,26 +163,40 @@ def _load_profile_selection(profile_dir: Path) -> tuple[List[int], str, str]:
         raise ValueError("Profile directory must contain a digest and best_contiguous_region")
     if status not in {"PARTIAL_PROFILE", "FULL_PROFILE"}:
         raise ValueError(f"Unsupported profile status: {status!r}")
-    return selected, digest, status
+    tier_path = (profile_stability_dir or profile_dir) / "profile_tier_validation.json"
+    tier = json.loads(tier_path.read_text()) if tier_path.exists() else {
+        "passed": False,
+        "tier": "MISSING",
+        "reason": "PROFILE_TIER_VALIDATION_MISSING",
+    }
+    tier["promotion_passed"] = bool(
+        tier.get("promotion_passed", tier.get("passed"))
+        and tier.get("passed")
+        and tier.get("tier") in {"PROFILE_PILOT", "PROFILE_FULL"}
+    )
+    return selected, digest, status, tier
 
 
-def _build_e3_config(mode: str, steps: int, profile_dir: Path | None) -> tuple[E3RefinementConfig, str | None]:
+def _build_e3_config(
+    mode: str, steps: int, profile_dir: Path | None,
+    profile_stability_dir: Path | None = None,
+) -> tuple[E3RefinementConfig, Dict[str, Any]]:
     if mode == "profiled_middle_recurrent":
         if profile_dir is None:
             raise ValueError("--profile-dir is required for profiled_middle_recurrent")
-        layers, digest, status = _load_profile_selection(profile_dir)
+        layers, digest, status, tier = _load_profile_selection(profile_dir, profile_stability_dir)
         return E3RefinementConfig(
             e3_refinement_mode=mode,
             e3_refine_steps=steps,
             e3_region_selection="profiled",
             e3_profiled_layers=layers,
             source_profile_digest=digest,
-        ), status
+        ), {"profile_status": status, "profile_tier": tier}
     return E3RefinementConfig(
         e3_refinement_mode=mode,
         e3_refine_steps=steps,
         e3_region_selection="middle_heuristic",
-    ), None
+    ), {"profile_status": None, "profile_tier": None}
 
 
 def main() -> None:
@@ -190,6 +218,10 @@ def main() -> None:
         default="middle_recurrent",
     )
     parser.add_argument("--profile-dir", help="Layer-profile directory required by profiled_middle_recurrent")
+    parser.add_argument(
+        "--profile-stability-dir",
+        help="Multi-seed profile-stability evidence directory required for profile-guided promotion.",
+    )
     parser.add_argument("--steps", type=int, default=200)
     parser.add_argument("--e3-scale", type=float, default=1e-3)
     parser.add_argument("--lr-refinement", type=float, default=1e-4)
@@ -199,6 +231,10 @@ def main() -> None:
     parser.add_argument("--max-new-tokens", type=int, default=12)
     parser.add_argument("--latent-size", type=int, default=64)
     parser.add_argument("--seed", type=int, default=20260803)
+    parser.add_argument(
+        "--training-seeds",
+        help="Predeclared complete set of independent training seeds; defaults to --seed.",
+    )
     parser.add_argument("--min-e2-accuracy", type=float, default=0.30)
     parser.add_argument("--max-e2-accuracy", type=float, default=0.70)
     parser.add_argument("--bootstrap-samples", type=int, default=2000)
@@ -207,16 +243,41 @@ def main() -> None:
     parser.add_argument("--lambda-sweep", default="0,0.1,0.25,0.5,1,2")
     parser.add_argument("--bootstrap-group-key", default="template_id")
     parser.add_argument("--experiment-tier", choices=("SMOKE", "PILOT", "QUALIFICATION", "FINAL"), default="SMOKE")
+    parser.add_argument(
+        "--predeclared-heldout-examples", type=int,
+        help="Required for FINAL; the held-out size committed before the run.",
+    )
     parser.add_argument("--heldout-steps", type=int, help="Force a common held-out dose across locations")
     parser.add_argument("--device", default="auto")
     args = parser.parse_args()
     counts, output = _parse_counts(args.latent_step_counts), Path(args.output)
-    e3_config, profile_status = _build_e3_config(
+    e3_config, profile_info = _build_e3_config(
         args.e3_mode, counts[0], Path(args.profile_dir) if args.profile_dir else None,
+        Path(args.profile_stability_dir) if args.profile_stability_dir else None,
     )
+    profile_status = profile_info["profile_status"]
+    profile_promotion_passed = bool((profile_info["profile_tier"] or {}).get("promotion_passed", True))
     output.mkdir(parents=True, exist_ok=True)
     train_tasks, selection_tasks, test_tasks = _load_tasks(Path(args.hard_train)), _load_tasks(Path(args.selection)), _load_tasks(Path(args.test))
     natural_tasks = _load_tasks(Path(args.natural_test)) if args.natural_test else None
+    tier = ExperimentTier(args.experiment_tier)
+    declared_training_seeds = _parse_seeds(args.training_seeds or "", args.seed)
+    calibrated_scale = ExperimentScale(
+        tier=tier, heldout_examples=len(test_tasks), training_seeds=declared_training_seeds,
+        evaluation_seed=args.seed, predeclared=True,
+        predeclared_heldout_examples=args.predeclared_heldout_examples,
+    )
+    # Fail before consuming GPU time when the declared tier is impossible.
+    calibrated_scale.validate()
+    if tier != ExperimentTier.SMOKE and natural_tasks is None:
+        raise ValueError(f"{tier.value} requires --natural-test")
+    natural_scale = ExperimentScale(
+        tier=tier, heldout_examples=len(natural_tasks or []), training_seeds=declared_training_seeds,
+        evaluation_seed=args.seed, predeclared=True,
+        predeclared_heldout_examples=args.predeclared_heldout_examples,
+    ) if natural_tasks is not None else None
+    if natural_scale is not None:
+        natural_scale.validate()
     train_jsonl = output / "hard_train_answer_only.jsonl"
     _write_answer_only_training_data(train_tasks, train_jsonl)
     device = torch.device("mps" if args.device == "auto" and torch.backends.mps.is_available() else ("cpu" if args.device == "auto" else args.device))
@@ -270,7 +331,10 @@ def main() -> None:
             save_final_checkpoint=False, save_model_artifact=False,
             answer_only_loss=True,
         )
-        result, selection = train_adapt(model, cfg), _task_eval(model, tokenizer, selection_tasks, device=device, max_new_tokens=args.max_new_tokens)
+        result, selection = train_adapt(model, cfg), _task_eval(
+            model, tokenizer, selection_tasks, device=device,
+            max_new_tokens=args.max_new_tokens, training_seed=args.seed,
+        )
         e2_unchanged = torch.equal(_e2_logits(model, tokenizer, str(selection_tasks[0]["prompt"]), device), e2_anchor)
         if not e2_unchanged:
             raise RuntimeError("E2 anchor output changed during an E3-only phase")
@@ -288,8 +352,14 @@ def main() -> None:
     with torch.no_grad():
         active_layer.latent_scale.copy_(candidate_states[heldout_steps]["scale"])
     set_refinement_steps(model, heldout_steps)
-    heldout = _task_eval(model, tokenizer, test_tasks, device=device, max_new_tokens=args.max_new_tokens)
-    natural_heldout = _task_eval(model, tokenizer, natural_tasks, device=device, max_new_tokens=args.max_new_tokens) if natural_tasks else None
+    heldout = _task_eval(
+        model, tokenizer, test_tasks, device=device,
+        max_new_tokens=args.max_new_tokens, training_seed=args.seed,
+    )
+    natural_heldout = _task_eval(
+        model, tokenizer, natural_tasks, device=device,
+        max_new_tokens=args.max_new_tokens, training_seed=args.seed,
+    ) if natural_tasks else None
     lambda_values = [float(value) for value in args.lambda_sweep.split(",") if value.strip()]
     paired_qualification = qualify_e3_pairs(
         heldout["task_outcomes"],
@@ -299,6 +369,7 @@ def main() -> None:
             confidence=args.confidence,
             group_key=args.bootstrap_group_key,
             seed=args.seed,
+            experiment_scale=calibrated_scale,
         ),
     )
     heldout_lambda_sweep = lambda_sweep(
@@ -311,6 +382,7 @@ def main() -> None:
         E3QualificationConfig(
             lambda_compute=args.lambda_compute, bootstrap_samples=args.bootstrap_samples,
             confidence=args.confidence, group_key=args.bootstrap_group_key, seed=args.seed + 1000,
+            experiment_scale=natural_scale,
         ),
     ) if natural_heldout else None
     e2_band_passed = args.min_e2_accuracy <= heldout["e2_accuracy"] <= args.max_e2_accuracy
@@ -318,6 +390,7 @@ def main() -> None:
     qualified = bool(
         e2_frozen and e2_band_passed and paired_qualification["qualified"]
         and natural_qualification is not None and natural_qualification["qualified"]
+        and profile_promotion_passed
     )
     qualification = {
         **paired_qualification,
@@ -330,6 +403,12 @@ def main() -> None:
         "requires_oracle_opportunity_gate": True,
         "natural_test_required_for_promotion": True,
         "natural_test_qualification": natural_qualification,
+        "profile_promotion_passed": profile_promotion_passed,
+        "experiment_scale": calibrated_scale.validation_report(
+            observed_tasks=paired_qualification["tasks"],
+            observed_groups=paired_qualification["quality_gate"]["bootstrap"]["group_count"],
+            observed_training_seeds=[args.seed],
+        ),
     }
     report = {
         "experiment": "frozen-e2-hardcase-e3-location-dose-ablation", "model": {"id": args.model, "revision": args.revision, "source_exact_coverage_percent": import_report.exact_coverage_percent},
@@ -340,6 +419,7 @@ def main() -> None:
             "selection_method": model.e3_region.selection_method,
             "source_profile_digest": model.e3_region.source_profile_digest,
             "source_profile_status": profile_status,
+            "source_profile_tier": profile_info["profile_tier"],
         },
         "environment": {"torch": torch.__version__, "platform": platform.platform(), "device": str(device)},
         "datasets": {
@@ -359,6 +439,7 @@ def main() -> None:
         "lambda_sweep": heldout_lambda_sweep,
         "qualification": qualification,
         "experiment_tier": args.experiment_tier,
+        "declared_training_seeds": list(declared_training_seeds),
         "training_objective": {"name": "answer_token_only_causal_ce", "prompt_tokens_supervised": False, "uses_verified_reward": False, "is_rlvr": False},
         "limitations": ["This is a targeted task-loss ablation, not a general-language capability claim.", "Do not train or claim an effort router unless this result replicates on independent hard-task families."],
     }

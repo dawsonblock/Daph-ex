@@ -21,6 +21,7 @@ from daph.e3_experiment import (
     numeric_answer_correct,
     select_mixed_success_tasks,
 )
+from daph.verified_tasks import calibrated_sensitivity_split
 
 
 def load_tasks(path: Path) -> List[Dict[str, Any]]:
@@ -75,6 +76,10 @@ def main() -> None:
     parser.add_argument("--min-e2-accuracy", type=float, default=0.30)
     parser.add_argument("--max-e2-accuracy", type=float, default=0.70)
     parser.add_argument("--target-e2-accuracy", type=float, default=0.50)
+    parser.add_argument(
+        "--family-stratified", action=argparse.BooleanOptionalAction, default=True,
+        help="Balance E2 successes/failures within each task family (default: enabled).",
+    )
     parser.add_argument("--max-new-tokens", type=int, default=6)
     parser.add_argument("--seed", type=int, default=20260803)
     parser.add_argument("--device", default="auto")
@@ -109,14 +114,32 @@ def main() -> None:
             outcomes = evaluate_e2(
                 model, tokenizer, tasks, device=device, max_new_tokens=args.max_new_tokens,
             )
-        config = E2DifficultyBandConfig(
-            target_size=count,
-            min_accuracy=args.min_e2_accuracy,
-            max_accuracy=args.max_e2_accuracy,
-            target_accuracy=args.target_e2_accuracy,
-            seed=args.seed + offset,
-        )
-        selected, report = select_mixed_success_tasks(tasks, outcomes, config)
+        if args.family_stratified:
+            selected, split_manifest = calibrated_sensitivity_split(
+                tasks, outcomes, count=count,
+                target_e2_accuracy=args.target_e2_accuracy, seed=args.seed + offset,
+            )
+            selected_accuracy = float(split_manifest["selected_e2_accuracy"])
+            if not args.min_e2_accuracy <= selected_accuracy <= args.max_e2_accuracy:
+                raise ValueError(
+                    f"Family-stratified {split} accuracy {selected_accuracy:.4f} is outside "
+                    f"[{args.min_e2_accuracy:.4f}, {args.max_e2_accuracy:.4f}]"
+                )
+            report = {
+                "selected_count": len(selected),
+                "selected_e2_accuracy": selected_accuracy,
+                "selection_method": "family_stratified_mixed_success",
+                "split_manifest": split_manifest,
+            }
+        else:
+            config = E2DifficultyBandConfig(
+                target_size=count,
+                min_accuracy=args.min_e2_accuracy,
+                max_accuracy=args.max_e2_accuracy,
+                target_accuracy=args.target_e2_accuracy,
+                seed=args.seed + offset,
+            )
+            selected, report = select_mixed_success_tasks(tasks, outcomes, config)
         if remaining_ids is not None:
             remaining_ids -= {str(task["task_id"]) for task in selected}
         destination = output / f"{split}.jsonl"
@@ -138,6 +161,7 @@ def main() -> None:
             "min_e2_accuracy": args.min_e2_accuracy,
             "max_e2_accuracy": args.max_e2_accuracy,
             "target_e2_accuracy": args.target_e2_accuracy,
+            "family_stratified": args.family_stratified,
             "max_new_tokens": args.max_new_tokens,
             "seed": args.seed,
         },

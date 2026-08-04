@@ -9,7 +9,7 @@ import random
 from typing import Any, Dict, Mapping, Sequence
 
 
-GENERATOR_VERSION = "daph_verified_multifamily_v1"
+GENERATOR_VERSION = "daph_verified_multifamily_v2"
 VERIFIER_VERSION = "exact_numeric_v1"
 
 
@@ -63,6 +63,16 @@ def generate_verified_tasks(*, count_per_family: int, seed: int) -> list[Dict[st
                 loops = rng.randint(2, 8)
                 prompt = f"What integer does this Python code print?\nx = {a}\nfor _ in range({loops}):\n    x += {b}\nprint(x)\nAnswer:"
                 expected, template = a + loops * b, "python_loop_output_v1"
+            # Template variation increases the number of independent grouped-
+            # bootstrap clusters without changing the verified task itself.
+            template_variant = index % 3
+            if template_variant == 1:
+                prompt = prompt.replace("\nAnswer:", "\nGive only the resulting integer:")
+                template = template.removesuffix("_v1") + "_v2"
+            elif template_variant == 2:
+                prompt = "Solve the following exactly.\n" + prompt
+                template = template.removesuffix("_v1") + "_v3"
+            generator_bucket = _difficulty(scale)
             task_id = f"{family}-{seed}-{index}"
             tasks.append({
                 "task_id": task_id,
@@ -70,8 +80,12 @@ def generate_verified_tasks(*, count_per_family: int, seed: int) -> list[Dict[st
                 "expected": str(expected),
                 "task_family": family,
                 "template_id": template,
-                "difficulty": _difficulty(scale),
-                "difficulty_bucket": _difficulty(scale),
+                # This is a generator-scale bucket, deliberately not a claim
+                # about empirical/model-defined reasoning difficulty.
+                "difficulty": f"GENERATOR_{generator_bucket}",
+                "difficulty_bucket": f"GENERATOR_{generator_bucket}",
+                "difficulty_source": "generator_numeric_scale_v1",
+                "empirical_difficulty": None,
                 "generator_version": GENERATOR_VERSION,
                 "verifier_version": VERIFIER_VERSION,
                 "generation_seed": seed,
@@ -111,18 +125,48 @@ def calibrated_sensitivity_split(
     outcome_by_id = {str(row["task_id"]): bool(row["e2_correct"]) for row in e2_outcomes}
     if any(str(task["task_id"]) not in outcome_by_id for task in tasks):
         raise ValueError("Every calibration candidate needs an E2 outcome")
+    if count < 1 or count > len(tasks):
+        raise ValueError("Calibrated split count must be within the available task count")
     rng = random.Random(seed)
     by_family: Dict[str, Dict[bool, list[Mapping[str, Any]]]] = defaultdict(lambda: {True: [], False: []})
     for task in tasks:
         by_family[str(task["task_family"])][outcome_by_id[str(task["task_id"])]].append(task)
-    desired_successes = round(count * target_e2_accuracy)
-    desired_failures = count - desired_successes
-    successes = [task for buckets in by_family.values() for task in buckets[True]]
-    failures = [task for buckets in by_family.values() for task in buckets[False]]
-    if len(successes) < desired_successes or len(failures) < desired_failures:
-        raise ValueError("Insufficient E2 successes/failures for the requested calibrated band")
-    rng.shuffle(successes); rng.shuffle(failures)
-    selected = [dict(task) for task in successes[:desired_successes] + failures[:desired_failures]]
+    families = sorted(by_family)
+    # Equal allocation prevents a family with many E2 successes/failures from
+    # becoming a proxy for correctness class in the calibrated set.
+    base, extra = divmod(count, len(families))
+    quotas = {family: base + int(index < extra) for index, family in enumerate(families)}
+    ideal_successes = {family: quotas[family] * target_e2_accuracy for family in families}
+    success_quotas = {family: int(ideal_successes[family]) for family in families}
+    remaining_successes = round(count * target_e2_accuracy) - sum(success_quotas.values())
+    for family in sorted(
+        families, key=lambda key: (-(ideal_successes[key] - success_quotas[key]), key),
+    )[:remaining_successes]:
+        success_quotas[family] += 1
+    selected: list[Dict[str, Any]] = []
+    per_family: Dict[str, Dict[str, Any]] = {}
+    for family in families:
+        successes, failures = list(by_family[family][True]), list(by_family[family][False])
+        wanted_successes = success_quotas[family]
+        wanted_failures = quotas[family] - wanted_successes
+        if len(successes) < wanted_successes or len(failures) < wanted_failures:
+            raise ValueError(
+                "Cannot form a family-stratified calibrated split; "
+                f"family={family!r} needs {wanted_successes} E2 successes and {wanted_failures} failures, "
+                f"has {len(successes)} successes and {len(failures)} failures"
+            )
+        rng.shuffle(successes)
+        rng.shuffle(failures)
+        chosen = successes[:wanted_successes] + failures[:wanted_failures]
+        selected.extend(dict(task) for task in chosen)
+        per_family[family] = {
+            "available_e2_successes": len(successes),
+            "available_e2_failures": len(failures),
+            "selected_tasks": len(chosen),
+            "selected_e2_successes": wanted_successes,
+            "selected_e2_failures": wanted_failures,
+            "selected_e2_accuracy": wanted_successes / len(chosen) if chosen else None,
+        }
     rng.shuffle(selected)
     return selected, {
         "split_type": "CALIBRATED_SENSITIVITY",
@@ -133,4 +177,7 @@ def calibrated_sensitivity_split(
         "selected_e2_accuracy": sum(outcome_by_id[str(task["task_id"])] for task in selected) / len(selected),
         "target_e2_accuracy": target_e2_accuracy,
         "seed": seed,
+        "family_stratified": True,
+        "family_allocation": "balanced_equal",
+        "per_task_family": per_family,
     }

@@ -17,7 +17,10 @@ sys.path.insert(0, str(ROOT))
 
 import daph
 from daph.e3_metrics import E3QualificationConfig, lambda_sweep, qualify_e3_pairs
-from daph.e3_protocol import ClaimStrength, EvidenceMetadata, digest_json, write_evidence_metadata
+from daph.e3_protocol import (
+    ClaimStrength, EvidenceMetadata, ExperimentScale, ExperimentTier,
+    digest_json, write_evidence_metadata,
+)
 
 
 def _read_jsonl(path: Path) -> list[Dict[str, Any]]:
@@ -37,10 +40,19 @@ def _git(*args: str) -> str:
     ).stdout.strip()
 
 
-def _claim(report: Dict[str, Any]) -> ClaimStrength:
-    if report["qualified"]:
+def _parse_seeds(value: str) -> tuple[int, ...]:
+    seeds = tuple(sorted(set(int(part) for part in value.split(",") if part.strip())))
+    if not seeds:
+        raise ValueError("--training-seeds must contain at least one integer seed")
+    return seeds
+
+
+def _claim(report: Dict[str, Any], tier: ExperimentTier, *, promoted: bool) -> ClaimStrength:
+    if promoted and tier == ExperimentTier.FINAL:
+        return ClaimStrength.FINAL_EVIDENCE
+    if promoted and tier == ExperimentTier.QUALIFICATION:
         return ClaimStrength.STATISTICALLY_QUALIFIED
-    if report["tasks"] >= 200:
+    if report["qualified"] or tier == ExperimentTier.PILOT or report.get("unique_task_count", 0) >= 200:
         return ClaimStrength.PILOT_EVIDENCE
     if report["rescue_count"] or report["regression_count"]:
         return ClaimStrength.MECHANISM_SIGNAL
@@ -62,6 +74,15 @@ def main() -> None:
     parser.add_argument("--pytest-output", required=True)
     parser.add_argument("--model-id", default="unspecified")
     parser.add_argument("--model-revision", default="unspecified")
+    parser.add_argument("--experiment-tier", choices=tuple(item.value for item in ExperimentTier), default="SMOKE")
+    parser.add_argument("--training-seeds", required=True, help="Predeclared comma-separated independent E3 training seeds")
+    parser.add_argument("--predeclared-heldout-examples", type=int)
+    parser.add_argument(
+        "--placement",
+        choices=("final_refine", "middle_recurrent", "profiled_middle_recurrent"),
+        default="middle_recurrent",
+    )
+    parser.add_argument("--profile-tier-validation", help="Required to promote profiled_middle_recurrent")
     args = parser.parse_args()
     output = Path(args.output)
     if output.exists() and any(output.iterdir()):
@@ -69,12 +90,60 @@ def main() -> None:
     output.mkdir(parents=True, exist_ok=True)
     calibrated_path, natural_path = Path(args.calibrated_results), Path(args.natural_results)
     calibrated, natural = _read_jsonl(calibrated_path), _read_jsonl(natural_path)
+    tier, training_seeds = ExperimentTier(args.experiment_tier), _parse_seeds(args.training_seeds)
+    def make_scale(rows: list[Dict[str, Any]]) -> ExperimentScale:
+        unique_tasks = len({str(row["task_id"]) for row in rows})
+        scale = ExperimentScale(
+            tier=tier, heldout_examples=unique_tasks, training_seeds=training_seeds,
+            evaluation_seed=args.seed, predeclared=True,
+            predeclared_heldout_examples=args.predeclared_heldout_examples if tier == ExperimentTier.FINAL else None,
+        )
+        scale.validate()
+        return scale
+    calibrated_scale, natural_scale = make_scale(calibrated), make_scale(natural)
     config = E3QualificationConfig(
         lambda_compute=args.lambda_compute, bootstrap_samples=args.bootstrap_samples,
         confidence=args.confidence, group_key=args.group_key, seed=args.seed,
+        experiment_scale=calibrated_scale,
     )
     calibrated_report = qualify_e3_pairs(calibrated, config)
-    natural_report = qualify_e3_pairs(natural, config)
+    natural_report = qualify_e3_pairs(natural, E3QualificationConfig(
+        lambda_compute=args.lambda_compute, bootstrap_samples=args.bootstrap_samples,
+        confidence=args.confidence, group_key=args.group_key, seed=args.seed + 100,
+        experiment_scale=natural_scale,
+    ))
+    def per_seed_reports(rows: list[Dict[str, Any]], seed_offset: int) -> Dict[str, Any]:
+        reports: Dict[str, Any] = {}
+        for training_seed in training_seeds:
+            subset = [row for row in rows if int(row.get("training_seed", -1)) == training_seed]
+            reports[str(training_seed)] = (
+                qualify_e3_pairs(subset, E3QualificationConfig(
+                    lambda_compute=args.lambda_compute,
+                    bootstrap_samples=args.bootstrap_samples,
+                    confidence=args.confidence,
+                    group_key=args.group_key,
+                    seed=args.seed + seed_offset + training_seed,
+                )) if subset else {"qualified": False, "qualification_status": "MISSING_SEED"}
+            )
+        return reports
+
+    calibrated_by_seed = per_seed_reports(calibrated, 1000)
+    natural_by_seed = per_seed_reports(natural, 2000)
+    seed_pass_rate = sum(
+        bool(calibrated_by_seed[str(seed)]["qualified"])
+        and bool(natural_by_seed[str(seed)]["qualified"])
+        for seed in training_seeds
+    ) / len(training_seeds)
+    profile_validation: Dict[str, Any] | None = None
+    profile_passed = args.placement != "profiled_middle_recurrent"
+    if args.profile_tier_validation:
+        profile_validation = json.loads(Path(args.profile_tier_validation).read_text())
+    if args.placement == "profiled_middle_recurrent":
+        profile_passed = bool(
+            profile_validation
+            and profile_validation.get("promotion_passed")
+            and profile_validation.get("tier") in {"PROFILE_PILOT", "PROFILE_FULL"}
+        )
     lambdas = [float(value) for value in args.lambda_sweep.split(",") if value.strip()]
     sweep = {
         "calibrated_sensitivity": lambda_sweep(
@@ -86,14 +155,36 @@ def main() -> None:
             confidence=args.confidence, group_key=args.group_key, seed=args.seed + 100,
         ),
     }
-    overall_pass = calibrated_report["qualified"] and natural_report["qualified"]
+    overall_pass = bool(
+        calibrated_report["qualified"] and natural_report["qualified"]
+        and seed_pass_rate >= 2 / 3 and profile_passed
+    )
+    claim_strength = _claim(natural_report, tier, promoted=overall_pass)
+    if overall_pass:
+        decision_reason = "ORACLE_GATE_REQUIRED"
+    elif not profile_passed:
+        decision_reason = "PROFILE_TIER_OR_STABILITY_GATE_FAILED"
+    elif seed_pass_rate < 2 / 3:
+        decision_reason = "SEED_REPLICATION_GATE_FAILED"
+    else:
+        decision_reason = "E3_QUALITY_OR_UTILITY_GATE_FAILED"
     decision = {
         "calibrated_status": calibrated_report["qualification_status"],
         "natural_status": natural_report["qualification_status"],
         "canonical_e3_promoted": overall_pass,
         "policy_training_allowed": False,
-        "reason": "ORACLE_GATE_REQUIRED" if overall_pass else "E3_QUALITY_OR_UTILITY_GATE_FAILED",
-        "claim_strength": _claim(natural_report).value,
+        "reason": decision_reason,
+        "claim_strength": claim_strength.value,
+        "experiment_tier": tier.value,
+        "calibrated_scale": calibrated_report["experiment_scale"],
+        "natural_scale": natural_report["experiment_scale"],
+        "seed_pass_rate": seed_pass_rate,
+        "seed_replication_passed": seed_pass_rate >= 2 / 3,
+        "calibrated_by_seed": calibrated_by_seed,
+        "natural_by_seed": natural_by_seed,
+        "placement": args.placement,
+        "profile_tier_validation": profile_validation,
+        "profile_promotion_passed": profile_passed,
     }
     config_payload = vars(args)
     pytest_path = Path(args.pytest_output)
@@ -102,7 +193,7 @@ def main() -> None:
         test_count_at_creation=args.test_count, pytest_digest=_sha256(pytest_path),
         config_digest=digest_json(config_payload),
         source_tree_digest=_git("rev-parse", "HEAD^{tree}"),
-        claim_strength=_claim(natural_report),
+        claim_strength=claim_strength,
     )
     write_evidence_metadata(output, metadata)
     (output / "environment.json").write_text(json.dumps({
@@ -139,6 +230,7 @@ def main() -> None:
         "# E3 qualification summary\n\n"
         f"- Calibrated sensitivity: `{decision['calibrated_status']}`\n"
         f"- Natural held-out: `{decision['natural_status']}`\n"
+        f"- Seed pass rate: `{decision['seed_pass_rate']:.3f}`\n"
         f"- Claim strength: `{decision['claim_strength']}`\n"
         "- Router training: blocked pending a qualified non-E2 arm and positive oracle gate.\n\n"
         "Quality is measured separately from cost-aware utility; all compute values are supplied by per-task execution receipts.\n"

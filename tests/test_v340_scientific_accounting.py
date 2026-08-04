@@ -15,6 +15,8 @@ from daph.e3_metrics import (
 from daph.e3_protocol import (
     ClaimStrength,
     EvidenceMetadata,
+    ExperimentScale,
+    ExperimentTier,
     profile_stability,
     promote_e3_placement,
     write_evidence_metadata,
@@ -49,8 +51,71 @@ def test_utility_requires_actual_compute_not_effort_id_inference():
         qualify_e3_pairs([row])
 
 
+def test_default_smoke_gate_cannot_pass_with_two_tasks():
+    report = qualify_e3_pairs([pair("a"), pair("b")], E3QualificationConfig(bootstrap_samples=50))
+    assert report["qualification_status"] == "INSUFFICIENT_POWER"
+    assert not report["qualified"]
+
+
+def test_qualification_tier_cannot_be_promoted_by_low_n_even_with_local_override():
+    scale = ExperimentScale(
+        tier=ExperimentTier.QUALIFICATION, heldout_examples=500,
+        training_seeds=(1, 2, 3), evaluation_seed=4,
+    )
+    rows = [pair("a"), pair("b")]
+    report = qualify_e3_pairs(rows, E3QualificationConfig(
+        min_tasks=2, bootstrap_samples=50, experiment_scale=scale,
+    ))
+    assert report["qualification_status"] == "INSUFFICIENT_POWER"
+    assert "OBSERVED_HELDOUT_BELOW_TIER_MINIMUM" in report["experiment_scale"]["failures"]
+
+
+def test_repeated_seed_rows_do_not_inflate_unique_qualification_task_count():
+    scale = ExperimentScale(
+        tier=ExperimentTier.QUALIFICATION, heldout_examples=500,
+        training_seeds=(1, 2, 3), evaluation_seed=4,
+    )
+    rows = []
+    for seed in (1, 2, 3):
+        for task_id in ("a", "b"):
+            row = pair(task_id, template=f"template_{task_id}")
+            row["training_seed"] = seed
+            rows.append(row)
+    report = qualify_e3_pairs(rows, E3QualificationConfig(
+        min_tasks=2, bootstrap_samples=50, experiment_scale=scale,
+    ))
+    assert report["unique_task_count"] == 2
+    assert report["qualification_status"] == "INSUFFICIENT_POWER"
+
+
+def test_qualification_scale_rejects_a_declared_low_n_run():
+    scale = ExperimentScale(
+        tier=ExperimentTier.QUALIFICATION, heldout_examples=24,
+        training_seeds=(1,), evaluation_seed=1,
+    )
+    with pytest.raises(ValueError, match="QUALIFICATION experiment scale"):
+        scale.validate()
+
+
+def test_predeclared_qualification_pass_requires_observed_tasks_groups_and_seeds():
+    scale = ExperimentScale(
+        tier=ExperimentTier.QUALIFICATION, heldout_examples=500,
+        training_seeds=(11, 22, 33), evaluation_seed=44,
+    )
+    rows = []
+    for index in range(500):
+        row = pair(f"q{index}", template=f"template_{index % 9}")
+        row["training_seed"] = (11, 22, 33)[index % 3]
+        rows.append(row)
+    report = qualify_e3_pairs(rows, E3QualificationConfig(
+        bootstrap_samples=50, experiment_scale=scale,
+    ))
+    assert report["experiment_scale"]["passed"]
+    assert report["qualification_status"] == "PASS_QUALITY_AND_UTILITY"
+
+
 def test_quality_and_cost_aware_gates_are_distinct():
-    rows = [pair(f"t{i}", c3=3.0) for i in range(6)]
+    rows = [pair(f"t{i}", c3=3.0) for i in range(24)]
     report = qualify_e3_pairs(rows, E3QualificationConfig(bootstrap_samples=200, seed=1))
     assert report["quality_gate"]["passed"]
     assert not report["utility_gate"]["passed"]
@@ -58,7 +123,7 @@ def test_quality_and_cost_aware_gates_are_distinct():
 
 
 def test_lambda_changes_utility_decision_without_changing_quality():
-    rows = [pair(f"t{i}", c3=1.75) for i in range(6)]
+    rows = [pair(f"t{i}", c3=1.75) for i in range(24)]
     free = qualify_e3_pairs(rows, E3QualificationConfig(lambda_compute=0, bootstrap_samples=100))
     expensive = qualify_e3_pairs(rows, E3QualificationConfig(lambda_compute=2, bootstrap_samples=100))
     assert free["quality_lcb95"] == expensive["quality_lcb95"]
@@ -102,6 +167,19 @@ def test_calibrated_and_natural_splits_have_distinct_provenance():
     assert len(natural) == len(calibrated) == 6
 
 
+def test_calibrated_split_is_family_stratified_not_globally_class_sampled():
+    tasks = generate_verified_tasks(count_per_family=4, seed=30)
+    outcomes = []
+    for task in tasks:
+        index = int(task["task_id"].rsplit("-", 1)[1])
+        outcomes.append({"task_id": task["task_id"], "e2_correct": index % 2 == 0})
+    selected, manifest = calibrated_sensitivity_split(tasks, outcomes, count=18, seed=3)
+    assert manifest["family_stratified"]
+    assert {item["selected_tasks"] for item in manifest["per_task_family"].values()} == {2}
+    assert sum(item["selected_e2_successes"] for item in manifest["per_task_family"].values()) == 9
+    assert len(selected) == 18
+
+
 def test_natural_test_selection_does_not_inspect_e3_outcomes():
     tasks = generate_verified_tasks(count_per_family=2, seed=8)
     poisoned = [{**row, "e3_correct": index % 2 == 0} for index, row in enumerate(tasks)]
@@ -141,6 +219,14 @@ def test_generated_tasks_have_required_verification_metadata():
     assert all(row["template_id"] and row["difficulty"] and row["generator_version"] and row["verifier_version"] for row in rows)
 
 
+def test_generator_emits_multiple_templates_and_labels_difficulty_source_honestly():
+    rows = generate_verified_tasks(count_per_family=6, seed=1)
+    additions = {row["template_id"] for row in rows if row["task_family"] == "addition_with_carry"}
+    assert len(additions) == 3
+    assert all(row["difficulty"].startswith("GENERATOR_") for row in rows)
+    assert all(row["difficulty_source"] == "generator_numeric_scale_v1" for row in rows)
+
+
 def test_profile_stability_metrics_detect_stable_and_unstable_rankings():
     stable = profile_stability({1: {0: 0.1, 1: 0.9, 2: 0.5}, 2: {0: 0.2, 1: 0.8, 2: 0.6}}, top_k=2)
     unstable = profile_stability({1: {0: 0.1, 1: 0.9, 2: 0.5}, 2: {0: 0.9, 1: 0.1, 2: 0.5}}, top_k=1)
@@ -149,13 +235,33 @@ def test_profile_stability_metrics_detect_stable_and_unstable_rankings():
     assert not unstable["stable_for_promotion"]
 
 
+def test_profile_stability_ranks_only_the_shared_layer_subset():
+    report = profile_stability({
+        1: {0: 0.0, 1: 10.0, 2: 20.0, 10: 5.0, 11: 6.0},
+        2: {0: 0.0, 1: 10.0, 2: 20.0},
+    }, top_k=2)
+    assert report["mean_spearman"] == pytest.approx(1.0)
+
+
 def test_heuristic_profiled_promotion_is_deterministic_and_stability_gated():
     candidates = [
         {"name": "HEURISTIC_MIDDLE", "quality_lcb95": 0.02, "utility_lcb95": 0.01, "rescues": 5, "regressions": 1, "seed_pass_rate": 1.0, "compute_delta": 0.04},
         {"name": "PROFILED_LAYER", "quality_lcb95": 0.03, "utility_lcb95": 0.02, "rescues": 6, "regressions": 1, "seed_pass_rate": 1.0, "compute_delta": 0.04},
     ]
     assert promote_e3_placement(candidates, profile_stable=False)["canonical"] == "HEURISTIC_MIDDLE"
-    assert promote_e3_placement(candidates, profile_stable=True)["canonical"] == "PROFILED_LAYER"
+    assert promote_e3_placement(
+        candidates, profile_stable=True, profile_tier_passed=True,
+        experiment_scale_passed=True, natural_test_passed=True,
+    )["canonical"] == "PROFILED_LAYER"
+
+
+def test_profiled_placement_cannot_promote_without_passing_profile_tier():
+    candidate = [{"name": "PROFILED_LAYER", "quality_lcb95": 0.02, "utility_lcb95": 0.01, "rescues": 3, "regressions": 0, "seed_pass_rate": 1.0, "compute_delta": 0.04}]
+    report = promote_e3_placement(
+        candidate, profile_stable=True, profile_tier_passed=False,
+        experiment_scale_passed=True, natural_test_passed=True,
+    )
+    assert not report["promoted"]
 
 
 def frontier_rows(e1_quality=0.8, e1_compute=0.8):
