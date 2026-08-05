@@ -1,0 +1,105 @@
+{
+  "evidence_dir": "evidence/gate_a_qualification_v2",
+  "mean_completion_tokens": 7.0,
+  "mean_latency_ms": 1073.3,
+  "overall": {
+    "mean_quality": {
+      "B0": 0.002,
+      "B1": 0.0,
+      "B1b": 0.002,
+      "B2": 0.602,
+      "B3": 1.0
+    },
+    "n": 500,
+    "paired_deltas": {
+      "B1-B0": -0.002,
+      "B1b-B0": 0.0,
+      "B2-B0": 0.6,
+      "B3-B0": 0.998
+    }
+  },
+  "peak_memory_bytes": 38400,
+  "per_family": {
+    "distractor_heavy": {
+      "mean_quality": {
+        "B0": 0.0,
+        "B1": 0.0,
+        "B1b": 0.0,
+        "B2": 1.0,
+        "B3": 1.0
+      },
+      "n": 100,
+      "paired_deltas": {
+        "B1-B0": 0.0,
+        "B1b-B0": 0.0,
+        "B2-B0": 1.0,
+        "B3-B0": 1.0
+      }
+    },
+    "numeric_derivation": {
+      "mean_quality": {
+        "B0": 0.01,
+        "B1": 0.0,
+        "B1b": 0.01,
+        "B2": 0.0,
+        "B3": 1.0
+      },
+      "n": 100,
+      "paired_deltas": {
+        "B1-B0": -0.01,
+        "B1b-B0": 0.0,
+        "B2-B0": -0.01,
+        "B3-B0": 0.99
+      }
+    },
+    "single_hop": {
+      "mean_quality": {
+        "B0": 0.0,
+        "B1": 0.0,
+        "B1b": 0.0,
+        "B2": 1.0,
+        "B3": 1.0
+      },
+      "n": 100,
+      "paired_deltas": {
+        "B1-B0": 0.0,
+        "B1b-B0": 0.0,
+        "B2-B0": 1.0,
+        "B3-B0": 1.0
+      }
+    },
+    "temporal_update": {
+      "mean_quality": {
+        "B0": 0.0,
+        "B1": 0.0,
+        "B1b": 0.0,
+        "B2": 1.0,
+        "B3": 1.0
+      },
+      "n": 100,
+      "paired_deltas": {
+        "B1-B0": 0.0,
+        "B1b-B0": 0.0,
+        "B2-B0": 1.0,
+        "B3-B0": 1.0
+      }
+    },
+    "two_hop": {
+      "mean_quality": {
+        "B0": 0.0,
+        "B1": 0.0,
+        "B1b": 0.0,
+        "B2": 0.01,
+        "B3": 1.0
+      },
+      "n": 100,
+      "paired_deltas": {
+        "B1-B0": 0.0,
+        "B1b-B0": 0.0,
+        "B2-B0": 0.01,
+        "B3-B0": 1.0
+      }
+    }
+  },
+  "prompt_condition": "direct"
+}

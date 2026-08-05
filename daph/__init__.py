@@ -1,4 +1,9 @@
 """
+LEGACY_QWEN_EXFUSION — frozen legacy research system.
+
+Active HRM research lives exclusively in hrm_adaptive_memory/.  Do not add new
+HRM work here; keep existing tests passing but treat this package as read-only.
+
 DAPH / ExFusion v3
 
 Structured hybrid computation + adaptive effort.

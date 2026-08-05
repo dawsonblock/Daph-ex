@@ -1,0 +1,35 @@
+{
+  "answer_in_own_question_count": 0,
+  "b1_answer_leak_count": 0,
+  "b1_b3_token_mismatch_count": 0,
+  "b1b_answer_leak_count": 0,
+  "construction_failure_count": 0,
+  "construction_failures": [],
+  "construction_seed": 42,
+  "dataset_dir": "data/hrm/controlled_gate_a_dev_smoke_v2",
+  "dataset_id": "controlled-gate-a-v2",
+  "duplicate_answer_count": 1,
+  "duplicate_answer_values": {
+    "840": 2
+  },
+  "duplicate_entity_count": 0,
+  "duplicate_evidence_id_count": 0,
+  "evidence_count": 60,
+  "evidence_sha256": "67b2c86e1e6cbf0f9d03321fbe1093415dea7a625e29bf520ff4f5edec10c9cb",
+  "families": {
+    "distractor_heavy": 5,
+    "numeric_derivation": 5,
+    "single_hop": 5,
+    "temporal_update": 5,
+    "two_hop": 5
+  },
+  "generation_seed": 1101,
+  "generator_reproduces_committed_digests": true,
+  "leakage_zero_after_construction": true,
+  "prefilter_answer_collision_task_count": 2,
+  "report_type": "controlled_corpus_audit",
+  "required_evidence_leak_count": 0,
+  "task_count": 25,
+  "task_sha256": "e687d1338ed3aa4a2e9a3132ffa2f31f3e4720c703ed735a52662c8f03e329ce",
+  "unique_answers": 24
+}

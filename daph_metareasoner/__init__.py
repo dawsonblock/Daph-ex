@@ -1,4 +1,8 @@
-"""DAPH Stage 1 marginal-utility controller research package."""
+"""DAPH Stage 1 marginal-utility controller research package.
+
+LEGACY_METAREASONING — frozen legacy research system.  Active HRM research
+lives exclusively in hrm_adaptive_memory/; do not add new HRM work here.
+"""
 
 from .adapters import HFCausalLMAdapter
 from .analysis import (

@@ -1,0 +1,9 @@
+{
+  "cuda_available": false,
+  "cuda_device": null,
+  "platform": "macOS-26.2-arm64-arm-64bit",
+  "python": "3.12.0",
+  "source_commit": "non-git-tree:b3b55cdf5008c92634dda9493e6e94215598572ef53205b141d098242422eb69",
+  "torch": "2.10.0",
+  "transformers": "5.13.0"
+}

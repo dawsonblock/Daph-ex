@@ -1,0 +1,18 @@
+{
+  "report_type": "pre_patch_test_baseline",
+  "created_utc": "2026-08-04T22:45:52Z",
+  "python_version": "3.12.0",
+  "platform": "macOS-26.2-arm64-arm-64bit",
+  "packages": {
+    "torch": "2.10.0",
+    "numpy": "2.4.6",
+    "transformers": "5.13.0",
+    "pytest": "8.4.2",
+    "huggingface-hub": "1.22.0"
+  },
+  "tree_digest_sha256": "951d6266ad979dbaf9d3526cef60f6ed2ff2a8810f72261e630d881de300da56",
+  "test_command": "python3 -m pytest -q",
+  "tests_passed": 210,
+  "tests_failed": 0,
+  "duration_seconds": 6.33
+}

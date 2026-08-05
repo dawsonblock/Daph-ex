@@ -1,0 +1,17 @@
+{
+  "capabilities": {
+    "batch_indexing": true,
+    "dense": false,
+    "filtering": false,
+    "graph_traversal": false,
+    "maxsim": false,
+    "sparse": true
+  },
+  "health": {
+    "backend_id": "control:bm25",
+    "detail": "",
+    "state": "healthy",
+    "version": "control-v1"
+  },
+  "silent_fallback_allowed": false
+}

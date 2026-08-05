@@ -1,0 +1,105 @@
+{
+  "evidence_dir": "evidence/hrm_pilot_v2_direct",
+  "mean_completion_tokens": 7.3,
+  "mean_latency_ms": 1067.5,
+  "overall": {
+    "mean_quality": {
+      "B0": 0.0,
+      "B1": 0.0,
+      "B1b": 0.0,
+      "B2": 0.6,
+      "B3": 1.0
+    },
+    "n": 100,
+    "paired_deltas": {
+      "B1-B0": 0.0,
+      "B1b-B0": 0.0,
+      "B2-B0": 0.6,
+      "B3-B0": 1.0
+    }
+  },
+  "peak_memory_bytes": 38400,
+  "per_family": {
+    "distractor_heavy": {
+      "mean_quality": {
+        "B0": 0.0,
+        "B1": 0.0,
+        "B1b": 0.0,
+        "B2": 1.0,
+        "B3": 1.0
+      },
+      "n": 20,
+      "paired_deltas": {
+        "B1-B0": 0.0,
+        "B1b-B0": 0.0,
+        "B2-B0": 1.0,
+        "B3-B0": 1.0
+      }
+    },
+    "numeric_derivation": {
+      "mean_quality": {
+        "B0": 0.0,
+        "B1": 0.0,
+        "B1b": 0.0,
+        "B2": 0.0,
+        "B3": 1.0
+      },
+      "n": 20,
+      "paired_deltas": {
+        "B1-B0": 0.0,
+        "B1b-B0": 0.0,
+        "B2-B0": 0.0,
+        "B3-B0": 1.0
+      }
+    },
+    "single_hop": {
+      "mean_quality": {
+        "B0": 0.0,
+        "B1": 0.0,
+        "B1b": 0.0,
+        "B2": 1.0,
+        "B3": 1.0
+      },
+      "n": 20,
+      "paired_deltas": {
+        "B1-B0": 0.0,
+        "B1b-B0": 0.0,
+        "B2-B0": 1.0,
+        "B3-B0": 1.0
+      }
+    },
+    "temporal_update": {
+      "mean_quality": {
+        "B0": 0.0,
+        "B1": 0.0,
+        "B1b": 0.0,
+        "B2": 1.0,
+        "B3": 1.0
+      },
+      "n": 20,
+      "paired_deltas": {
+        "B1-B0": 0.0,
+        "B1b-B0": 0.0,
+        "B2-B0": 1.0,
+        "B3-B0": 1.0
+      }
+    },
+    "two_hop": {
+      "mean_quality": {
+        "B0": 0.0,
+        "B1": 0.0,
+        "B1b": 0.0,
+        "B2": 0.0,
+        "B3": 1.0
+      },
+      "n": 20,
+      "paired_deltas": {
+        "B1-B0": 0.0,
+        "B1b-B0": 0.0,
+        "B2-B0": 0.0,
+        "B3-B0": 1.0
+      }
+    }
+  },
+  "prompt_condition": "direct"
+}

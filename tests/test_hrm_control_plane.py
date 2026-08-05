@@ -25,6 +25,7 @@ from hrm_adaptive_memory.contracts import (
 from hrm_adaptive_memory.derivation import CachedDerivationStore, derive_cached
 from hrm_adaptive_memory.evaluation import GateAConfig, qualify_gate_a
 from hrm_adaptive_memory.experiments.context_study import (
+    ContextConstructor,
     ContextStudyConfig,
     ContextStudyRunner,
     EvaluationMode,
@@ -268,6 +269,122 @@ def test_fake_context_results_cannot_qualify():
         ))
 
 
+def leak_corpus_records(*, clean_count: int = 12):
+    rows = [IndexRecord(
+        evidence_id="oracle-1", source_id="source-oracle",
+        content="The registry assigns the project the access code 58342.", token_count=10,
+    )]
+    for index in range(5):
+        rows.append(IndexRecord(
+            evidence_id=f"leak-{index}", source_id=f"source-leak-{index}",
+            content=f"An unrelated audit row {index} happens to mention the value 58342 in passing.",
+            token_count=14,
+        ))
+    for index in range(clean_count):
+        rows.append(IndexRecord(
+            evidence_id=f"clean-{index}", source_id=f"source-clean-{index}",
+            content=f"Harmless filler note {index} about an unrelated maintenance topic entirely.",
+            token_count=11,
+        ))
+    return rows
+
+
+def leak_task():
+    return OracleTask(
+        task_id="leak-task", question="What access code is assigned to the project?",
+        answer="58342", required_evidence_ids=("oracle-1",), oracle_evidence_ids=("oracle-1",),
+        family="single_hop", template_id="single_hop-template-0",
+        source_cluster_id="single_hop-source-cluster-0", split="test", verifier="numeric",
+    )
+
+
+def make_constructor(source, seed=42):
+    return ContextConstructor(
+        EvidenceCorpus(source),
+        LocalControlBackend(LocalRetrievalMode.BM25, source),
+        config=ContextStudyConfig(tier=ExperimentTier.SMOKE, seed=seed),
+    )
+
+
+def test_b1_excludes_required_oracle_and_answer_leaking_chunks():
+    source = leak_corpus_records()
+    constructor = make_constructor(source)
+    task = leak_task()
+    b1 = run(constructor.construct(task, StudyCondition.B1_RANDOM_CONTEXT))
+    b3 = run(constructor.construct(task, StudyCondition.B3_ORACLE_EVIDENCE))
+    origins = {value.split("#b1:", 1)[0] for value in (row.evidence_id for row in b1.evidence)}
+    assert not origins & set(task.required_evidence_ids)
+    assert not origins & set(task.oracle_evidence_ids)
+    assert all(not origin.startswith("leak-") for origin in origins)
+    assert task.answer not in b1.prompt
+    assert b1.evidence_tokens == b3.evidence_tokens
+
+
+def test_b1_selection_is_deterministic_per_seed():
+    task = leak_task()
+    first = run(make_constructor(leak_corpus_records(), seed=7).construct(task, StudyCondition.B1_RANDOM_CONTEXT))
+    second = run(make_constructor(leak_corpus_records(), seed=7).construct(task, StudyCondition.B1_RANDOM_CONTEXT))
+    assert [row.evidence_id for row in first.evidence] == [row.evidence_id for row in second.evidence]
+    assert first.prompt_sha256 == second.prompt_sha256
+
+
+class CharTokenCodec:
+    """Subword-like codec: truncation can split a number mid-way, as BPE can."""
+
+    def count(self, text):
+        return len(text)
+
+    def truncate(self, text, tokens):
+        return text[:tokens]
+
+
+def test_b1_truncation_cannot_create_the_answer_token():
+    # Oracle content is 9 chars, so B1 truncates candidates to 9 chars.
+    # Truncating "abcdef 741..." at 9 chars would yield "abcdef 74" — the
+    # exact gold answer created at the cut. The constructor must skip it.
+    source = [
+        IndexRecord(evidence_id="oracle-1", source_id="s-oracle", content="paycode74", token_count=9),
+        IndexRecord(evidence_id="trap-1", source_id="s-trap", content="abcdef 741zz", token_count=12),
+        IndexRecord(evidence_id="clean-1", source_id="s-clean", content="ghijkl mn op", token_count=12),
+    ]
+    task = OracleTask(
+        task_id="trunc-task", question="What is the paycode for Zone Q?", answer="74",
+        required_evidence_ids=("oracle-1",), oracle_evidence_ids=("oracle-1",),
+        family="single_hop", template_id="single_hop-template-0",
+        source_cluster_id="single_hop-source-cluster-0", split="test", verifier="numeric",
+    )
+    constructor = ContextConstructor(
+        EvidenceCorpus(source),
+        LocalControlBackend(LocalRetrievalMode.BM25, source),
+        config=ContextStudyConfig(tier=ExperimentTier.SMOKE, seed=42),
+        token_codec=CharTokenCodec(),
+    )
+    b1 = run(constructor.construct(task, StudyCondition.B1_RANDOM_CONTEXT))
+    b3 = run(constructor.construct(task, StudyCondition.B3_ORACLE_EVIDENCE))
+    assert b1.evidence_tokens == b3.evidence_tokens
+    assert "74" not in " ".join(
+        part for part in b1.prompt.split() if part not in task.question.split()
+    )
+    origins = {row.evidence_id.split("#b1:", 1)[0] for row in b1.evidence}
+    assert origins == {"clean-1"}
+    # With only the trap candidate left, construction must fail closed.
+    trapped = ContextConstructor(
+        EvidenceCorpus(source[:2]),
+        LocalControlBackend(LocalRetrievalMode.BM25, source[:2]),
+        config=ContextStudyConfig(tier=ExperimentTier.SMOKE, seed=42),
+        token_codec=CharTokenCodec(),
+    )
+    with pytest.raises(ValueError, match="Insufficient"):
+        run(trapped.construct(task, StudyCondition.B1_RANDOM_CONTEXT))
+
+
+def test_b1_fails_closed_instead_of_shortening_when_only_leaking_chunks_remain():
+    source = leak_corpus_records(clean_count=0)
+    constructor = make_constructor(source)
+    with pytest.raises(ValueError, match="Insufficient"):
+        run(constructor.construct(leak_task(), StudyCondition.B1_RANDOM_CONTEXT))
+
+
 def test_optional_hard_distractor_is_answer_free_and_token_matched():
     source = records()
     receipts = run(ContextStudyRunner(
@@ -413,8 +530,17 @@ def test_controlled_gate_a_corpus_is_reproducible_and_has_independent_evidence_i
     )
 
 
-def test_committed_controlled_corpus_has_the_predeclared_qualification_shape():
-    root = Path("data/hrm/controlled_gate_a_v1")
+def test_controlled_generator_never_leaks_answer_into_question():
+    corpus = build_controlled_gate_a_corpus(seed=3601, tasks_per_family=100)
+    for row in corpus.tasks:
+        question_terms = tuple(row["question"].lower().replace("-", " ").split())
+        answer = row["answer"].lower()
+        assert answer not in question_terms, row["task_id"]
+
+
+@pytest.mark.parametrize("dataset", ["controlled_gate_a_v1", "controlled_gate_a_v2"])
+def test_committed_controlled_corpus_has_the_predeclared_qualification_shape(dataset):
+    root = Path("data/hrm") / dataset
     manifest = json.loads((root / "dataset_manifest.json").read_text())
     task_rows = [json.loads(line) for line in (root / "oracle_tasks.jsonl").read_text().splitlines()]
     evidence_rows = [json.loads(line) for line in (root / "evidence.jsonl").read_text().splitlines()]

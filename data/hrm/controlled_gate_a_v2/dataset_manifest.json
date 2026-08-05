@@ -1,0 +1,18 @@
+{
+  "claim_strength": "CONTROLLED_SYNTHETIC_BENCHMARK_ONLY",
+  "dataset_id": "controlled-gate-a-v2",
+  "evidence_count": 1200,
+  "evidence_sha256": "7df8fc4f847f613ac24fccd501a76705ac3d3eccca7619e6fe11fb857cb50ff4",
+  "families": [
+    "single_hop",
+    "two_hop",
+    "numeric_derivation",
+    "temporal_update",
+    "distractor_heavy"
+  ],
+  "generation_seed": 3601,
+  "natural_memory_claim_allowed": false,
+  "task_count": 500,
+  "task_sha256": "50e8f405e7fcff2dd573e3b10e898c97e0f8951ef923465a8b0d1a1d05367b39",
+  "tasks_per_family": 100
+}

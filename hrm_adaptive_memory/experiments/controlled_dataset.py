@@ -11,11 +11,12 @@ from __future__ import annotations
 import hashlib
 import json
 import random
+import re
 from dataclasses import dataclass
 from typing import Any, Callable, Mapping
 
 
-GENERATOR_VERSION = "controlled-gate-a-v1"
+GENERATOR_VERSION = "controlled-gate-a-v2"
 FAMILIES = (
     "single_hop",
     "two_hop",
@@ -30,6 +31,22 @@ class ControlledCorpus:
     tasks: tuple[Mapping[str, Any], ...]
     evidence: tuple[Mapping[str, Any], ...]
     manifest: Mapping[str, Any]
+
+
+def _answer_leaks_into_question(question: str, answer: str) -> bool:
+    """True when the normalized answer token sequence appears in the question.
+
+    Entity names carry random numeric suffixes (e.g. Service-043-587), so an
+    unguarded generator can hand B0 the answer inside the question itself.
+    """
+
+    question_terms = tuple(re.findall(r"\w+", question.lower()))
+    answer_terms = tuple(re.findall(r"\w+", answer.lower()))
+    width = len(answer_terms)
+    return bool(width) and any(
+        question_terms[index:index + width] == answer_terms
+        for index in range(len(question_terms) - width + 1)
+    )
 
 
 def _digest(rows: tuple[Mapping[str, Any], ...]) -> str:
@@ -218,9 +235,16 @@ def build_controlled_gate_a_corpus(
             task_id = f"{family}-{ordinal:03d}"
             template_id = f"{family}-template-{ordinal % 3}"
             source_cluster_id = f"{family}-source-cluster-{ordinal % 10}"
-            question, answer, required, rows = builder(
-                rng, task_id, family, source_cluster_id, ordinal,
-            )
+            for _attempt in range(20):
+                question, answer, required, rows = builder(
+                    rng, task_id, family, source_cluster_id, ordinal,
+                )
+                if not _answer_leaks_into_question(question, answer):
+                    break
+            else:
+                raise RuntimeError(
+                    f"Could not build an answer-free question for {task_id} in 20 attempts"
+                )
             tasks.append({
                 "task_id": task_id,
                 "question": question,

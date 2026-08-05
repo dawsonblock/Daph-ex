@@ -1,0 +1,7 @@
+{
+  "evidence_corpus_sha256": "836875b1432d85e78148855283fbb66ac73bac2de0a5baefc498ac610df52d7d",
+  "independent_oracle_labels": true,
+  "normalized_corpus_digest": "43a39c235840f2dee2c490466da2e7e5f7cded4b324235d4cdc741404b5d3e18",
+  "task_count": 100,
+  "task_dataset_sha256": "f00de6e2f08d5077efa7d569cb14e621786a745cc6c61ea8ab1f4098085da18b"
+}

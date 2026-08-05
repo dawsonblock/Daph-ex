@@ -81,7 +81,14 @@ class NativeHRMExecutor:
             max_new_tokens=self.max_new_tokens,
         )
         latency = (time.perf_counter() - started) * 1000
-        peak = int(torch.cuda.max_memory_allocated()) if torch.cuda.is_available() else 0
+        if torch.cuda.is_available():
+            peak = int(torch.cuda.max_memory_allocated())
+        elif torch.backends.mps.is_available():
+            # MPS has no peak-stats API; current allocation after generation is
+            # the closest honest measurement.
+            peak = int(torch.mps.current_allocated_memory())
+        else:
+            peak = 0
         return ModelOutput(
             text=str(result["text"]),
             prompt_tokens=int(result["prompt_tokens"]),
@@ -98,13 +105,46 @@ def _load_jsonl(path: Path) -> tuple[bytes, list[dict]]:
 
 async def _run(args: argparse.Namespace) -> None:
     output = Path(args.output)
+    partial_path = output / "partial_results.jsonl"
     if output.exists():
-        raise FileExistsError(
-            f"Evidence directory already exists and will not be overwritten: {output}"
-        )
+        if not args.resume:
+            raise FileExistsError(
+                f"Evidence directory already exists and will not be overwritten: {output}"
+            )
+        if (output / "per_task_results.jsonl").exists():
+            raise FileExistsError(
+                f"Run already finalized; refusing to resume into: {output}"
+            )
 
     task_bytes, task_rows = _load_jsonl(Path(args.tasks))
     evidence_bytes, evidence_rows = _load_jsonl(Path(args.evidence))
+    frozen_config_digest = None
+    if args.frozen_config:
+        frozen_bytes = Path(args.frozen_config).read_bytes()
+        frozen = json.loads(frozen_bytes)
+        frozen_config_digest = _sha256(frozen_bytes)
+        expected_args = {
+            "prompt_condition": args.prompt_condition,
+            "tier": args.tier,
+            "retriever": args.retriever,
+            "retrieval_k": args.retrieval_k,
+            "max_new_tokens": args.max_new_tokens,
+            "seed": args.seed,
+            "evaluation_mode": args.evaluation_mode,
+            "include_hard_distractor": args.include_hard_distractor,
+            "lambda_evidence_tokens": args.lambda_evidence_tokens,
+        }
+        drift = {
+            key: (frozen[key], observed)
+            for key, observed in expected_args.items()
+            if frozen.get(key) != observed
+        }
+        if frozen.get("task_dataset_sha256") != _sha256(task_bytes):
+            drift["task_dataset_sha256"] = (frozen.get("task_dataset_sha256"), _sha256(task_bytes))
+        if frozen.get("evidence_corpus_sha256") != _sha256(evidence_bytes):
+            drift["evidence_corpus_sha256"] = (frozen.get("evidence_corpus_sha256"), _sha256(evidence_bytes))
+        if drift:
+            raise RuntimeError(f"Run drifts from frozen protocol {args.frozen_config}: {drift}")
     tasks = [OracleTask.from_dict(row) for row in task_rows]
     config = ContextStudyConfig(
         tier=ExperimentTier(args.tier),
@@ -164,25 +204,64 @@ async def _run(args: argparse.Namespace) -> None:
         PromptCondition(args.prompt_condition),
         args.max_new_tokens,
     )
-    receipts = await ContextStudyRunner(
+    runner = ContextStudyRunner(
         corpus=corpus,
         retrieval_backend=backend,
         executor=executor,
         config=config,
         token_codec=codec,
-    ).run(tasks)
+    )
 
-    output.mkdir(parents=True, exist_ok=False)
+    # Receipts persist per task so a long qualification run is restartable
+    # (--resume) without duplicating completed tasks.
+    output.mkdir(parents=True, exist_ok=True)
+    expected_conditions = {condition.value for condition in config.conditions()}
+    completed: dict[str, list[dict]] = {}
+    if partial_path.exists():
+        stale = [
+            json.loads(line) for line in partial_path.read_text().splitlines() if line.strip()
+        ]
+        by_task: dict[str, dict[str, dict]] = {}
+        for row in stale:
+            by_task.setdefault(row["task_id"], {})[row["condition"]] = row
+        completed = {
+            task_id: [arms[value] for value in sorted(arms)]
+            for task_id, arms in by_task.items()
+            if set(arms) == expected_conditions
+        }
+        print(f"Resuming: {len(completed)} of {len(tasks)} tasks already complete")
+    receipt_rows: list[dict] = []
+    with partial_path.open("a") as handle:
+        for task in tasks:
+            if task.task_id in completed:
+                receipt_rows.extend(completed[task.task_id])
+                continue
+            task_receipts = await runner.run_task(task)
+            rows = [row.to_dict() for row in task_receipts]
+            for row in rows:
+                handle.write(json.dumps(row, sort_keys=True) + "\n")
+            handle.flush()
+            receipt_rows.extend(rows)
+
     results_path = output / "per_task_results.jsonl"
-    results_path.write_text("".join(json.dumps(row.to_dict(), sort_keys=True) + "\n" for row in receipts))
-    commit = subprocess.run(
-        ["git", "rev-parse", "HEAD"], cwd=ROOT, check=True, capture_output=True, text=True,
-    ).stdout.strip()
+    results_path.write_text("".join(json.dumps(row, sort_keys=True) + "\n" for row in receipt_rows))
+    try:
+        commit = subprocess.run(
+            ["git", "rev-parse", "HEAD"], cwd=ROOT, check=True, capture_output=True, text=True,
+        ).stdout.strip()
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        source_digest = hashlib.sha256()
+        for path in sorted(ROOT.rglob("*.py")):
+            if any(part in {"evidence", "__pycache__", ".pytest_cache"} for part in path.parts):
+                continue
+            source_digest.update(str(path.relative_to(ROOT)).encode())
+            source_digest.update(path.read_bytes())
+        commit = f"non-git-tree:{source_digest.hexdigest()}"
     manifest = {
         "protocol_version": "hrm-context-study-v2",
         "tier": config.tier.value,
         "task_count": len(tasks),
-        "receipt_count": len(receipts),
+        "receipt_count": len(receipt_rows),
         "conditions_per_task": len(config.conditions()),
         "evaluation_mode": config.evaluation_mode.value,
         "hard_distractor_control": config.include_hard_distractor,
@@ -194,6 +273,7 @@ async def _run(args: argparse.Namespace) -> None:
         "task_dataset_sha256": _sha256(task_bytes),
         "evidence_corpus_sha256": _sha256(evidence_bytes),
         "normalized_corpus_digest": corpus.digest(),
+        "frozen_config_digest": frozen_config_digest,
         "source_commit": commit,
         "scientific_eligible": True,
         "retrieval_expansion_allowed": False,
@@ -258,6 +338,14 @@ def main() -> None:
     parser.add_argument(
         "--include-hard-distractor", action="store_true",
         help="Add the optional answer-free B1b lexical hard-distractor control.",
+    )
+    parser.add_argument(
+        "--resume", action="store_true",
+        help="Continue an interrupted run, skipping tasks with complete receipts.",
+    )
+    parser.add_argument(
+        "--frozen-config",
+        help="Frozen protocol JSON; the run aborts on any drift from it.",
     )
     parser.add_argument("--gate-a-report")
     parser.add_argument("--ruvector-url")

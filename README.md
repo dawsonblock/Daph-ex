@@ -2,6 +2,19 @@
 
 Pretrained-compatible adaptive computation with a physically ordered four-level effort hierarchy.
 
+## Repository ownership
+
+| Package | Status |
+|---|---|
+| `hrm_adaptive_memory/` | **ACTIVE_HRM_RESEARCH** — the only canonical research implementation; all new HRM work lands here |
+| `daph/` | LEGACY_QWEN_EXFUSION — frozen; tests kept passing, no new HRM work |
+| `daph_metareasoner/` | LEGACY_METAREASONING — frozen; tests kept passing, no new HRM work |
+
+The active scientific target is Gate A: whether native `sapientinc/HRM-Text-1B`
+can use externally supplied evidence (`Q(B3) − Q(B0)`). Memory-stack expansion
+(RuVector, TurboVec, Graphiti, adaptive recurrence, learned executive) stays
+blocked until its prerequisite gate passes.
+
 ## Canonical architecture
 
 - `QwenCompatModel` is the exact source-compatible checkpoint representation used by Gate 0A.

@@ -1,0 +1,18 @@
+{
+  "evidence_dir": "evidence/gate_a_qualification_v2",
+  "expected_arms": [
+    "B0_NO_CONTEXT",
+    "B1B_HARD_DISTRACTOR",
+    "B1_RANDOM_CONTEXT",
+    "B2_NAIVE_RETRIEVAL",
+    "B3_ORACLE_EVIDENCE"
+  ],
+  "passed": false,
+  "problem_count": 1,
+  "problems": [
+    "numeric_derivation-040: gold answer appears in B1 prompt"
+  ],
+  "receipt_count": 2500,
+  "report_type": "context_study_receipt_check",
+  "task_count": 500
+}

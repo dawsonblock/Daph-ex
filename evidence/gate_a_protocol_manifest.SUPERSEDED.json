@@ -1,0 +1,4 @@
+{
+  "superseded_by": "evidence/gate_a_protocol_manifest_v2.json",
+  "reason": "context_study.py fixed after truncation-created B1 answer leak (numeric_derivation-040); see evidence/gate_a_qualification_v2/VOIDED.md"
+}

@@ -297,6 +297,10 @@ class ContextConstructor:
                 source_type=record.source_type,
                 metadata={**record.metadata, "matched_control_from": record.evidence_id},
             )
+            # Subword truncation can cut a longer number at the boundary and
+            # thereby create the gold-answer token; re-check the derived text.
+            if self._leaks_answer(task, derived):
+                continue
             selected.append(self._direct(
                 derived, backend_id, len(selected) + 1, lexical_score=score,
             ))
@@ -307,9 +311,24 @@ class ContextConstructor:
             )
         return tuple(selected)
 
+    @staticmethod
+    def _leaks_answer(task: OracleTask, record: IndexRecord) -> bool:
+        """True when the record contains the normalized gold-answer token sequence."""
+
+        answer_terms = tuple(re.findall(r"\w+", _normalize(task.answer)))
+        content_terms = tuple(re.findall(r"\w+", _normalize(record.content)))
+        width = len(answer_terms)
+        return bool(width) and any(
+            content_terms[index:index + width] == answer_terms
+            for index in range(len(content_terms) - width + 1)
+        )
+
     def _matched_irrelevant(self, task: OracleTask) -> tuple[RetrievedEvidence, ...]:
         excluded = set(task.required_evidence_ids) | set(task.oracle_evidence_ids)
-        candidates = [row for key, row in self.corpus.records.items() if key not in excluded]
+        candidates = [
+            row for key, row in self.corpus.records.items()
+            if key not in excluded and not self._leaks_answer(task, row)
+        ]
         candidates.sort(key=lambda row: hashlib.sha256(
             f"{self.config.seed}\0{task.task_id}\0{row.evidence_id}".encode()
         ).hexdigest())
@@ -321,7 +340,6 @@ class ContextConstructor:
         """Select answer-free lexical distractors without exposing an arm label to HRM."""
 
         excluded = set(task.required_evidence_ids) | set(task.oracle_evidence_ids)
-        answer_terms = tuple(re.findall(r"\w+", _normalize(task.answer)))
         query_terms = set(re.findall(r"\w+", _normalize(task.question)))
         oracle_source_types = {
             self.corpus.records[value].source_type for value in task.oracle_evidence_ids
@@ -336,17 +354,9 @@ class ContextConstructor:
             ).hexdigest()
             return source_match, overlap, tie_break
 
-        def leaks_answer(record: IndexRecord) -> bool:
-            content_terms = tuple(re.findall(r"\w+", _normalize(record.content)))
-            width = len(answer_terms)
-            return bool(width) and any(
-                content_terms[index:index + width] == answer_terms
-                for index in range(len(content_terms) - width + 1)
-            )
-
         candidates = [
             row for key, row in self.corpus.records.items()
-            if key not in excluded and not leaks_answer(row)
+            if key not in excluded and not self._leaks_answer(task, row)
         ]
         candidates.sort(
             key=lambda row: (-candidate_score(row)[0], -candidate_score(row)[1], candidate_score(row)[2])
@@ -435,45 +445,56 @@ class ContextStudyRunner:
         self.config.validate(tasks)
         receipts: list[ContextStudyReceipt] = []
         for task in tasks:
-            contexts = {
-                condition: await self.constructor.construct(task, condition)
-                for condition in self.config.conditions()
-            }
-            if contexts[StudyCondition.B0_NO_CONTEXT].prompt_sha256 == contexts[StudyCondition.B3_ORACLE_EVIDENCE].prompt_sha256:
-                raise RuntimeError("B0/B3 prompt digests must differ when B3 has evidence")
-            for condition in self.config.conditions():
-                context = contexts[condition]
-                output = await self.executor.generate(context.prompt)
-                quality, exact = verify_answer(task, output.text)
-                utility = quality - self.config.lambda_evidence_tokens * context.evidence_tokens
-                retrieval = context.retrieval_receipt
-                receipts.append(ContextStudyReceipt(
-                    task_id=task.task_id,
-                    condition=condition,
-                    family=task.family,
-                    template_id=task.template_id,
-                    source_cluster_id=task.source_cluster_id,
-                    split=task.split,
-                    evaluation_mode=self.config.evaluation_mode,
-                    evidence_ids=tuple(row.evidence_id for row in context.evidence),
-                    source_ids=tuple(row.source_id for row in context.evidence),
-                    retrieval_scores=tuple(ContextConstructor._score(row) for row in context.evidence),
-                    final_prompt=context.prompt,
-                    final_prompt_sha256=context.prompt_sha256,
-                    prompt_tokens=output.prompt_tokens,
-                    evidence_tokens=context.evidence_tokens,
-                    completion_tokens=output.completion_tokens,
-                    output=output.text,
-                    verified_quality=quality,
-                    verified_utility=utility,
-                    exact_match=exact,
-                    latency_ms=output.latency_ms,
-                    peak_memory_bytes=output.peak_memory_bytes,
-                    model_id=self.executor.model_id,
-                    model_revision=self.executor.model_revision,
-                    corpus_digest=self.corpus.digest(),
-                    retrieval_backend_id=None if retrieval is None else retrieval.backend_id,
-                    retrieval_receipt=None if retrieval is None else asdict(retrieval),
-                    scientific_eligible=bool(self.executor.scientific_eligible),
-                ))
+            receipts.extend(await self.run_task(task))
+        return receipts
+
+    async def run_task(self, task: OracleTask) -> list[ContextStudyReceipt]:
+        """Execute every configured arm for one task.
+
+        Public so long qualification runs can persist receipts incrementally
+        and resume without duplicating completed tasks.
+        """
+
+        receipts: list[ContextStudyReceipt] = []
+        contexts = {
+            condition: await self.constructor.construct(task, condition)
+            for condition in self.config.conditions()
+        }
+        if contexts[StudyCondition.B0_NO_CONTEXT].prompt_sha256 == contexts[StudyCondition.B3_ORACLE_EVIDENCE].prompt_sha256:
+            raise RuntimeError("B0/B3 prompt digests must differ when B3 has evidence")
+        for condition in self.config.conditions():
+            context = contexts[condition]
+            output = await self.executor.generate(context.prompt)
+            quality, exact = verify_answer(task, output.text)
+            utility = quality - self.config.lambda_evidence_tokens * context.evidence_tokens
+            retrieval = context.retrieval_receipt
+            receipts.append(ContextStudyReceipt(
+                task_id=task.task_id,
+                condition=condition,
+                family=task.family,
+                template_id=task.template_id,
+                source_cluster_id=task.source_cluster_id,
+                split=task.split,
+                evaluation_mode=self.config.evaluation_mode,
+                evidence_ids=tuple(row.evidence_id for row in context.evidence),
+                source_ids=tuple(row.source_id for row in context.evidence),
+                retrieval_scores=tuple(ContextConstructor._score(row) for row in context.evidence),
+                final_prompt=context.prompt,
+                final_prompt_sha256=context.prompt_sha256,
+                prompt_tokens=output.prompt_tokens,
+                evidence_tokens=context.evidence_tokens,
+                completion_tokens=output.completion_tokens,
+                output=output.text,
+                verified_quality=quality,
+                verified_utility=utility,
+                exact_match=exact,
+                latency_ms=output.latency_ms,
+                peak_memory_bytes=output.peak_memory_bytes,
+                model_id=self.executor.model_id,
+                model_revision=self.executor.model_revision,
+                corpus_digest=self.corpus.digest(),
+                retrieval_backend_id=None if retrieval is None else retrieval.backend_id,
+                retrieval_receipt=None if retrieval is None else asdict(retrieval),
+                scientific_eligible=bool(self.executor.scientific_eligible),
+            ))
         return receipts

@@ -1,0 +1,16 @@
+{
+  "evidence_dir": "evidence/hrm_smoke_v2_direct",
+  "expected_arms": [
+    "B0_NO_CONTEXT",
+    "B1B_HARD_DISTRACTOR",
+    "B1_RANDOM_CONTEXT",
+    "B2_NAIVE_RETRIEVAL",
+    "B3_ORACLE_EVIDENCE"
+  ],
+  "passed": true,
+  "problem_count": 0,
+  "problems": [],
+  "receipt_count": 125,
+  "report_type": "context_study_receipt_check",
+  "task_count": 25
+}

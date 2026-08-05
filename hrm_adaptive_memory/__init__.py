@@ -1,5 +1,8 @@
 """HRM external-memory and adaptive-compute research package.
 
+ACTIVE_HRM_RESEARCH — the only canonical implementation.  Legacy systems:
+daph/ (LEGACY_QWEN_EXFUSION) and daph_metareasoner/ (LEGACY_METAREASONING).
+
 The package deliberately separates retrieval, context packing, model use, and
 adaptive decisions.  Learned control stays blocked until oracle-context and
 counterfactual opportunity gates pass.
