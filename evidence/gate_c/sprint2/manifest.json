@@ -1,0 +1,220 @@
+{
+  "arms": {
+    "one_pass": {
+      "arm": "one_pass",
+      "calculator_answers": 0,
+      "complete_set_success": 0.818,
+      "followups_fired": 0,
+      "mean_evidence_records": 10.0,
+      "mean_evidence_tokens": 239.8,
+      "mean_quality": 0.8,
+      "mean_retrieval_calls": 1.0,
+      "per_family": {
+        "distractor_heavy": {
+          "complete_set_success": 1.0,
+          "followups_fired": 0,
+          "quality": 1.0
+        },
+        "numeric_derivation": {
+          "complete_set_success": 1.0,
+          "followups_fired": 0,
+          "quality": 0.99
+        },
+        "single_hop": {
+          "complete_set_success": 1.0,
+          "followups_fired": 0,
+          "quality": 1.0
+        },
+        "temporal_update": {
+          "complete_set_success": 1.0,
+          "followups_fired": 0,
+          "quality": 1.0
+        },
+        "two_hop": {
+          "complete_set_success": 0.09,
+          "followups_fired": 0,
+          "quality": 0.01
+        }
+      },
+      "task_count": 500,
+      "wall_seconds": 742.5
+    },
+    "one_pass_selected": {
+      "arm": "one_pass_selected",
+      "calculator_answers": 0,
+      "complete_set_success": 0.8,
+      "followups_fired": 0,
+      "mean_evidence_records": 1.6,
+      "mean_evidence_tokens": 40.0,
+      "mean_quality": 0.8,
+      "mean_retrieval_calls": 1.0,
+      "per_family": {
+        "distractor_heavy": {
+          "complete_set_success": 1.0,
+          "followups_fired": 0,
+          "quality": 1.0
+        },
+        "numeric_derivation": {
+          "complete_set_success": 1.0,
+          "followups_fired": 0,
+          "quality": 1.0
+        },
+        "single_hop": {
+          "complete_set_success": 1.0,
+          "followups_fired": 0,
+          "quality": 1.0
+        },
+        "temporal_update": {
+          "complete_set_success": 1.0,
+          "followups_fired": 0,
+          "quality": 1.0
+        },
+        "two_hop": {
+          "complete_set_success": 0.0,
+          "followups_fired": 0,
+          "quality": 0.0
+        }
+      },
+      "task_count": 500,
+      "wall_seconds": 391.4
+    },
+    "two_pass_calculate": {
+      "arm": "two_pass_calculate",
+      "calculator_answers": 100,
+      "complete_set_success": 0.982,
+      "followups_fired": 91,
+      "mean_evidence_records": 1.78,
+      "mean_evidence_tokens": 43.6,
+      "mean_quality": 0.982,
+      "mean_retrieval_calls": 1.182,
+      "per_family": {
+        "distractor_heavy": {
+          "complete_set_success": 1.0,
+          "followups_fired": 0,
+          "quality": 1.0
+        },
+        "numeric_derivation": {
+          "complete_set_success": 1.0,
+          "followups_fired": 0,
+          "quality": 1.0
+        },
+        "single_hop": {
+          "complete_set_success": 1.0,
+          "followups_fired": 0,
+          "quality": 1.0
+        },
+        "temporal_update": {
+          "complete_set_success": 1.0,
+          "followups_fired": 0,
+          "quality": 1.0
+        },
+        "two_hop": {
+          "complete_set_success": 0.91,
+          "followups_fired": 91,
+          "quality": 0.91
+        }
+      },
+      "task_count": 500,
+      "wall_seconds": 317.6
+    },
+    "two_pass_selected": {
+      "arm": "two_pass_selected",
+      "calculator_answers": 0,
+      "complete_set_success": 0.982,
+      "followups_fired": 91,
+      "mean_evidence_records": 1.78,
+      "mean_evidence_tokens": 43.6,
+      "mean_quality": 0.982,
+      "mean_retrieval_calls": 1.182,
+      "per_family": {
+        "distractor_heavy": {
+          "complete_set_success": 1.0,
+          "followups_fired": 0,
+          "quality": 1.0
+        },
+        "numeric_derivation": {
+          "complete_set_success": 1.0,
+          "followups_fired": 0,
+          "quality": 1.0
+        },
+        "single_hop": {
+          "complete_set_success": 1.0,
+          "followups_fired": 0,
+          "quality": 1.0
+        },
+        "temporal_update": {
+          "complete_set_success": 1.0,
+          "followups_fired": 0,
+          "quality": 1.0
+        },
+        "two_hop": {
+          "complete_set_success": 0.91,
+          "followups_fired": 91,
+          "quality": 0.91
+        }
+      },
+      "task_count": 500,
+      "wall_seconds": 386.1
+    }
+  },
+  "authorized_by": {
+    "gate": "B",
+    "verdict": "PASS_RETRIEVAL_EXPANSION"
+  },
+  "created_utc": "2026-08-05T23:39:48Z",
+  "environment": {
+    "platform": "macOS-26.2-arm64-arm-64bit",
+    "python": "3.12.0",
+    "torch": "2.10.0",
+    "transformers": "5.13.0"
+  },
+  "evidence_corpus_sha256": "f8ea20353bed006f37d16a4b5af157387a2a1c70eef48a9c29f810702e27221b",
+  "marginal_utility": {
+    "one_pass_selected - one_pass": {
+      "delta_complete_set_success": -0.018,
+      "delta_quality": 0.0,
+      "delta_retrieval_calls": 0.0,
+      "per_family_delta_quality": {
+        "distractor_heavy": 0.0,
+        "numeric_derivation": 0.01,
+        "single_hop": 0.0,
+        "temporal_update": 0.0,
+        "two_hop": -0.01
+      }
+    },
+    "two_pass_calculate - two_pass_selected": {
+      "delta_complete_set_success": 0.0,
+      "delta_quality": 0.0,
+      "delta_retrieval_calls": 0.0,
+      "per_family_delta_quality": {
+        "distractor_heavy": 0.0,
+        "numeric_derivation": 0.0,
+        "single_hop": 0.0,
+        "temporal_update": 0.0,
+        "two_hop": 0.0
+      }
+    },
+    "two_pass_selected - one_pass_selected": {
+      "delta_complete_set_success": 0.182,
+      "delta_quality": 0.182,
+      "delta_retrieval_calls": 0.182,
+      "per_family_delta_quality": {
+        "distractor_heavy": 0.0,
+        "numeric_derivation": 0.0,
+        "single_hop": 0.0,
+        "temporal_update": 0.0,
+        "two_hop": 0.91
+      }
+    }
+  },
+  "max_retrieval_depth": 2,
+  "model_id": "sapientinc/HRM-Text-1B",
+  "model_revision": "9f082d68b8cd0ebc56e33f1c88c45609174c272c",
+  "prompt_condition": "direct",
+  "reformulator": "deterministic-bridge-v1",
+  "retrieval_k": 10,
+  "retriever": "canonical:bm25",
+  "sprint": "2_bounded_iterative_retrieval",
+  "task_count": 500,
+  "task_dataset_sha256": "4ee67dcad8d153b2cd90797acda657f4ebf85b9336d782f6de79694e9f76e07a"
+}
