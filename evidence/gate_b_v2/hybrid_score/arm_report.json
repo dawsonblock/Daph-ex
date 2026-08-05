@@ -1,0 +1,218 @@
+{
+  "arm": "hybrid_score",
+  "backend_config_digest": "234574e580bb0b1f360928c6aed41b64f280cbadf4330e91ab3297e2f1b39fe2",
+  "backend_id": "canonical:hybrid_score",
+  "downstream": {
+    "b0_anchor": 0.002,
+    "b3_anchor": 1.0,
+    "delta_vs_b0": 0.596,
+    "mean_quality": 0.598,
+    "oracle_gap": 0.402,
+    "per_family": {
+      "distractor_heavy": 1.0,
+      "numeric_derivation": 0.0,
+      "single_hop": 1.0,
+      "temporal_update": 0.99,
+      "two_hop": 0.0
+    }
+  },
+  "embedding_digest": null,
+  "embedding_spec": null,
+  "failure_attribution": {
+    "counts": {
+      "CALCULATION_FAILURE": 0,
+      "NONE": 299,
+      "PACKING_FAILURE": 0,
+      "REASONING_FAILURE": 4,
+      "RETRIEVAL_FAILURE": 197,
+      "UNKNOWN": 0,
+      "VERIFICATION_FAILURE": 0
+    },
+    "failure_count": 201,
+    "per_family": {
+      "distractor_heavy": {
+        "CALCULATION_FAILURE": 0,
+        "NONE": 100,
+        "PACKING_FAILURE": 0,
+        "REASONING_FAILURE": 0,
+        "RETRIEVAL_FAILURE": 0,
+        "UNKNOWN": 0,
+        "VERIFICATION_FAILURE": 0
+      },
+      "numeric_derivation": {
+        "CALCULATION_FAILURE": 0,
+        "NONE": 0,
+        "PACKING_FAILURE": 0,
+        "REASONING_FAILURE": 0,
+        "RETRIEVAL_FAILURE": 100,
+        "UNKNOWN": 0,
+        "VERIFICATION_FAILURE": 0
+      },
+      "single_hop": {
+        "CALCULATION_FAILURE": 0,
+        "NONE": 100,
+        "PACKING_FAILURE": 0,
+        "REASONING_FAILURE": 0,
+        "RETRIEVAL_FAILURE": 0,
+        "UNKNOWN": 0,
+        "VERIFICATION_FAILURE": 0
+      },
+      "temporal_update": {
+        "CALCULATION_FAILURE": 0,
+        "NONE": 99,
+        "PACKING_FAILURE": 0,
+        "REASONING_FAILURE": 0,
+        "RETRIEVAL_FAILURE": 1,
+        "UNKNOWN": 0,
+        "VERIFICATION_FAILURE": 0
+      },
+      "two_hop": {
+        "CALCULATION_FAILURE": 0,
+        "NONE": 0,
+        "PACKING_FAILURE": 0,
+        "REASONING_FAILURE": 4,
+        "RETRIEVAL_FAILURE": 96,
+        "UNKNOWN": 0,
+        "VERIFICATION_FAILURE": 0
+      }
+    },
+    "retrieval_bound_fraction": 0.9801,
+    "task_count": 500
+  },
+  "index_seconds": 1.142,
+  "index_source_digest": "3ed39b9d9145cc94684264fa09f7b803f27676d95e5e647a2cb7d3532293daaf",
+  "resources": {
+    "calls": {
+      "calculator_calls": 0,
+      "hrm_steps": 0,
+      "model_calls": 500,
+      "retrieval_calls": 500,
+      "verifier_calls": 500
+    },
+    "latency_ms": {
+      "calculation_ms": 0.0,
+      "model_ms": 747282.129,
+      "prompt_construction_ms": 13094.243,
+      "retrieval_ms": 13378.86,
+      "total_wall_ms": 0.0,
+      "unattributed_ms": null,
+      "verification_ms": 6.834
+    },
+    "memory": {
+      "framework_allocator_current_bytes": 3584,
+      "framework_allocator_kind": "mps",
+      "framework_allocator_peak_bytes": null,
+      "model_parameter_bytes": 2365590528,
+      "process_rss_bytes": 1461649408,
+      "python_allocator_peak_bytes": null
+    },
+    "tokens": {
+      "completion_tokens": 2410,
+      "evidence_tokens": 119143,
+      "prompt_tokens": 172843
+    }
+  },
+  "retrieval": {
+    "backend_id": "canonical:hybrid_score",
+    "metrics": {
+      "complete_set_success": 0.606,
+      "irrelevant_token_ratio": 0.9108,
+      "mean_evidence_tokens": 238.29,
+      "mean_latency_ms": 26.742,
+      "mrr": 0.8377,
+      "ndcg": 0.7503,
+      "p95_latency_ms": 28.542,
+      "precision_at_k": 0.0882,
+      "recall_at_1": 0.703,
+      "recall_at_10": 0.74,
+      "recall_at_3": 0.725,
+      "recall_at_5": 0.731,
+      "redundancy": 0.0,
+      "required_evidence_recall": 0.74
+    },
+    "per_family": {
+      "distractor_heavy": {
+        "complete_set_success": 1.0,
+        "irrelevant_token_ratio": 0.9039,
+        "mean_evidence_tokens": 260.5,
+        "mean_latency_ms": 26.802,
+        "mrr": 1.0,
+        "ndcg": 1.0,
+        "p95_latency_ms": 28.928,
+        "precision_at_k": 0.1,
+        "recall_at_1": 1.0,
+        "recall_at_10": 1.0,
+        "recall_at_3": 1.0,
+        "recall_at_5": 1.0,
+        "redundancy": 0.0,
+        "required_evidence_recall": 1.0
+      },
+      "numeric_derivation": {
+        "complete_set_success": 0.0,
+        "irrelevant_token_ratio": 0.9,
+        "mean_evidence_tokens": 200,
+        "mean_latency_ms": 27.79,
+        "mrr": 1.0,
+        "ndcg": 0.6131,
+        "p95_latency_ms": 29.564,
+        "precision_at_k": 0.1,
+        "recall_at_1": 0.5,
+        "recall_at_10": 0.5,
+        "recall_at_3": 0.5,
+        "recall_at_5": 0.5,
+        "redundancy": 0.0,
+        "required_evidence_recall": 0.5
+      },
+      "single_hop": {
+        "complete_set_success": 1.0,
+        "irrelevant_token_ratio": 0.9,
+        "mean_evidence_tokens": 260,
+        "mean_latency_ms": 26.048,
+        "mrr": 1.0,
+        "ndcg": 1.0,
+        "p95_latency_ms": 27.013,
+        "precision_at_k": 0.1,
+        "recall_at_1": 1.0,
+        "recall_at_10": 1.0,
+        "recall_at_3": 1.0,
+        "recall_at_5": 1.0,
+        "redundancy": 0.0,
+        "required_evidence_recall": 1.0
+      },
+      "temporal_update": {
+        "complete_set_success": 0.99,
+        "irrelevant_token_ratio": 0.9006,
+        "mean_evidence_tokens": 268.95,
+        "mean_latency_ms": 26.128,
+        "mrr": 0.9583,
+        "ndcg": 0.9665,
+        "p95_latency_ms": 27.463,
+        "precision_at_k": 0.099,
+        "recall_at_1": 0.93,
+        "recall_at_10": 0.99,
+        "recall_at_3": 0.99,
+        "recall_at_5": 0.99,
+        "redundancy": 0.0,
+        "required_evidence_recall": 0.99
+      },
+      "two_hop": {
+        "complete_set_success": 0.04,
+        "irrelevant_token_ratio": 0.9495,
+        "mean_evidence_tokens": 201.98,
+        "mean_latency_ms": 26.942,
+        "mrr": 0.2304,
+        "ndcg": 0.172,
+        "p95_latency_ms": 27.76,
+        "precision_at_k": 0.042,
+        "recall_at_1": 0.085,
+        "recall_at_10": 0.21,
+        "recall_at_3": 0.135,
+        "recall_at_5": 0.165,
+        "redundancy": 0.0,
+        "required_evidence_recall": 0.21
+      }
+    },
+    "task_count": 500
+  },
+  "retrieval_k": 10
+}

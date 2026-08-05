@@ -8,8 +8,16 @@ from typing import Sequence
 from hrm_adaptive_memory.memory.chunking import Chunk
 
 
+# Internal '.', '/', and '-' are kept ("Plan-000-965", "v1.2", "src/main"), but
+# a trailing separator is not part of the token. Without the inner-boundary
+# requirement, a sentence-final entity tokenizes as "plan-000-965." and never
+# matches the same entity written mid-sentence, which silently hides evidence
+# from every lexical query.
+_TOKEN = re.compile(r"[A-Za-z0-9_]+(?:[./-][A-Za-z0-9_]+)*")
+
+
 def tokenize(text: str) -> list[str]:
-    return re.findall(r"[A-Za-z0-9_./-]+", text.lower())
+    return _TOKEN.findall(text.lower())
 
 
 class BM25Retriever:

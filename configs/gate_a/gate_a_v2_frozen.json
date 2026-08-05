@@ -1,0 +1,27 @@
+{
+  "protocol": "hrm-gate-a-qualification-v1",
+  "prompt_condition": "direct",
+  "condition_selection_rationale": "Selected on the 25-task development smoke set (seed-1101 corpus, never qualification data). direct: B3-B0=1.00, B2-B0=0.64, B1/B1b-B0=0.00, 1.1s mean latency, 7.4 mean completion tokens with terse well-formed answers. cot: B3-B0=0.80 at 9.6s/44.1 tokens with rambling self-questioning output. synth,cot: B3-B0=0.80 at 9.1s/52.7 tokens. direct dominates every axis; comparison receipts in evidence/hrm_smoke_v2_{direct,cot,synthcot}.",
+  "tier": "QUALIFICATION",
+  "retriever": "bm25",
+  "retrieval_k": 10,
+  "max_new_tokens": 64,
+  "seed": 42,
+  "evaluation_mode": "CAPABILITY_USE",
+  "include_hard_distractor": true,
+  "lambda_evidence_tokens": 0.0,
+  "decoding": {"do_sample": false, "notes": "greedy; generation limit identical across arms"},
+  "model_id": "sapientinc/HRM-Text-1B",
+  "model_revision": "9f082d68b8cd0ebc56e33f1c88c45609174c272c",
+  "tasks_path": "data/hrm/controlled_gate_a_v2/oracle_tasks.jsonl",
+  "evidence_path": "data/hrm/controlled_gate_a_v2/evidence.jsonl",
+  "task_dataset_sha256": "4ee67dcad8d153b2cd90797acda657f4ebf85b9336d782f6de79694e9f76e07a",
+  "evidence_corpus_sha256": "f8ea20353bed006f37d16a4b5af157387a2a1c70eef48a9c29f810702e27221b",
+  "statistical_thresholds": {
+    "minimum_mean_quality_gain": 0.05,
+    "bootstrap_samples": 10000,
+    "confidence": 0.95,
+    "group_keys": ["template_id", "family", "source_cluster_id"],
+    "grouped_lcb_requirement": "LCB95 > 0 for every grouping key"
+  }
+}

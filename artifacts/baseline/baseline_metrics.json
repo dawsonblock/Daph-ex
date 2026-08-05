@@ -1,0 +1,10 @@
+{
+  "gate_a": {
+    "mean_b3_minus_b0": 0.998,
+    "lcb95_all_groupings": 0.994,
+    "b2_minus_b0": 0.6,
+    "b1_minus_b0": -0.002,
+    "b1b_minus_b0": 0.0
+  },
+  "source": "evidence/gate_a_report_v2r1.json"
+}

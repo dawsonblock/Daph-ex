@@ -1,0 +1,67 @@
+{
+  "b0_anchor": 0.002,
+  "b3_anchor": 1.0,
+  "best_arm": "bm25",
+  "best_complete_set_success": 0.818,
+  "best_downstream_quality": 0.8,
+  "dense_beats_bm25": false,
+  "gate": "B_RETRIEVAL",
+  "hybrid_beats_individual_backends": false,
+  "iterative_retrieval_authorized": true,
+  "next_stage": "BOUNDED_ITERATIVE_RETRIEVAL",
+  "packing_diagnostic": {
+    "conclusion": "Packet size and oracle position do not degrade evidence use; distractor similarity does. Retrieval precision, not just recall, is a binding constraint on downstream answer quality.",
+    "distractor_kind": {
+      "bm25_top_k": 0.39,
+      "random_corpus": 1.0,
+      "same_template": 0.67
+    }
+  },
+  "per_family": {
+    "distractor_heavy": {
+      "b3_oracle": 1.0,
+      "best_complete_set_success": 1.0,
+      "dominant_failure": "CALCULATION_FAILURE",
+      "downstream_quality": 1.0
+    },
+    "numeric_derivation": {
+      "b3_oracle": 1.0,
+      "best_complete_set_success": 1.0,
+      "dominant_failure": "CALCULATION_FAILURE",
+      "downstream_quality": 0.99
+    },
+    "single_hop": {
+      "b3_oracle": 1.0,
+      "best_complete_set_success": 1.0,
+      "dominant_failure": "CALCULATION_FAILURE",
+      "downstream_quality": 1.0
+    },
+    "temporal_update": {
+      "b3_oracle": 1.0,
+      "best_complete_set_success": 1.0,
+      "dominant_failure": "CALCULATION_FAILURE",
+      "downstream_quality": 1.0
+    },
+    "two_hop": {
+      "b3_oracle": 1.0,
+      "best_complete_set_success": 0.09,
+      "dominant_failure": "RETRIEVAL_FAILURE",
+      "downstream_quality": 0.01
+    }
+  },
+  "rationale": "bm25 recovers complete evidence sets on 81.8% of tasks and lifts answer quality +0.798 over B0",
+  "source_manifest": "evidence/gate_b_v2/gate_b_manifest.json",
+  "still_blocked": [
+    "macro_executive_training",
+    "micro_compute_controller",
+    "adaptive_recurrence",
+    "graphiti_temporal_memory",
+    "external_vector_engines",
+    "transactional_persistent_memory"
+  ],
+  "thresholds": {
+    "min_complete_set_success": 0.5,
+    "min_downstream_gain_over_b0": 0.05
+  },
+  "verdict": "PASS_RETRIEVAL_EXPANSION"
+}

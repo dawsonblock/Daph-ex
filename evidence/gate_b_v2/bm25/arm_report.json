@@ -1,0 +1,218 @@
+{
+  "arm": "bm25",
+  "backend_config_digest": "f92caffa92eab1e7febc5bea8b727c2735b8b20dabdc0877d37069ffd881c26f",
+  "backend_id": "canonical:bm25",
+  "downstream": {
+    "b0_anchor": 0.002,
+    "b3_anchor": 1.0,
+    "delta_vs_b0": 0.798,
+    "mean_quality": 0.8,
+    "oracle_gap": 0.2,
+    "per_family": {
+      "distractor_heavy": 1.0,
+      "numeric_derivation": 0.99,
+      "single_hop": 1.0,
+      "temporal_update": 1.0,
+      "two_hop": 0.01
+    }
+  },
+  "embedding_digest": null,
+  "embedding_spec": null,
+  "failure_attribution": {
+    "counts": {
+      "CALCULATION_FAILURE": 1,
+      "NONE": 400,
+      "PACKING_FAILURE": 0,
+      "REASONING_FAILURE": 8,
+      "RETRIEVAL_FAILURE": 91,
+      "UNKNOWN": 0,
+      "VERIFICATION_FAILURE": 0
+    },
+    "failure_count": 100,
+    "per_family": {
+      "distractor_heavy": {
+        "CALCULATION_FAILURE": 0,
+        "NONE": 100,
+        "PACKING_FAILURE": 0,
+        "REASONING_FAILURE": 0,
+        "RETRIEVAL_FAILURE": 0,
+        "UNKNOWN": 0,
+        "VERIFICATION_FAILURE": 0
+      },
+      "numeric_derivation": {
+        "CALCULATION_FAILURE": 1,
+        "NONE": 99,
+        "PACKING_FAILURE": 0,
+        "REASONING_FAILURE": 0,
+        "RETRIEVAL_FAILURE": 0,
+        "UNKNOWN": 0,
+        "VERIFICATION_FAILURE": 0
+      },
+      "single_hop": {
+        "CALCULATION_FAILURE": 0,
+        "NONE": 100,
+        "PACKING_FAILURE": 0,
+        "REASONING_FAILURE": 0,
+        "RETRIEVAL_FAILURE": 0,
+        "UNKNOWN": 0,
+        "VERIFICATION_FAILURE": 0
+      },
+      "temporal_update": {
+        "CALCULATION_FAILURE": 0,
+        "NONE": 100,
+        "PACKING_FAILURE": 0,
+        "REASONING_FAILURE": 0,
+        "RETRIEVAL_FAILURE": 0,
+        "UNKNOWN": 0,
+        "VERIFICATION_FAILURE": 0
+      },
+      "two_hop": {
+        "CALCULATION_FAILURE": 0,
+        "NONE": 1,
+        "PACKING_FAILURE": 0,
+        "REASONING_FAILURE": 8,
+        "RETRIEVAL_FAILURE": 91,
+        "UNKNOWN": 0,
+        "VERIFICATION_FAILURE": 0
+      }
+    },
+    "retrieval_bound_fraction": 0.91,
+    "task_count": 500
+  },
+  "index_seconds": 0.016,
+  "index_source_digest": "3ed39b9d9145cc94684264fa09f7b803f27676d95e5e647a2cb7d3532293daaf",
+  "resources": {
+    "calls": {
+      "calculator_calls": 0,
+      "hrm_steps": 0,
+      "model_calls": 500,
+      "retrieval_calls": 500,
+      "verifier_calls": 500
+    },
+    "latency_ms": {
+      "calculation_ms": 0.0,
+      "model_ms": 741021.267,
+      "prompt_construction_ms": 1132.554,
+      "retrieval_ms": 677.276,
+      "total_wall_ms": 0.0,
+      "unattributed_ms": null,
+      "verification_ms": 7.154
+    },
+    "memory": {
+      "framework_allocator_current_bytes": 128000,
+      "framework_allocator_kind": "mps",
+      "framework_allocator_peak_bytes": null,
+      "model_parameter_bytes": 2365590528,
+      "process_rss_bytes": 1461649408,
+      "python_allocator_peak_bytes": null
+    },
+    "tokens": {
+      "completion_tokens": 2379,
+      "evidence_tokens": 119900,
+      "prompt_tokens": 173600
+    }
+  },
+  "retrieval": {
+    "backend_id": "canonical:bm25",
+    "metrics": {
+      "complete_set_success": 0.818,
+      "irrelevant_token_ratio": 0.8748,
+      "mean_evidence_tokens": 239.8,
+      "mean_latency_ms": 1.341,
+      "mrr": 1.0,
+      "ndcg": 0.927,
+      "p95_latency_ms": 1.847,
+      "precision_at_k": 0.1218,
+      "recall_at_1": 0.8,
+      "recall_at_10": 0.909,
+      "recall_at_3": 0.902,
+      "recall_at_5": 0.904,
+      "redundancy": 0.0,
+      "required_evidence_recall": 0.909
+    },
+    "per_family": {
+      "distractor_heavy": {
+        "complete_set_success": 1.0,
+        "irrelevant_token_ratio": 0.9088,
+        "mean_evidence_tokens": 274,
+        "mean_latency_ms": 1.785,
+        "mrr": 1.0,
+        "ndcg": 1.0,
+        "p95_latency_ms": 1.919,
+        "precision_at_k": 0.1,
+        "recall_at_1": 1.0,
+        "recall_at_10": 1.0,
+        "recall_at_3": 1.0,
+        "recall_at_5": 1.0,
+        "redundancy": 0.0,
+        "required_evidence_recall": 1.0
+      },
+      "numeric_derivation": {
+        "complete_set_success": 1.0,
+        "irrelevant_token_ratio": 0.804,
+        "mean_evidence_tokens": 199,
+        "mean_latency_ms": 1.342,
+        "mrr": 1.0,
+        "ndcg": 1.0,
+        "p95_latency_ms": 1.465,
+        "precision_at_k": 0.2,
+        "recall_at_1": 0.5,
+        "recall_at_10": 1.0,
+        "recall_at_3": 1.0,
+        "recall_at_5": 1.0,
+        "redundancy": 0.0,
+        "required_evidence_recall": 1.0
+      },
+      "single_hop": {
+        "complete_set_success": 1.0,
+        "irrelevant_token_ratio": 0.8964,
+        "mean_evidence_tokens": 251,
+        "mean_latency_ms": 1.304,
+        "mrr": 1.0,
+        "ndcg": 1.0,
+        "p95_latency_ms": 1.47,
+        "precision_at_k": 0.1,
+        "recall_at_1": 1.0,
+        "recall_at_10": 1.0,
+        "recall_at_3": 1.0,
+        "recall_at_5": 1.0,
+        "redundancy": 0.0,
+        "required_evidence_recall": 1.0
+      },
+      "temporal_update": {
+        "complete_set_success": 1.0,
+        "irrelevant_token_ratio": 0.8996,
+        "mean_evidence_tokens": 269,
+        "mean_latency_ms": 1.039,
+        "mrr": 1.0,
+        "ndcg": 1.0,
+        "p95_latency_ms": 1.157,
+        "precision_at_k": 0.1,
+        "recall_at_1": 1.0,
+        "recall_at_10": 1.0,
+        "recall_at_3": 1.0,
+        "recall_at_5": 1.0,
+        "redundancy": 0.0,
+        "required_evidence_recall": 1.0
+      },
+      "two_hop": {
+        "complete_set_success": 0.09,
+        "irrelevant_token_ratio": 0.865,
+        "mean_evidence_tokens": 206,
+        "mean_latency_ms": 1.235,
+        "mrr": 1.0,
+        "ndcg": 0.6349,
+        "p95_latency_ms": 1.328,
+        "precision_at_k": 0.109,
+        "recall_at_1": 0.5,
+        "recall_at_10": 0.545,
+        "recall_at_3": 0.51,
+        "recall_at_5": 0.52,
+        "redundancy": 0.0,
+        "required_evidence_recall": 0.545
+      }
+    },
+    "task_count": 500
+  },
+  "retrieval_k": 10
+}

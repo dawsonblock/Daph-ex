@@ -1,0 +1,76 @@
+{
+  "conclusion": "Packet size and oracle position do not degrade evidence use; distractor similarity does. Retrieval precision, not just recall, is a binding constraint on downstream answer quality.",
+  "created_utc": "2026-08-05T22:22:50Z",
+  "diagnostic": "gate_b_packing",
+  "distractor_kind": {
+    "bm25_top_k": {
+      "n": 100,
+      "quality": 0.39,
+      "seconds": 138.8,
+      "slot_label_echoes": 61
+    },
+    "random_corpus": {
+      "n": 100,
+      "quality": 1.0,
+      "seconds": 185.3,
+      "slot_label_echoes": 0
+    },
+    "same_template": {
+      "n": 100,
+      "quality": 0.67,
+      "seconds": 137.3,
+      "slot_label_echoes": 33
+    }
+  },
+  "family": "two_hop",
+  "model_id": "sapientinc/HRM-Text-1B",
+  "model_revision": "9f082d68b8cd0ebc56e33f1c88c45609174c272c",
+  "note": "required evidence is present in every condition; only the stated factor varies",
+  "oracle_position": {
+    "first": {
+      "n": 100,
+      "quality": 1.0,
+      "seconds": 184.4,
+      "slot_label_echoes": 0
+    },
+    "last": {
+      "n": 100,
+      "quality": 1.0,
+      "seconds": 184.8,
+      "slot_label_echoes": 0
+    },
+    "middle": {
+      "n": 100,
+      "quality": 1.0,
+      "seconds": 189.6,
+      "slot_label_echoes": 0
+    }
+  },
+  "packet_size": {
+    "10": {
+      "n": 100,
+      "quality": 1.0,
+      "seconds": 168.2,
+      "slot_label_echoes": 0
+    },
+    "2": {
+      "n": 100,
+      "quality": 1.0,
+      "seconds": 70.3,
+      "slot_label_echoes": 0
+    },
+    "3": {
+      "n": 100,
+      "quality": 1.0,
+      "seconds": 87.2,
+      "slot_label_echoes": 0
+    },
+    "5": {
+      "n": 100,
+      "quality": 1.0,
+      "seconds": 108.0,
+      "slot_label_echoes": 0
+    }
+  },
+  "prompt_condition": "direct"
+}

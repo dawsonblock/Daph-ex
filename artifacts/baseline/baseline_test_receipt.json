@@ -1,0 +1,10 @@
+{
+  "artifact": "DAPH-HRM-B0 baseline test receipt",
+  "created_utc": "2026-08-05T20:21:27Z",
+  "git_commit": "a84d38da362e586b0afaa857d0cebacb65ac6848",
+  "test_command": "python3 -m pytest -q",
+  "tests_passed": 216,
+  "tests_failed": 0,
+  "gate_a_status": "PASS_HRM_CAN_USE_ORACLE_EVIDENCE",
+  "gate_a_report": "evidence/gate_a_report_v2r1.json"
+}

@@ -1,0 +1,143 @@
+{
+  "arm": "hybrid_rrf",
+  "backend_config_digest": "5407112d2308ead62b3cca81376df84626cfb567fd1756b333959a7ccec70f05",
+  "backend_id": "canonical:hybrid_rrf",
+  "embedding_digest": null,
+  "embedding_spec": null,
+  "index_seconds": 1.169,
+  "index_source_digest": "3ed39b9d9145cc94684264fa09f7b803f27676d95e5e647a2cb7d3532293daaf",
+  "resources": {
+    "calls": {
+      "calculator_calls": 0,
+      "hrm_steps": 0,
+      "model_calls": 0,
+      "retrieval_calls": 500,
+      "verifier_calls": 0
+    },
+    "latency_ms": {
+      "calculation_ms": 0.0,
+      "model_ms": 0.0,
+      "prompt_construction_ms": 0.0,
+      "retrieval_ms": 12190.076,
+      "total_wall_ms": 0.0,
+      "unattributed_ms": null,
+      "verification_ms": 0.0
+    },
+    "memory": {
+      "framework_allocator_current_bytes": 0,
+      "framework_allocator_kind": "mps",
+      "framework_allocator_peak_bytes": null,
+      "model_parameter_bytes": null,
+      "process_rss_bytes": 627982336,
+      "python_allocator_peak_bytes": null
+    },
+    "tokens": {
+      "completion_tokens": 0,
+      "evidence_tokens": 0,
+      "prompt_tokens": 0
+    }
+  },
+  "retrieval": {
+    "backend_id": "canonical:hybrid_rrf",
+    "metrics": {
+      "complete_set_success": 0.546,
+      "irrelevant_token_ratio": 0.9164,
+      "mean_evidence_tokens": 98.01,
+      "mean_latency_ms": 24.367,
+      "mrr": 0.7116,
+      "ndcg": 0.6441,
+      "p95_latency_ms": 25.469,
+      "precision_at_k": 0.0844,
+      "recall_at_1": 0.547,
+      "recall_at_10": 0.691,
+      "recall_at_3": 0.616,
+      "recall_at_5": 0.653,
+      "redundancy": 0.0,
+      "required_evidence_recall": 0.691
+    },
+    "per_family": {
+      "distractor_heavy": {
+        "complete_set_success": 0.87,
+        "irrelevant_token_ratio": 0.9209,
+        "mean_evidence_tokens": 99.59,
+        "mean_latency_ms": 24.402,
+        "mrr": 0.7087,
+        "ndcg": 0.7471,
+        "p95_latency_ms": 25.469,
+        "precision_at_k": 0.087,
+        "recall_at_1": 0.65,
+        "recall_at_10": 0.87,
+        "recall_at_3": 0.74,
+        "recall_at_5": 0.82,
+        "redundancy": 0.0,
+        "required_evidence_recall": 0.87
+      },
+      "numeric_derivation": {
+        "complete_set_success": 0.0,
+        "irrelevant_token_ratio": 0.9,
+        "mean_evidence_tokens": 100,
+        "mean_latency_ms": 24.331,
+        "mrr": 0.9825,
+        "ndcg": 0.6051,
+        "p95_latency_ms": 25.214,
+        "precision_at_k": 0.1,
+        "recall_at_1": 0.485,
+        "recall_at_10": 0.5,
+        "recall_at_3": 0.495,
+        "recall_at_5": 0.5,
+        "redundancy": 0.0,
+        "required_evidence_recall": 0.5
+      },
+      "single_hop": {
+        "complete_set_success": 1.0,
+        "irrelevant_token_ratio": 0.9,
+        "mean_evidence_tokens": 90,
+        "mean_latency_ms": 24.678,
+        "mrr": 0.99,
+        "ndcg": 0.9926,
+        "p95_latency_ms": 25.86,
+        "precision_at_k": 0.1,
+        "recall_at_1": 0.98,
+        "recall_at_10": 1.0,
+        "recall_at_3": 1.0,
+        "recall_at_5": 1.0,
+        "redundancy": 0.0,
+        "required_evidence_recall": 1.0
+      },
+      "temporal_update": {
+        "complete_set_success": 0.82,
+        "irrelevant_token_ratio": 0.918,
+        "mean_evidence_tokens": 110,
+        "mean_latency_ms": 23.919,
+        "mrr": 0.6395,
+        "ndcg": 0.6836,
+        "p95_latency_ms": 24.75,
+        "precision_at_k": 0.082,
+        "recall_at_1": 0.54,
+        "recall_at_10": 0.82,
+        "recall_at_3": 0.71,
+        "recall_at_5": 0.77,
+        "redundancy": 0.0,
+        "required_evidence_recall": 0.82
+      },
+      "two_hop": {
+        "complete_set_success": 0.04,
+        "irrelevant_token_ratio": 0.9429,
+        "mean_evidence_tokens": 90.44,
+        "mean_latency_ms": 24.503,
+        "mrr": 0.2373,
+        "ndcg": 0.1919,
+        "p95_latency_ms": 25.567,
+        "precision_at_k": 0.053,
+        "recall_at_1": 0.08,
+        "recall_at_10": 0.265,
+        "recall_at_3": 0.135,
+        "recall_at_5": 0.175,
+        "redundancy": 0.0,
+        "required_evidence_recall": 0.265
+      }
+    },
+    "task_count": 500
+  },
+  "retrieval_k": 10
+}
