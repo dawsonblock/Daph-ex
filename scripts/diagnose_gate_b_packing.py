@@ -53,7 +53,7 @@ def main() -> None:
     parser.add_argument("--evidence", default="data/hrm/controlled_gate_a_v2/evidence.jsonl")
     parser.add_argument("--frozen-config", default="configs/gate_a/gate_a_v2_frozen.json")
     parser.add_argument("--family", default="two_hop")
-    parser.add_argument("--output", default="evidence/gate_b_v2/packing_diagnostic.json")
+    parser.add_argument("--output", default="evidence/gate_b/qualification/packing_diagnostic.json")
     parser.add_argument("--seed", type=int, default=42)
     args = parser.parse_args()
 

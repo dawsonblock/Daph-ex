@@ -3,6 +3,9 @@
 ACTIVE_HRM_RESEARCH — the only canonical implementation.  Legacy systems:
 daph/ (LEGACY_QWEN_EXFUSION) and daph_metareasoner/ (LEGACY_METAREASONING).
 
+Gate status is machine-readable in RESEARCH_STATUS.json at the repository
+root; tests fail if it disagrees with the packaged version.
+
 The package deliberately separates retrieval, context packing, model use, and
 adaptive decisions.  Learned control stays blocked until oracle-context and
 counterfactual opportunity gates pass.
@@ -49,3 +52,6 @@ __all__ = [
     "SemanticMemoryStore", "SourceMemoryStore", "StructuralChunker", "UtilityController",
     "action_utilities",
 ]
+
+__version__ = "3.7.0"
+

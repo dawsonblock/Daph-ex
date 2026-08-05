@@ -317,7 +317,7 @@ def main() -> None:
     parser.add_argument("--evidence", default="data/hrm/controlled_gate_a_v2/evidence.jsonl")
     parser.add_argument("--output", required=True)
     parser.add_argument("--frozen-config", default="configs/gate_a/gate_a_v2_frozen.json")
-    parser.add_argument("--gate-a-report", default="evidence/gate_a_report_v2r1.json")
+    parser.add_argument("--gate-a-report", default="evidence/gate_a/qualified_run_002/gate_a_report_v2r1.json")
     parser.add_argument(
         "--arms", default="bm25,hash,dense,hybrid_score,hybrid_rrf,hybrid_rerank",
     )

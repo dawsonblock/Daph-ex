@@ -44,7 +44,7 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--config", required=True, help="Frozen gate_a_qualification.json")
     parser.add_argument("--pilot-evidence-dir", required=True)
-    parser.add_argument("--output", default="evidence/gate_a_protocol_manifest.json")
+    parser.add_argument("--output", default="evidence/gate_a/protocol_manifest_v1_superseded.json")
     parser.add_argument("--source-lock", default="third_party/sources.lock.json")
     args = parser.parse_args()
     output = Path(args.output)

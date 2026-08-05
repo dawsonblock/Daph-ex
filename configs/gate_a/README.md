@@ -3,7 +3,7 @@
 `gate_a_v2_frozen.json` is a byte-identical copy of
 `configs/gate_a_qualification.json` (sha256
 `07f7a4b34f9c6bf43666da5256c40ca9dca430f51e305326bfe68722d106bdde`, the exact
-digest pinned in `evidence/gate_a_protocol_manifest_v2.json`). It exists so the
+digest pinned in `evidence/gate_a/protocol_manifest_v2.json`). It exists so the
 canonical frozen protocol has a stable, discoverable home; the original file is
 kept untouched because historical manifests reference its path.
 

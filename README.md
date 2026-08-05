@@ -1,4 +1,4 @@
-# DAPH / ExFusion v3.6.1
+# DAPH-HRM adaptive memory control plane v3.7.0
 
 Pretrained-compatible adaptive computation with a physically ordered four-level effort hierarchy.
 
@@ -10,10 +10,22 @@ Pretrained-compatible adaptive computation with a physically ordered four-level 
 | `daph/` | LEGACY_QWEN_EXFUSION — frozen; tests kept passing, no new HRM work |
 | `daph_metareasoner/` | LEGACY_METAREASONING — frozen; tests kept passing, no new HRM work |
 
-The active scientific target is Gate A: whether native `sapientinc/HRM-Text-1B`
-can use externally supplied evidence (`Q(B3) − Q(B0)`). Memory-stack expansion
-(RuVector, TurboVec, Graphiti, adaptive recurrence, learned executive) stays
-blocked until its prerequisite gate passes.
+Gate A0 (evidence use) and Gate B (single-pass retrieval) have **passed**; the
+active scientific target is Gate C, bounded iterative retrieval. Memory-stack
+expansion (RuVector, TurboVec, Graphiti, adaptive recurrence, learned
+executive) stays blocked until its prerequisite gate passes. Current state is
+machine-readable in [RESEARCH_STATUS.json](RESEARCH_STATUS.json).
+
+The central design principle established by Gate B is that second-hop recall
+and evidence precision must be optimised **jointly** — raising recall while
+flooding the reader with plausible near-duplicates lowers answer quality:
+
+```
+question → small precise retrieval₁ → bridge detection
+        → targeted retrieval₂ (only if unresolved)
+        → entity-aware dedupe → near-duplicate suppression
+        → small high-value evidence packet → HRM
+```
 
 ## Canonical architecture
 
@@ -153,4 +165,12 @@ for the staged protocol and commands.
 
 ## Status
 
-The canonical Qwen path, legacy hybrid path, standalone marginal-utility package, and HRM adaptive-memory control plane coexist. Gate A has not been run on a real paired qualification set, so TurboVec/RuVector expansion, Graphiti integration, recurrence control, and executive training remain blocked. Neither E3 task utility, HRM external-memory gains, nor a learned controller is scientifically qualified.
+The canonical Qwen path, legacy hybrid path, standalone marginal-utility package, and HRM adaptive-memory control plane coexist. Machine-readable gate state lives in [RESEARCH_STATUS.json](RESEARCH_STATUS.json); tests fail if it disagrees with the packaged version.
+
+**Gate A0 — PASSED.** Native `sapientinc/HRM-Text-1B` uses correctly supplied external evidence on the controlled synthetic benchmark: mean B3−B0 = 0.998, grouped-bootstrap LCB95 = 0.994 across template, family, and source-cluster groupings ([report](evidence/gate_a/qualified_run_002/gate_a_report_v2r1.json)). This claim is scoped to the controlled synthetic corpus. It is **not** a claim about general long-term memory, natural-document memory, open-domain RAG, or persistent cognition.
+
+**Gate B — PASSED.** BM25 recovers complete evidence sets on 81.8% of tasks and lifts downstream answer quality to 0.800 against a 0.002 no-evidence baseline ([report](GATE_B_REPORT.md)). The scoped conclusion is that lexical retrieval dominates *the tested dense representation* (MiniLM-L6-v2, single-vector, mean-pooled, cosine) on this identifier-heavy corpus — not that dense retrieval is inferior in general. Untested alternatives include E5, BGE, GTE, ColBERT/MaxSim, cross-encoder reranking, and entity-aware or task-tuned embeddings.
+
+Gate B also established that retrieval **precision** is a binding constraint: holding required evidence present, answer quality falls 1.00 → 0.67 → 0.39 as distractors move from random to same-template to the retriever's own top-k ([diagnostic](evidence/gate_b/packing_diagnostic/packing_diagnostic.json)). Retrieving more is therefore counterproductive on its own.
+
+Gate C (bounded iterative retrieval) is under measurement. Adaptive retrieval, adaptive recurrence, executive training, Graphiti, RuVector, TurboVec, AgentDB procedural memory, Infini consolidation, and PixelRAG all remain blocked pending their own gates. Neither E3 task utility nor a learned controller is scientifically qualified.

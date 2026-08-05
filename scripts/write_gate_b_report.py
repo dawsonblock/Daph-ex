@@ -169,7 +169,13 @@ def build(manifest: dict) -> tuple[str, dict]:
         )
 
     diagnostic_section = ""
-    diagnostic_path = Path(manifest.get("_path", "")).parent / "packing_diagnostic.json"
+    manifest_dir = Path(manifest.get("_path", "")).parent
+    for diagnostic_path in (
+        manifest_dir / "packing_diagnostic.json",
+        manifest_dir.parent / "packing_diagnostic" / "packing_diagnostic.json",
+    ):
+        if diagnostic_path.exists():
+            break
     if diagnostic_path.exists():
         diag = json.loads(diagnostic_path.read_text())
         size_rows = [[f"{k} records", f"{v['quality']:.3f}", str(v["slot_label_echoes"])]
@@ -284,7 +290,7 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--manifest", required=True)
     parser.add_argument("--report", default="GATE_B_REPORT.md")
-    parser.add_argument("--verdict", default="evidence/gate_b_verdict.json")
+    parser.add_argument("--verdict", default="evidence/gate_b/gate_b_verdict.json")
     args = parser.parse_args()
     manifest = json.loads(Path(args.manifest).read_text())
     manifest["_path"] = args.manifest

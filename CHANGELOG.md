@@ -1,5 +1,37 @@
 # Changelog
 
+## 3.7.0 — Gate A0 and Gate B qualified; lineage repaired
+
+Release integrity: 3.6.1 shipped newer science under stale metadata (pyproject
+3.6.1, `daph.__version__` 3.4.1, README asserting Gate A had not been run).
+This release makes version, README, changelog, and gate state agree, enforced
+by tests, and adds machine-readable `RESEARCH_STATUS.json`.
+
+- **Gate A0 PASS** — HRM-Text-1B uses correctly supplied evidence on the
+  controlled synthetic benchmark: mean B3−B0 = 0.998, grouped-bootstrap LCB95
+  = 0.994 for every grouping key. Scoped to the controlled synthetic corpus;
+  not a claim about general, natural-document, or persistent memory.
+- **Gate B PASS** — BM25 recovers complete evidence sets on 81.8% of tasks and
+  lifts downstream quality to 0.800 vs a 0.002 baseline. Scoped to *the tested
+  dense stack*: MiniLM-L6-v2, single-vector, mean-pooled, cosine.
+- Retrieval precision established as a binding constraint: with required
+  evidence held present, quality falls 1.00 (random distractors) → 0.67
+  (same-template) → 0.39 (retriever top-k), with the model emitting evidence
+  slot labels instead of answers.
+- Corrected a lexical tokenizer defect that glued sentence-final punctuation
+  onto tokens, hiding evidence from every lexical query; BM25 complete-set
+  success rose 0.618 → 0.818 and `numeric_derivation` 0.000 → 1.000. Gate A0's
+  qualified claim is unaffected (neither arm retrieves); see the erratum.
+- Corrected a generator defect that embedded a gold answer in its own question
+  (`controlled_gate_a_v2`), and a B1 control leak where subword truncation
+  could synthesise the answer token at a chunk boundary.
+- Added: canonical six-arm retrieval backends, revision-pinned embedding
+  backend with hashed config, complete-evidence-set metrics, failure
+  attribution, phase-attributed resource accounting, the HRM state contract
+  and commit ledger, bounded two-pass retrieval with bridge detection, and an
+  AST-restricted calculator.
+- Voided and failed runs are retained, never overwritten.
+
 ## 3.6.1 — Gate A confound controls
 
 - Remove model-visible B0/B1/B2/B3 labels from study prompts and retain condition identity only in immutable receipts.

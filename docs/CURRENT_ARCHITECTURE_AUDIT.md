@@ -42,7 +42,7 @@ before Sprint 1 (Gate B) work begins. Classifications:
 
 ## Gate ladder position
 
-Gate A **PASSED** (`evidence/gate_a_report_v2r1.json`): mean B3−B0 = 0.998,
+Gate A **PASSED** (`evidence/gate_a/qualified_run_002/gate_a_report_v2r1.json`): mean B3−B0 = 0.998,
 LCB95 = 0.994 (all groupings). Enabled: retrieval expansion only. Blocked:
 iterative retrieval promotion (needs Gate B), controllers (need Gate C),
 adaptive recurrence (Stage 10 gate), Graphiti (Stage 9), transactional
@@ -61,4 +61,4 @@ complete-evidence-set success rises 0.618 → 0.818 and `numeric_derivation`
 rises 0.000 → 1.000; only `two_hop` remains genuinely retrieval-bound, and
 structurally so (the bridge entity is unknowable from the question alone).
 Gate A's qualified B3−B0 claim is unaffected — neither arm uses retrieval. See
-`evidence/gate_a_b2_tokenizer_erratum.md`.
+`evidence/gate_a/ERRATA.md`.

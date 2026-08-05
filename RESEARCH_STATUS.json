@@ -1,0 +1,62 @@
+{
+  "version": "3.7.0",
+  "canonical_package": "hrm_adaptive_memory",
+  "gates": {
+    "gate_a0_controlled_evidence_use": "PASS",
+    "gate_a1_structural_generalization": "PENDING",
+    "gate_b_single_pass_retrieval": "PASS",
+    "gate_c_iterative_retrieval": "IN_PROGRESS",
+    "gate_d_conditional_retrieval_opportunity": "PENDING",
+    "gate_e_learned_retrieval_control": "BLOCKED",
+    "gate_f_recurrence_opportunity": "BLOCKED",
+    "gate_g_adaptive_recurrence": "BLOCKED",
+    "gate_h_verification_control": "BLOCKED",
+    "gate_i_unified_executive": "BLOCKED",
+    "gate_j_persistent_memory": "BLOCKED",
+    "gate_k_consolidation": "BLOCKED",
+    "gate_l_latent_memory": "BLOCKED"
+  },
+  "capabilities": {
+    "single_pass_retrieval": "QUALIFIED",
+    "bounded_iterative_retrieval": "UNDER_MEASUREMENT",
+    "adaptive_retrieval": "BLOCKED",
+    "adaptive_recurrence": "BLOCKED",
+    "executive_training": "BLOCKED",
+    "graphiti_temporal_memory": "BLOCKED",
+    "ruvector": "BLOCKED",
+    "turbovec": "BLOCKED",
+    "agentdb_procedural_memory": "BLOCKED",
+    "infini_consolidation": "BLOCKED",
+    "pixelrag": "BLOCKED"
+  },
+  "qualified_claims": {
+    "gate_a0": {
+      "claim": "HRM-Text-1B can use correctly supplied external evidence on the controlled synthetic Gate A benchmark.",
+      "not_a_claim_about": [
+        "general long-term memory",
+        "natural-document memory",
+        "open-domain RAG",
+        "persistent cognition"
+      ],
+      "mean_b3_minus_b0": 0.998,
+      "grouped_bootstrap_lcb95": 0.994,
+      "report": "evidence/gate_a/qualified_run_002/gate_a_report_v2r1.json"
+    },
+    "gate_b": {
+      "claim": "Lexical retrieval (BM25) dominates the tested dense representation on this identifier-heavy synthetic corpus, and recovers enough complete evidence sets to lift downstream answer quality far above the no-evidence baseline.",
+      "not_a_claim_about": [
+        "dense retrieval being inferior in general",
+        "any dense stack other than MiniLM-L6-v2 single-vector mean-pooled cosine"
+      ],
+      "best_arm": "bm25",
+      "complete_set_success": 0.818,
+      "downstream_quality": 0.800,
+      "report": "GATE_B_REPORT.md"
+    }
+  },
+  "benchmark_lineage": {
+    "controlled_gate_a_v1": "SUPERSEDED_answer_leaked_into_one_question",
+    "controlled_gate_a_v2": "CANONICAL_for_gate_a0_and_gate_b",
+    "controlled_gate_a_v3": "PLANNED_structural_variation_for_gate_a1"
+  }
+}

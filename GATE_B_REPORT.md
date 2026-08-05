@@ -12,7 +12,7 @@ identical to Gate A, so every difference below is attributable to retrieval alon
 
 - Tasks: 500 · evidence records: 1200 · k = 10
 - Corpus digest: `4ee67dcad8d153b2…` / `f8ea20353bed006f…`
-- Anchors from `evidence/gate_a_report_v2r1.json`: B0 = 0.002, B3 = 1.000
+- Anchors from `evidence/gate_a/qualified_run_002/gate_a_report_v2r1.json`: B0 = 0.002, B3 = 1.000
 
 ## Arms
 
