@@ -1,0 +1,52 @@
+{
+  "VALID_DESCRIPTION_V4": true,
+  "audit": {
+    "descv4_id": {
+      "description_identifiability": {
+        "DESCRIPTION_SURFACE_UNIQUENESS": 0,
+        "IDENTITY_EVIDENCE_SUFFICIENCY": 0,
+        "NORMALIZED_SURFACE_COLLISION": 0,
+        "RUNTIME_REFERENT_IDENTIFIABILITY": 0,
+        "description_task_count": 0,
+        "distinct_description_surfaces": 0
+      },
+      "distractor_leaks": 0,
+      "id_collisions_with_prior_corpora": 0,
+      "latent_leaks": 0,
+      "not_inferable": 0,
+      "question_leaks": 0
+    },
+    "descv4_surface": {
+      "description_identifiability": {
+        "DESCRIPTION_SURFACE_UNIQUENESS": 0,
+        "IDENTITY_EVIDENCE_SUFFICIENCY": 0,
+        "NORMALIZED_SURFACE_COLLISION": 0,
+        "RUNTIME_REFERENT_IDENTIFIABILITY": 0,
+        "description_task_count": 50,
+        "distinct_description_surfaces": 50
+      },
+      "distractor_leaks": 0,
+      "id_collisions_with_prior_corpora": 0,
+      "latent_leaks": 0,
+      "not_inferable": 0,
+      "question_leaks": 0
+    }
+  },
+  "generator": "controlled_gate_c2_description_valid_v4",
+  "problems": [],
+  "separation": {
+    "evidence_id_collisions": 0,
+    "overlap_with_cal_v1_heads": 0,
+    "overlap_with_v4_heads": 0,
+    "task_id_prefix": "descv4-"
+  },
+  "state": {
+    "arm_reselection_forbidden": true,
+    "frozen_before_evaluation": true,
+    "holdout_touched": false,
+    "purpose": "independent_replication_of_fixed_C4_mechanism",
+    "replaces_prior_corpora": false,
+    "valid": true,
+    "vocabulary_domain": "summits"
+  }
+}

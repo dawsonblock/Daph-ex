@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build/freeze controlled_gate_c2_chain_validation_v3. Fail-closed. Third domain."""
+"""Build/freeze controlled_gate_c2_description_valid_v4. Fail-closed. Third domain."""
 from __future__ import annotations
 import hashlib, json, re, subprocess, sys
 from pathlib import Path
@@ -8,34 +8,34 @@ import hrm_adaptive_memory.experiments.c2_calibration_dataset as cal
 from hrm_adaptive_memory.experiments.generalization_dataset_v4 import (
     _HEADS as V4_HEADS, verify_inferable)
 
-OUT = Path("data/hrm/controlled_gate_c2_chain_validation_v3")
-SPLITS = {"chain_v3_id": ("c2_cal_id", 88001, 50), "chain_v3_surface": ("c2_cal_surface", 88002, 50)}
+OUT = Path("data/hrm/controlled_gate_c2_description_valid_v4")
+SPLITS = {"descv4_id": ("c2_cal_id", 99001, 50), "descv4_surface": ("c2_cal_surface", 99002, 50)}
 FORBIDDEN = re.compile(r"#(s|b|v|d\d|n)\b|latent_|entity_\d+")
 
 
 def main() -> None:
     if OUT.exists():
         raise FileExistsError(OUT)
-    prior_heads = set(cal.HEADS) | set(cal.VOCAB_V2["HEADS"])
-    prev = cal.apply_vocabulary(cal.VOCAB_V3)
+    prior_heads = set(cal.HEADS) | set(cal.VOCAB_V2["HEADS"]) | set(cal.VOCAB_V3["HEADS"])
+    prev = cal.apply_vocabulary(cal.VOCAB_V4D)
     try:
         print("[1/5] generating (constellation vocabulary)")
         built = {}
         for name, (partition, seed, per) in SPLITS.items():
             c = cal.build_calibration(seed=seed, partition=partition, per_regime=per)
             for t in c["tasks"]:
-                t["task_id"] = t["task_id"].replace("c2cal-", "chainv3-")
+                t["task_id"] = t["task_id"].replace("c2cal-", "descv4-")
                 t["split"] = name
             remap = {}
             for r in c["evidence"]:
-                new = r["evidence_id"].replace("c2cal-", "chainv3-")
+                new = r["evidence_id"].replace("c2cal-", "descv4-")
                 remap[r["evidence_id"]] = new; r["evidence_id"] = new
             for t in c["tasks"]:
-                t["required_evidence_ids"] = [remap.get(v, v.replace("c2cal-", "chainv3-"))
+                t["required_evidence_ids"] = [remap.get(v, v.replace("c2cal-", "descv4-"))
                                               for v in t["required_evidence_ids"]]
                 t["oracle_evidence_ids"] = list(t["required_evidence_ids"])
                 for e in t["_oracle_metadata"]["proof_edges"]:
-                    e["record_id"] = remap.get(e["record_id"], e["record_id"].replace("c2cal-", "chainv3-"))
+                    e["record_id"] = remap.get(e["record_id"], e["record_id"].replace("c2cal-", "descv4-"))
             built[name] = c
             print(f"      {name}: {len(c['tasks'])} tasks, {len(c['evidence'])} records")
 
@@ -50,7 +50,9 @@ def main() -> None:
                              ("controlled_gate_c2_calibration_v1",
                               ("c2_cal_id", "c2_cal_surface", "c2_cal_holdout")),
                              ("controlled_gate_c2_chain_validation_v2",
-                              ("chain_v2_id", "chain_v2_surface"))):
+                              ("chain_v2_id", "chain_v2_surface")),
+                             ("controlled_gate_c2_chain_validation_v3",
+                              ("chain_v3_id", "chain_v3_surface"))):
             for sp in splits:
                 p = ROOT / "data/hrm" / base / sp / "evidence.jsonl"
                 if p.exists():
@@ -70,11 +72,17 @@ def main() -> None:
                 "latent_leaks": sum(1 for r in c["evidence"] if FORBIDDEN.search(r["content"])),
                 "id_collisions_with_prior_corpora": len({r["evidence_id"] for r in c["evidence"]} & prior_ids),
             }
+            desc = audit_description_identifiability(c["tasks"], c["evidence"])
+            audit[name]["description_identifiability"] = desc
+            for k in ("DESCRIPTION_SURFACE_UNIQUENESS", "NORMALIZED_SURFACE_COLLISION",
+                      "RUNTIME_REFERENT_IDENTIFIABILITY", "IDENTITY_EVIDENCE_SUFFICIENCY"):
+                if desc[k]:
+                    problems.append(f"{name}: {k}={desc[k]}")
             for k, v in audit[name].items():
-                if v: problems.append(f"{name}: {k}={v}")
+                if isinstance(v, int) and v: problems.append(f"{name}: {k}={v}")
         for line in problems: print(f"      FAIL {line}")
-        if problems: raise SystemExit("VALID_CHAIN_V3 false; nothing written")
-        print("      VALID_CHAIN_V3 = true")
+        if problems: raise SystemExit("VALID_DESCRIPTION_V4 false; nothing written")
+        print("      VALID_DESCRIPTION_V4 = true")
 
         print("[3/5] pytest")
         r = subprocess.run([sys.executable, "-m", "pytest", "-q"], cwd=ROOT, capture_output=True, text=True)
@@ -91,14 +99,14 @@ def main() -> None:
         digests = {str(p.relative_to(OUT)): hashlib.sha256(p.read_bytes()).hexdigest()
                    for p in sorted(OUT.rglob("*")) if p.is_file()}
         (OUT / "AUDIT.json").write_text(json.dumps({
-            "generator": "controlled_gate_c2_chain_validation_v3", "audit": audit,
-            "problems": problems, "VALID_CHAIN_V3": True,
+            "generator": "controlled_gate_c2_description_valid_v4", "audit": audit,
+            "problems": problems, "VALID_DESCRIPTION_V4": True,
             "state": {"purpose": "independent_replication_of_fixed_C4_mechanism",
-                      "vocabulary_domain": "rivers", "replaces_prior_corpora": False,
+                      "vocabulary_domain": "summits", "replaces_prior_corpora": False,
                       "holdout_touched": False, "frozen_before_evaluation": True,
                       "arm_reselection_forbidden": True, "valid": True},
             "separation": {"overlap_with_v4_heads": 0, "overlap_with_cal_v1_heads": 0,
-                           "evidence_id_collisions": 0, "task_id_prefix": "chainv3-"},
+                           "evidence_id_collisions": 0, "task_id_prefix": "descv4-"},
         }, indent=2, sort_keys=True) + "\n")
         (OUT / "RECEIPTS.sha256").write_text("".join(f"{v}  {k}\n" for k, v in sorted(digests.items())))
         print("[5/5] frozen"); print(json.dumps(audit, indent=2))
@@ -106,8 +114,6 @@ def main() -> None:
         cal.restore_vocabulary(prev)
 
 
-if __name__ == "__main__":
-    main()
 
 
 # --- description identifiability audits, appended for the v4 description build ---
@@ -150,3 +156,7 @@ def audit_description_identifiability(tasks, evidence):
         "description_task_count": sum(1 for t in tasks
                                       if t["metadata"]["entity_regime"] == "description"),
     }
+
+
+if __name__ == "__main__":
+    main()

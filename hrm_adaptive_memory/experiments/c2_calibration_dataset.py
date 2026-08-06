@@ -119,10 +119,11 @@ def make_entity(rng, latent_id, used):
             used.update({head, alias_head})
             role = rng.choice(ROLES)
             initials = "".join(w[0].upper() for w in role.split())
+            serial = rng.randrange(1000, 9999)
             return Entity(latent_id, f"{head} {role}",
                           f"{alias_head} {rng.choice(ROLES).split()[0]}",
                           f"{head[0].upper()}{initials}-{rng.randrange(10, 99)}",
-                          rng.choice(DESCRIPTORS))
+                          f"{rng.choice(DESCRIPTORS)} under docket {serial}")
     raise RuntimeError("exhausted heads")
 
 
@@ -467,4 +468,24 @@ VOCAB_V3 = {
     "ENUM": ("chartered", "dredged", "impeded", "reserved", "surveyed"),
     "BOOLEAN": ("confirmed", "declined"),
     "JSON_KEYS": ("grade3", "tier3", "state3", "band3"),
+}
+
+
+VOCAB_V4D = {
+    # Fifth domain: birds, minerals, constellations, rivers, now summits.
+    "HEADS": ("Aconcagua", "Belukha", "Chimborazo", "Denali", "Elbrus", "Fuji",
+              "Gasherbrum", "Huascaran", "Illimani", "Jaya", "Kazbek", "Logan",
+              "Makalu", "Nanda", "Ojos", "Pobeda", "Rainier", "Shasta",
+              "Tambora", "Ushba", "Vinson", "Whitney"),
+    "ROLES": ("anchor cleat", "brake shoe", "cable drum", "guide rail",
+              "hoist frame", "tension block"),
+    "DESCRIPTORS": ("unit inspected during the ascent audit",
+                    "unit registered on the base camp roll",
+                    "unit cited in the traverse report",
+                    "unit filed with the ridge survey"),
+    "SYMBOLIC": ("SIGMA2-FLINT", "TAU2-OCHRE", "UPSILON2-BIRCH", "PHI2-SABLE",
+                 "CHI2-IVORY", "PSI2-CEDAR", "OMEGA2-BASALT", "ALPHA3-DUNE"),
+    "ENUM": ("audited", "cleared", "flagged", "staged", "withdrawn"),
+    "BOOLEAN": ("true2", "false2"),
+    "JSON_KEYS": ("grade4", "tier4", "state4", "band4"),
 }

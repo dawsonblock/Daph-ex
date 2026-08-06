@@ -12,6 +12,7 @@
     "adaptive_recurrence": "BLOCKED",
     "adaptive_retrieval": "BLOCKED",
     "agentdb_procedural_memory": "BLOCKED",
+    "bounded_chain_completion": "QUALIFIED",
     "bounded_iterative_retrieval": "DOES_NOT_GENERALIZE",
     "calculate_action": "UNQUALIFIED",
     "executive_training": "BLOCKED",
@@ -33,6 +34,7 @@
     "gate_c2_s_evidence_selection": "PENDING",
     "gate_c2_semantic_information_gap_retrieval": "IN_PROGRESS_COVERAGE_MEASURED",
     "gate_c2c_chain_completion": "FAIL_ON_ONE_BADLY_SPECIFIED_CRITERION",
+    "gate_c2c_chain_completion_qualified": "PASS_all_four_regimes_on_identifiable_corpus",
     "gate_c2c_v2_chain_validation": "FAIL_ON_A_TRANSPLANTED_DESCRIPTION_THRESHOLD",
     "gate_c2c_v3_chain_validation": "FAIL_description_regime_only",
     "gate_d_conditional_retrieval_opportunity": "PENDING_ACTION_TOO_WEAK_TO_MEASURE",
@@ -71,7 +73,7 @@
     "slot_label_echo": "99 -> 0 under precision packing; was an evidence-confusability artefact, not a prompt-interface or reasoning limit",
     "slot_label_echoes": "Track evidence quality, not packet format: 85 -> 28 under precision packing, -> 3 under oracle evidence. F-arms would measure a symptom; implemented but unrun."
   },
-  "next_work": "Do NOT build a canonicalization ladder yet: the diagnostic shows the resolver resolves at rate 1.000 and fails on precision because the references are not uniquely referring. Fix the corpus first -- descriptors must identify exactly one entity, asserted by audit -- then re-run the fixed C4 under the existing v3 OGC protocol on a fresh corpus. Holdout untouched; pools unfrozen; selector and executive blocked.",
+  "next_work": "Chain completion is QUALIFIED across all four well-posed regimes. Next: freeze the candidate-generation policy (P2 fusion + C4 chain completion), emit immutable candidate pools, compute availability ceilings, then the S0/S5 selection gate at tau=0.05. Reproduce the BGE description effect on the identifiable corpus before citing it. Holdout still untouched.",
   "ood_taxonomy": {
     "REFERENTIAL_OOD": {
       "mechanism": "identity resolution + multi-hop retrieval",
@@ -228,6 +230,7 @@
     "gate_c2_bge_dense": {
       "claim": "A stronger pinned dense encoder (BAAI/bge-small-en-v1.5, CLS pooling, query-prefix only) earns promotion on OOD but not on qualification. Complete-set@50 rises 0.072 -> 0.152 OOD (more than doubling) while qualification moves only 0.364 -> 0.370.",
       "claim_class_note": "The numbers stand (BGE OOD CES@50 0.152 vs MiniLM 0.072; description 0.083 -> 0.242). But this OOD set has now been used to decide whether BGE belongs in the architecture, so it is no longer a pristine final confirmation set for THIS C2 architecture-selection question. Class changed from 'final untouched confirmation' to 'measured exploratory evidence used for architecture selection'. A clean confirmation requires controlled_gate_c2_calibration_v1.",
+      "description_component_caveat": "The +0.14/+0.159 description gains were measured on the ambiguous corpus. They may show that BGE retrieves semantically related text better, but they do NOT establish entity-level description handling and must not be cited as such until reproduced on an identifiable corpus.",
       "interpretation": "The entire OOD gain comes from the DESCRIPTION regime (+0.158, roughly 3x). That is mechanistically coherent: a description is a natural-language phrase, which is what a semantic encoder is for. An alias is an arbitrary name substitution that no encoder can resolve without retrieving the identity record, so alias remains a multi-hop retrieval problem rather than an embedding problem. Promoting BGE on aggregate recall alone would have obscured that split.",
       "not_a_claim_about": [
         "qualification, where the gain is +0.006 and within noise",
@@ -513,6 +516,8 @@
         "mean_followup_depth": 2.0,
         "target_given_identity": 0.0469
       },
+      "description_endpoint_valid": false,
+      "description_invalidity_reason": "NON_IDENTIFIABLE_RUNTIME_REFERENT",
       "experiment_verdict": "FAIL_CHAIN_COMPLETION",
       "failure_reason": "PROMOTION_CRITERION_NOT_MET",
       "mechanism_effect_observed": true,
@@ -533,8 +538,69 @@
       "verdict": "FAIL_CHAIN_COMPLETION under the frozen protocol, on one criterion only",
       "why_it_fails": "target_recall_given_identity_delta required >= +0.05. Measured: C1 +0.0144, C2 -0.0857, C3 -0.0143, C4 +0.0469. The reference already scored 0.96 on c2_cal_id and 0.80 on c2_cal_surface for that metric, so at most 0.20 of headroom existed and I still required +0.05 of it as a hard gate. C4 misses by 0.0031."
     },
+    "gate_c2c_description_valid_v4": {
+      "aggregate": {
+        "descv4_id": {
+          "C0": 0.71,
+          "C4": 0.99
+        },
+        "descv4_surface": {
+          "C0": 0.24,
+          "C4": 0.88
+        }
+      },
+      "claim": "Fifth disjoint corpus (summit vocabulary) with injective, runtime-identifiable description references. Fixed C4, unchanged v3 oracle-gap-closure protocol, uniform tau=0.25. ALL FOUR regimes pass: canonical saturated-and-held, abbreviation OGC 0.966, alias OGC 0.839, description OGC 0.905.",
+      "experiment_verdict": "PASS_CHAIN_COMPLETION",
+      "mechanism_effect_observed": true,
+      "not_a_claim_about": [
+        "downstream HRM answer quality, which has not been measured",
+        "the reserved holdout, still untouched",
+        "selection, which remains unmeasured"
+      ],
+      "per_regime_oracle_gap_closure": {
+        "abbreviation": {
+          "C0": 0.42,
+          "C4": 0.98,
+          "C5": 1.0,
+          "OGC": 0.966,
+          "gap": 0.58
+        },
+        "alias": {
+          "C0": 0.32,
+          "C4": 0.84,
+          "C5": 0.94,
+          "OGC": 0.839,
+          "gap": 0.62
+        },
+        "canonical": {
+          "C0": 1.0,
+          "C4": 1.0,
+          "C5": 1.0,
+          "gap": 0.0,
+          "rule": "saturation"
+        },
+        "description": {
+          "C0": 0.16,
+          "C4": 0.92,
+          "C5": 1.0,
+          "OGC": 0.905,
+          "gap": 0.84
+        }
+      },
+      "receipts": [
+        "evidence/gate_c2/description_valid_v4/RESULTS.sha256",
+        "evidence/gate_c2/description_valid_v4/description_valid_v4.json",
+        "data/hrm/controlled_gate_c2_description_valid_v4/AUDIT.json"
+      ],
+      "replication_breadth": "Chain completion now measured on five corpora with disjoint vocabularies (birds, minerals, constellations, rivers, summits). Abbreviation OGC 0.960/0.966 and alias 0.815/0.839 across the two that used the OGC protocol; surface complete-set 0.26->0.56, 0.26->0.57, 0.32->0.55, 0.24->0.88.",
+      "report": "configs/gate_c2c_v3_protocol.json",
+      "status": "MEASURED_RECEIPTED",
+      "the_erratum_is_confirmed": "Description went from OGC 0.025 on the ambiguous corpus to 0.905 on the identifiable one, with the mechanism, parser, query templates, and thresholds all unchanged. That is direct confirmation that the prior description failures were benchmark non-identifiability and not a mechanism gap. Building the D0-D5 resolver ladder would have optimised against an impossible task."
+    },
     "gate_c2c_v2_chain_validation": {
       "claim": "Independent replication of the FIXED C4 mechanism on a third disjoint corpus (constellation vocabulary, zero id collisions with V4 or calibration v1). The mechanism replicates strongly: complete_set@50 0.720 -> 0.980 on ID and 0.260 -> 0.570 on surface. Alias +0.54 and abbreviation +0.52 against required +0.25/+0.20. The headroom-normalized conditional endpoint PASSES (HCR 0.192 vs 0.15). It fails description at +0.08 against a required +0.10.",
+      "description_endpoint_valid": false,
+      "description_invalidity_reason": "NON_IDENTIFIABLE_RUNTIME_REFERENT",
       "experiment_verdict": "FAIL_CHAIN_COMPLETION",
       "failure_reason": "PROMOTION_CRITERION_NOT_MET",
       "mechanism_effect_observed": true,
@@ -558,6 +624,8 @@
     "gate_c2c_v3_chain_validation": {
       "amended": "The description FAIL measured an ambiguous-by-construction regime. See data/hrm/DESCRIPTION_REGIME_ERRATUM.md. The FAIL verdict is preserved unchanged; the description figure is voided as a mechanism measurement. Abbreviation (0.960) and alias (0.815) oracle-gap closure stand.",
       "claim": "Fourth disjoint corpus (river vocabulary), fixed C4, oracle-gap-closure protocol with uniform tau=0.25. Three of four regimes pass decisively: abbreviation OGC=0.960, alias OGC=0.815, canonical saturated-and-held. Description fails at OGC=0.025 against an oracle gap of 0.800 -- the largest headroom of any regime and almost none of it recovered.",
+      "description_endpoint_valid": false,
+      "description_invalidity_reason": "NON_IDENTIFIABLE_RUNTIME_REFERENT",
       "experiment_verdict": "FAIL_CHAIN_COMPLETION",
       "failure_reason": "PROMOTION_CRITERION_NOT_MET_description_regime",
       "mechanism_effect_observed": true,
