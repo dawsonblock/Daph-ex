@@ -1,0 +1,497 @@
+{
+  "arms": {
+    "one_pass": {
+      "arm": "one_pass",
+      "calculator_answers": 0,
+      "complete_set_success": 0.525,
+      "followups_fired": 0,
+      "mean_evidence_records": 10.0,
+      "mean_evidence_tokens": 227.3,
+      "mean_quality": 0.225,
+      "mean_retrieval_calls": 1.0,
+      "per_family": {
+        "configuration_chain": {
+          "complete_set_success": 0.4167,
+          "followups_fired": 0,
+          "quality": 0.1667
+        },
+        "dependency_chain": {
+          "complete_set_success": 0.4167,
+          "followups_fired": 0,
+          "quality": 0.0
+        },
+        "distractor_heavy": {
+          "complete_set_success": 1.0,
+          "followups_fired": 0,
+          "quality": 0.4167
+        },
+        "entity_attribute": {
+          "complete_set_success": 1.0,
+          "followups_fired": 0,
+          "quality": 0.6667
+        },
+        "location_chain": {
+          "complete_set_success": 0.3333,
+          "followups_fired": 0,
+          "quality": 0.0833
+        },
+        "numeric_chain": {
+          "complete_set_success": 0.25,
+          "followups_fired": 0,
+          "quality": 0.0
+        },
+        "ownership_chain": {
+          "complete_set_success": 0.5,
+          "followups_fired": 0,
+          "quality": 0.0833
+        },
+        "procedural_chain": {
+          "complete_set_success": 0.3333,
+          "followups_fired": 0,
+          "quality": 0.0
+        },
+        "temporal_chain": {
+          "complete_set_success": 0.0,
+          "followups_fired": 0,
+          "quality": 0.0
+        },
+        "temporal_update": {
+          "complete_set_success": 1.0,
+          "followups_fired": 0,
+          "quality": 0.8333
+        }
+      },
+      "task_count": 120,
+      "wall_seconds": 218.5
+    },
+    "one_pass_selected": {
+      "arm": "one_pass_selected",
+      "calculator_answers": 0,
+      "complete_set_success": 0.4667,
+      "followups_fired": 0,
+      "mean_evidence_records": 2.76,
+      "mean_evidence_tokens": 57.6,
+      "mean_quality": 0.2167,
+      "mean_retrieval_calls": 1.0,
+      "per_family": {
+        "configuration_chain": {
+          "complete_set_success": 0.25,
+          "followups_fired": 0,
+          "quality": 0.0833
+        },
+        "dependency_chain": {
+          "complete_set_success": 0.3333,
+          "followups_fired": 0,
+          "quality": 0.0
+        },
+        "distractor_heavy": {
+          "complete_set_success": 1.0,
+          "followups_fired": 0,
+          "quality": 0.4167
+        },
+        "entity_attribute": {
+          "complete_set_success": 1.0,
+          "followups_fired": 0,
+          "quality": 0.5833
+        },
+        "location_chain": {
+          "complete_set_success": 0.25,
+          "followups_fired": 0,
+          "quality": 0.0833
+        },
+        "numeric_chain": {
+          "complete_set_success": 0.25,
+          "followups_fired": 0,
+          "quality": 0.0833
+        },
+        "ownership_chain": {
+          "complete_set_success": 0.25,
+          "followups_fired": 0,
+          "quality": 0.0833
+        },
+        "procedural_chain": {
+          "complete_set_success": 0.3333,
+          "followups_fired": 0,
+          "quality": 0.0
+        },
+        "temporal_chain": {
+          "complete_set_success": 0.0,
+          "followups_fired": 0,
+          "quality": 0.0
+        },
+        "temporal_update": {
+          "complete_set_success": 1.0,
+          "followups_fired": 0,
+          "quality": 0.8333
+        }
+      },
+      "task_count": 120,
+      "wall_seconds": 103.4
+    },
+    "oracle_bridge": {
+      "arm": "oracle_bridge",
+      "calculator_answers": 0,
+      "complete_set_success": 0.825,
+      "followups_fired": 44,
+      "mean_evidence_records": 3.6,
+      "mean_evidence_tokens": 75.5,
+      "mean_quality": 0.5083,
+      "mean_retrieval_calls": 1.367,
+      "per_family": {
+        "configuration_chain": {
+          "complete_set_success": 0.75,
+          "followups_fired": 6,
+          "quality": 0.5833
+        },
+        "dependency_chain": {
+          "complete_set_success": 0.8333,
+          "followups_fired": 6,
+          "quality": 0.5
+        },
+        "distractor_heavy": {
+          "complete_set_success": 1.0,
+          "followups_fired": 0,
+          "quality": 0.4167
+        },
+        "entity_attribute": {
+          "complete_set_success": 1.0,
+          "followups_fired": 0,
+          "quality": 0.5833
+        },
+        "location_chain": {
+          "complete_set_success": 0.75,
+          "followups_fired": 6,
+          "quality": 0.5
+        },
+        "numeric_chain": {
+          "complete_set_success": 0.75,
+          "followups_fired": 6,
+          "quality": 0.5
+        },
+        "ownership_chain": {
+          "complete_set_success": 0.6667,
+          "followups_fired": 6,
+          "quality": 0.5
+        },
+        "procedural_chain": {
+          "complete_set_success": 0.8333,
+          "followups_fired": 6,
+          "quality": 0.3333
+        },
+        "temporal_chain": {
+          "complete_set_success": 0.6667,
+          "followups_fired": 8,
+          "quality": 0.3333
+        },
+        "temporal_update": {
+          "complete_set_success": 1.0,
+          "followups_fired": 0,
+          "quality": 0.8333
+        }
+      },
+      "task_count": 120,
+      "wall_seconds": 114.8
+    },
+    "oracle_evidence": {
+      "arm": "oracle_evidence",
+      "calculator_answers": 0,
+      "complete_set_success": 1.0,
+      "followups_fired": 0,
+      "mean_evidence_records": 1.55,
+      "mean_evidence_tokens": 32.6,
+      "mean_quality": 0.6917,
+      "mean_retrieval_calls": 0.0,
+      "per_family": {
+        "configuration_chain": {
+          "complete_set_success": 1.0,
+          "followups_fired": 0,
+          "quality": 0.6667
+        },
+        "dependency_chain": {
+          "complete_set_success": 1.0,
+          "followups_fired": 0,
+          "quality": 0.75
+        },
+        "distractor_heavy": {
+          "complete_set_success": 1.0,
+          "followups_fired": 0,
+          "quality": 0.6667
+        },
+        "entity_attribute": {
+          "complete_set_success": 1.0,
+          "followups_fired": 0,
+          "quality": 0.6667
+        },
+        "location_chain": {
+          "complete_set_success": 1.0,
+          "followups_fired": 0,
+          "quality": 0.75
+        },
+        "numeric_chain": {
+          "complete_set_success": 1.0,
+          "followups_fired": 0,
+          "quality": 0.6667
+        },
+        "ownership_chain": {
+          "complete_set_success": 1.0,
+          "followups_fired": 0,
+          "quality": 0.75
+        },
+        "procedural_chain": {
+          "complete_set_success": 1.0,
+          "followups_fired": 0,
+          "quality": 0.5833
+        },
+        "temporal_chain": {
+          "complete_set_success": 1.0,
+          "followups_fired": 0,
+          "quality": 0.5833
+        },
+        "temporal_update": {
+          "complete_set_success": 1.0,
+          "followups_fired": 0,
+          "quality": 0.8333
+        }
+      },
+      "task_count": 120,
+      "wall_seconds": 87.5
+    },
+    "two_pass_calculate": {
+      "arm": "two_pass_calculate",
+      "calculator_answers": 3,
+      "complete_set_success": 0.5917,
+      "followups_fired": 45,
+      "mean_evidence_records": 3.33,
+      "mean_evidence_tokens": 69.9,
+      "mean_quality": 0.2667,
+      "mean_retrieval_calls": 1.375,
+      "per_family": {
+        "configuration_chain": {
+          "complete_set_success": 0.3333,
+          "followups_fired": 7,
+          "quality": 0.1667
+        },
+        "dependency_chain": {
+          "complete_set_success": 0.5833,
+          "followups_fired": 7,
+          "quality": 0.1667
+        },
+        "distractor_heavy": {
+          "complete_set_success": 1.0,
+          "followups_fired": 0,
+          "quality": 0.3333
+        },
+        "entity_attribute": {
+          "complete_set_success": 1.0,
+          "followups_fired": 0,
+          "quality": 0.5
+        },
+        "location_chain": {
+          "complete_set_success": 0.4167,
+          "followups_fired": 7,
+          "quality": 0.1667
+        },
+        "numeric_chain": {
+          "complete_set_success": 0.4167,
+          "followups_fired": 7,
+          "quality": 0.1667
+        },
+        "ownership_chain": {
+          "complete_set_success": 0.4167,
+          "followups_fired": 7,
+          "quality": 0.25
+        },
+        "procedural_chain": {
+          "complete_set_success": 0.6667,
+          "followups_fired": 7,
+          "quality": 0.0833
+        },
+        "temporal_chain": {
+          "complete_set_success": 0.0833,
+          "followups_fired": 3,
+          "quality": 0.0
+        },
+        "temporal_update": {
+          "complete_set_success": 1.0,
+          "followups_fired": 0,
+          "quality": 0.8333
+        }
+      },
+      "task_count": 120,
+      "wall_seconds": 105.7
+    },
+    "two_pass_selected": {
+      "arm": "two_pass_selected",
+      "calculator_answers": 0,
+      "complete_set_success": 0.5917,
+      "followups_fired": 45,
+      "mean_evidence_records": 3.33,
+      "mean_evidence_tokens": 69.9,
+      "mean_quality": 0.2833,
+      "mean_retrieval_calls": 1.375,
+      "per_family": {
+        "configuration_chain": {
+          "complete_set_success": 0.3333,
+          "followups_fired": 7,
+          "quality": 0.1667
+        },
+        "dependency_chain": {
+          "complete_set_success": 0.5833,
+          "followups_fired": 7,
+          "quality": 0.1667
+        },
+        "distractor_heavy": {
+          "complete_set_success": 1.0,
+          "followups_fired": 0,
+          "quality": 0.4167
+        },
+        "entity_attribute": {
+          "complete_set_success": 1.0,
+          "followups_fired": 0,
+          "quality": 0.5833
+        },
+        "location_chain": {
+          "complete_set_success": 0.4167,
+          "followups_fired": 7,
+          "quality": 0.1667
+        },
+        "numeric_chain": {
+          "complete_set_success": 0.4167,
+          "followups_fired": 7,
+          "quality": 0.1667
+        },
+        "ownership_chain": {
+          "complete_set_success": 0.4167,
+          "followups_fired": 7,
+          "quality": 0.25
+        },
+        "procedural_chain": {
+          "complete_set_success": 0.6667,
+          "followups_fired": 7,
+          "quality": 0.0833
+        },
+        "temporal_chain": {
+          "complete_set_success": 0.0833,
+          "followups_fired": 3,
+          "quality": 0.0
+        },
+        "temporal_update": {
+          "complete_set_success": 1.0,
+          "followups_fired": 0,
+          "quality": 0.8333
+        }
+      },
+      "task_count": 120,
+      "wall_seconds": 108.9
+    }
+  },
+  "authorized_by": {
+    "gate": "B",
+    "verdict": "PASS_RETRIEVAL_EXPANSION"
+  },
+  "created_utc": "2026-08-06T00:55:17Z",
+  "environment": {
+    "platform": "macOS-26.2-arm64-arm-64bit",
+    "python": "3.12.0",
+    "torch": "2.10.0",
+    "transformers": "5.13.0"
+  },
+  "evidence_corpus_sha256": "d947f001f57b444c7e8882d299b0dd72fd89ddb20cb2e9ad3d568eae4bb3277f",
+  "marginal_utility": {
+    "one_pass_selected - one_pass": {
+      "delta_complete_set_success": -0.0583,
+      "delta_quality": -0.0083,
+      "delta_retrieval_calls": 0.0,
+      "per_family_delta_quality": {
+        "configuration_chain": -0.0834,
+        "dependency_chain": 0.0,
+        "distractor_heavy": 0.0,
+        "entity_attribute": -0.0834,
+        "location_chain": 0.0,
+        "numeric_chain": 0.0833,
+        "ownership_chain": 0.0,
+        "procedural_chain": 0.0,
+        "temporal_chain": 0.0,
+        "temporal_update": 0.0
+      }
+    },
+    "oracle_bridge - two_pass_calculate": {
+      "delta_complete_set_success": 0.2333,
+      "delta_quality": 0.2416,
+      "delta_retrieval_calls": -0.008,
+      "per_family_delta_quality": {
+        "configuration_chain": 0.4166,
+        "dependency_chain": 0.3333,
+        "distractor_heavy": 0.0834,
+        "entity_attribute": 0.0833,
+        "location_chain": 0.3333,
+        "numeric_chain": 0.3333,
+        "ownership_chain": 0.25,
+        "procedural_chain": 0.25,
+        "temporal_chain": 0.3333,
+        "temporal_update": 0.0
+      }
+    },
+    "oracle_evidence - oracle_bridge": {
+      "delta_complete_set_success": 0.175,
+      "delta_quality": 0.1834,
+      "delta_retrieval_calls": -1.367,
+      "per_family_delta_quality": {
+        "configuration_chain": 0.0834,
+        "dependency_chain": 0.25,
+        "distractor_heavy": 0.25,
+        "entity_attribute": 0.0834,
+        "location_chain": 0.25,
+        "numeric_chain": 0.1667,
+        "ownership_chain": 0.25,
+        "procedural_chain": 0.25,
+        "temporal_chain": 0.25,
+        "temporal_update": 0.0
+      }
+    },
+    "two_pass_calculate - two_pass_selected": {
+      "delta_complete_set_success": 0.0,
+      "delta_quality": -0.0166,
+      "delta_retrieval_calls": 0.0,
+      "per_family_delta_quality": {
+        "configuration_chain": 0.0,
+        "dependency_chain": 0.0,
+        "distractor_heavy": -0.0834,
+        "entity_attribute": -0.0833,
+        "location_chain": 0.0,
+        "numeric_chain": 0.0,
+        "ownership_chain": 0.0,
+        "procedural_chain": 0.0,
+        "temporal_chain": 0.0,
+        "temporal_update": 0.0
+      }
+    },
+    "two_pass_selected - one_pass_selected": {
+      "delta_complete_set_success": 0.125,
+      "delta_quality": 0.0666,
+      "delta_retrieval_calls": 0.375,
+      "per_family_delta_quality": {
+        "configuration_chain": 0.0834,
+        "dependency_chain": 0.1667,
+        "distractor_heavy": 0.0,
+        "entity_attribute": 0.0,
+        "location_chain": 0.0834,
+        "numeric_chain": 0.0834,
+        "ownership_chain": 0.1667,
+        "procedural_chain": 0.0833,
+        "temporal_chain": 0.0,
+        "temporal_update": 0.0
+      }
+    }
+  },
+  "max_retrieval_depth": 2,
+  "model_id": "sapientinc/HRM-Text-1B",
+  "model_revision": "9f082d68b8cd0ebc56e33f1c88c45609174c272c",
+  "prompt_condition": "direct",
+  "reformulator": "deterministic-bridge-v1",
+  "retrieval_k": 10,
+  "retriever": "canonical:bm25",
+  "sprint": "2_bounded_iterative_retrieval",
+  "task_count": 120,
+  "task_dataset_sha256": "5804fbedebfb84039555ab397722153812dc34ab5d44b8f12afe6f85960c816c"
+}
