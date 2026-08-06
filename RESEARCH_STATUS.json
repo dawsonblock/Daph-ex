@@ -327,6 +327,7 @@
       "receipts": [
         "evidence/gate_c2/dev_sweep/dev_sweep.json"
       ],
+      "report": "GATE_C2_DEV_SWEEP_REPORT.md",
       "status": "MEASURED_RECEIPTED_DEVELOPMENT_ONLY",
       "unique_gold_contribution": {
         "bge": 2,
