@@ -10,23 +10,32 @@ Pretrained-compatible adaptive computation with a physically ordered four-level 
 | `daph/` | LEGACY_QWEN_EXFUSION — frozen; tests kept passing, no new HRM work |
 | `daph_metareasoner/` | LEGACY_METAREASONING — frozen; tests kept passing, no new HRM work |
 
-Gate A0 (evidence use) and Gate B (single-pass retrieval) have **passed**. Gate C
-(bounded iterative retrieval) has been measured and is **not certified** — the
-mechanism saturates the corpus while the corpus cannot certify it, so the active
-work is benchmark construction (`controlled_gate_a_v3`), not new mechanism.
-Memory-stack expansion (RuVector, TurboVec, Graphiti, adaptive recurrence,
-learned executive) stays blocked until its prerequisite gate passes. Current
-state is machine-readable in [RESEARCH_STATUS.json](RESEARCH_STATUS.json).
+Gate A0 (evidence use) and Gate B (single-pass retrieval) have **passed**.
+Gate C0 reached the oracle ceiling on the v2 corpus but could not be promoted
+under its own pre-declared statistical rule. **Gate C1 then failed**: on the
+harder `controlled_gate_a_v3` corpus the same mechanism scores 0.394 against a
+0.828 oracle-evidence ceiling, and is **entirely inert out of distribution**
+(0.080 vs 0.764) — the entity extractor matches nothing in 250 of 250 OOD
+questions, so no follow-up ever fires ([report](GATE_C1_REPORT.md)).
 
-The central design principle established by Gate B is that second-hop recall
-and evidence precision must be optimised **jointly** — raising recall while
-flooding the reader with plausible near-duplicates lowers answer quality:
+The mechanism was performing lexical identifier chaining, not bridge inference.
+The reader is not the bottleneck: given perfect evidence HRM scores 0.828 and
+0.764 on a corpus of aliases, descriptions, unseen source styles, and
+non-numeric answers. Memory-stack expansion (RuVector, TurboVec, Graphiti,
+adaptive recurrence, learned executive) stays blocked. Current state is
+machine-readable in [RESEARCH_STATUS.json](RESEARCH_STATUS.json).
+
+Gate B established that second-hop recall and evidence precision must be
+optimised **jointly**. Gate C1 added the constraint that neither may depend on
+surface identifier shape, so the next mechanism is an information-gap layer
+rather than entity chaining:
 
 ```
-question → small precise retrieval₁ → bridge detection
-        → targeted retrieval₂ (only if unresolved)
-        → entity-aware dedupe → near-duplicate suppression
-        → small high-value evidence packet → HRM
+question → first-pass evidence
+        → explicit state: KNOWN / TARGET / MISSING RELATION / CANDIDATE BRIDGES
+        → query the missing *relation on the bridge*, not the bridge's name
+        → relation-aware connectivity (not entity-string anchoring)
+        → small coherent evidence subgraph → HRM
 ```
 
 ## Canonical architecture
