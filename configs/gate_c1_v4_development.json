@@ -1,0 +1,37 @@
+{
+  "condition_selection_rationale": "Inherited unchanged from the frozen Gate A protocol. V4 is a generalization test of the EXISTING mechanism; no prompt, model, decoding, verifier, ENTITY_PATTERN, packing, or query-formulation change is permitted.",
+  "decoding": {
+    "do_sample": false,
+    "notes": "greedy; generation limit identical across arms"
+  },
+  "evaluation_mode": "CAPABILITY_USE",
+  "evidence_corpus_sha256": "de6d710f5012a6152b945d6208aa0c0ef56fc8b719d34f1e37c197efd7f62547",
+  "evidence_path": "data/hrm/controlled_gate_a_v4/development/evidence.jsonl",
+  "include_hard_distractor": true,
+  "lambda_evidence_tokens": 0.0,
+  "max_new_tokens": 64,
+  "mechanism_commit": "3260ce0",
+  "mechanism_improvement_prohibited_this_sprint": true,
+  "mechanism_must_be_unchanged": true,
+  "model_id": "sapientinc/HRM-Text-1B",
+  "model_revision": "9f082d68b8cd0ebc56e33f1c88c45609174c272c",
+  "prompt_condition": "direct",
+  "protocol": "hrm-gate-c1-v4-structural-generalization",
+  "retrieval_k": 10,
+  "retriever": "bm25",
+  "seed": 42,
+  "statistical_thresholds": {
+    "bootstrap_samples": 10000,
+    "confidence": 0.95,
+    "group_keys": [
+      "template_id",
+      "family",
+      "source_cluster_id"
+    ],
+    "grouped_lcb_requirement": "LCB95 > 0 for every grouping key",
+    "minimum_mean_quality_gain": 0.05
+  },
+  "task_dataset_sha256": "71d136098ecf76d0962f2414cd27bfaddd0f36644c848e7edfdf0018215da1af",
+  "tasks_path": "data/hrm/controlled_gate_a_v4/development/oracle_tasks.jsonl",
+  "tier": "SMOKE"
+}
