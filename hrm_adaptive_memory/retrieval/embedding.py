@@ -21,6 +21,15 @@ class EmbeddingBackend(Protocol):
     def embed_documents(self, texts: Sequence[str]) -> Sequence[Sequence[float]]: ...
 
 
+BGE_SMALL = dict(
+    model_id="BAAI/bge-small-en-v1.5", revision="5c38ec7c405ec4b44b94cc5a9bb96e735b38267a", pooling="cls",
+    normalize=True, dimension=384, max_sequence_length=512,
+    # BGE's documented retrieval recipe prefixes the QUERY only, never the
+    # documents. Prefixing both would change the measured comparison.
+    query_prefix="Represent this sentence for searching relevant passages: ",
+)
+
+
 @dataclass(frozen=True)
 class EmbeddingSpec:
     model_id: str = "sentence-transformers/all-MiniLM-L6-v2"

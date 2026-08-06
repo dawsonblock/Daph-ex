@@ -61,7 +61,7 @@
     "slot_label_echo": "99 -> 0 under precision packing; was an evidence-confusability artefact, not a prompt-interface or reasoning limit",
     "slot_label_echoes": "Track evidence quality, not packet format: 85 -> 28 under precision packing, -> 3 under oracle evidence. F-arms would measure a symptom; implemented but unrun."
   },
-  "next_work": "Gate C2 continues: freeze candidate pools, run S0-S5 selection on identical pools, run the R1/R2/R3 failure diagnostic, and add a stronger dense retriever (rerankers cannot recover records absent from the pool). Executive, adaptive recurrence, Graphiti, and learned routing stay blocked.",
+  "next_work": "Freeze candidate pools from the winning retriever, then run S0-S5 selection on identical pools. Alias remains a retrieval/multi-hop problem, not an embedding one. Executive, adaptive recurrence, Graphiti, and learned routing stay blocked.",
   "qualified_claims": {
     "gate_a0": {
       "claim": "HRM-Text-1B can use correctly supplied external evidence on the controlled synthetic Gate A benchmark.",
@@ -201,6 +201,38 @@
         "the reader, which reaches 0.880/0.908 given the required evidence"
       ],
       "provenance": "Measured on Colab T4 at pinned commit 3b1fbd5, sequential generation (batch_equivalence_passed=false, batch_size=1). Values transcribed from the run output; the receipt files were not pushed back to this repository, so they are NOT independently re-verifiable here.",
+      "report": "GATE_C1_V4_REPORT.md"
+    },
+    "gate_c2_bge_dense": {
+      "claim": "A stronger pinned dense encoder (BAAI/bge-small-en-v1.5, CLS pooling, query-prefix only) earns promotion on OOD but not on qualification. Complete-set@50 rises 0.072 -> 0.152 OOD (more than doubling) while qualification moves only 0.364 -> 0.370.",
+      "interpretation": "The entire OOD gain comes from the DESCRIPTION regime (+0.158, roughly 3x). That is mechanistically coherent: a description is a natural-language phrase, which is what a semantic encoder is for. An alias is an arbitrary name substitution that no encoder can resolve without retrieving the identity record, so alias remains a multi-hop retrieval problem rather than an embedding problem. Promoting BGE on aggregate recall alone would have obscured that split.",
+      "not_a_claim_about": [
+        "qualification, where the gain is +0.006 and within noise",
+        "alias resolution, which improves only +0.008 and is not a semantic-similarity problem",
+        "downstream answer quality, which was not measured here"
+      ],
+      "per_entity_regime_complete_set_at_50": {
+        "ood": {
+          "alias": {
+            "bge": 0.069,
+            "minilm": 0.061
+          },
+          "description": {
+            "bge": 0.242,
+            "minilm": 0.083
+          }
+        },
+        "qualification": {
+          "abbreviation": {
+            "bge": 0.34,
+            "minilm": 0.324
+          },
+          "canonical": {
+            "bge": 0.4,
+            "minilm": 0.404
+          }
+        }
+      },
       "report": "GATE_C1_V4_REPORT.md"
     },
     "gate_c2_coverage": {

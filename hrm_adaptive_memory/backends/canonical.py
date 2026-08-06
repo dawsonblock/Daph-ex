@@ -46,10 +46,12 @@ class CanonicalRetrievalMode(str, Enum):
     HYBRID_SCORE = "hybrid_score"
     HYBRID_RRF = "hybrid_rrf"
     HYBRID_RERANK = "hybrid_rerank"
+    DENSE_BGE = "dense_bge"
 
 
 _DENSE_MODES = {
     CanonicalRetrievalMode.DENSE,
+    CanonicalRetrievalMode.DENSE_BGE,
     CanonicalRetrievalMode.HYBRID_SCORE,
     CanonicalRetrievalMode.HYBRID_RRF,
     CanonicalRetrievalMode.HYBRID_RERANK,
@@ -91,7 +93,10 @@ class CanonicalRetrievalBackend:
         self.embedding_spec = embedding_spec
         self._embedder = embedder
         if self.mode in _DENSE_MODES and self._embedder is None:
-            self._embedder = PinnedTransformerEmbedder(embedding_spec or EmbeddingSpec())
+            from ..retrieval.embedding import BGE_SMALL
+            default = (EmbeddingSpec(**BGE_SMALL)
+                       if self.mode == CanonicalRetrievalMode.DENSE_BGE else EmbeddingSpec())
+            self._embedder = PinnedTransformerEmbedder(embedding_spec or default)
             self.embedding_spec = self._embedder.spec
         elif self.mode == CanonicalRetrievalMode.HASH and self._embedder is None:
             self._embedder = HashingEmbedder()
@@ -200,7 +205,8 @@ class CanonicalRetrievalBackend:
                 (chunk_id, {"lexical": score, "dense": None, "fusion": None})
                 for chunk_id, score in self._ranked(self._lexical_scores(query), k)
             ]
-        if self.mode in (CanonicalRetrievalMode.DENSE, CanonicalRetrievalMode.HASH):
+        if self.mode in (CanonicalRetrievalMode.DENSE, CanonicalRetrievalMode.DENSE_BGE,
+                         CanonicalRetrievalMode.HASH):
             return [
                 (chunk_id, {"dense": score, "lexical": None, "fusion": None})
                 for chunk_id, score in self._ranked(self._dense_scores(query), k)
