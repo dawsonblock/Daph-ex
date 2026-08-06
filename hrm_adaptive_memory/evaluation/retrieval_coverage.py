@@ -39,6 +39,27 @@ class RetrievalGroundTruth:
     bridge_ids: tuple[str, ...]
     answer_record_ids: tuple[str, ...]
 
+    def weights(self, *, answer_weight: float = 3.0, bridge_weight: float = 2.0,
+                base_weight: float = 1.0) -> dict[str, float]:
+        """Evaluator-only record weights for partial proof coverage.
+
+        R4 answered 46.2% of tasks while holding the complete evidence set for
+        only 16.8%, so complete-set success is a necessary metric but not a
+        sufficient proxy for answerability: a partial packet containing the
+        answer-bearing record is often enough. Weighting lets partial coverage
+        reflect that without pretending it is a causal model of the reader.
+        """
+
+        out: dict[str, float] = {}
+        for value in self.required_ids:
+            weight = base_weight
+            if value in self.bridge_ids:
+                weight = max(weight, bridge_weight)
+            if value in self.answer_record_ids:
+                weight = max(weight, answer_weight)
+            out[value] = weight
+        return out
+
     @classmethod
     def from_task(cls, task: Mapping[str, Any]) -> "RetrievalGroundTruth":
         meta = task["_oracle_metadata"]
@@ -69,6 +90,7 @@ class CoverageResult:
     recall_at: Mapping[int, float]
     complete_set_at: Mapping[int, float]
     proof_path_coverage_at: Mapping[int, float]
+    partial_proof_coverage_at: Mapping[int, float]
     bridge_found: float
     answer_record_found: float
     mrr: float
@@ -79,7 +101,8 @@ class CoverageResult:
 
     def to_dict(self) -> dict[str, Any]:
         row = asdict(self)
-        for key in ("recall_at", "complete_set_at", "proof_path_coverage_at"):
+        for key in ("recall_at", "complete_set_at", "proof_path_coverage_at",
+                    "partial_proof_coverage_at"):
             row[key] = {str(k): v for k, v in getattr(self, key).items()}
         return row
 
@@ -93,12 +116,16 @@ def score_coverage(
     proof = set(truth.proof_path_ids)
     hits = [value in required for value in ranked]
 
-    recall_at, complete_at, proof_at = {}, {}, {}
+    weights = truth.weights()
+    total_weight = sum(weights.values()) or 1.0
+    recall_at, complete_at, proof_at, partial_at = {}, {}, {}, {}
     for depth in depths:
         window = set(ranked[:depth])
         recall_at[depth] = len(window & required) / max(1, len(required))
         complete_at[depth] = float(required <= window)
         proof_at[depth] = len(window & proof) / max(1, len(proof))
+        partial_at[depth] = sum(
+            weight for value, weight in weights.items() if value in window) / total_weight
 
     first = next((index for index, hit in enumerate(hits, 1) if hit), None)
     ideal = min(len(ranked), len(required))
@@ -108,6 +135,7 @@ def score_coverage(
     return CoverageResult(
         task_id=truth.task_id, retriever=retriever, retrieved=tuple(ranked),
         recall_at=recall_at, complete_set_at=complete_at, proof_path_coverage_at=proof_at,
+        partial_proof_coverage_at=partial_at,
         bridge_found=float(bool(truth.bridge_ids) and set(truth.bridge_ids) <= set(ranked)),
         answer_record_found=float(
             bool(truth.answer_record_ids) and bool(set(truth.answer_record_ids) & set(ranked))),
@@ -135,6 +163,8 @@ def summarize_coverage(
             **{f"complete_set@{d}": round(mean(r.complete_set_at[d] for r in rows), 4)
                for d in depths},
             **{f"proof_path@{d}": round(mean(r.proof_path_coverage_at[d] for r in rows), 4)
+               for d in depths},
+            **{f"partial_proof@{d}": round(mean(r.partial_proof_coverage_at[d] for r in rows), 4)
                for d in depths},
             "mrr": round(mean(r.mrr for r in rows), 4),
             "ndcg": round(mean(r.ndcg for r in rows), 4),

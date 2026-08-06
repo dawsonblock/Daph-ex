@@ -61,7 +61,7 @@
     "slot_label_echo": "99 -> 0 under precision packing; was an evidence-confusability artefact, not a prompt-interface or reasoning limit",
     "slot_label_echoes": "Track evidence quality, not packet format: 85 -> 28 under precision packing, -> 3 under oracle evidence. F-arms would measure a symptom; implemented but unrun."
   },
-  "next_work": "Gate C2 selection arms on frozen candidate pools (S0-S5), then the R1/R2/R3 failure diagnostic and the Q0-Q3 query-only coverage ladder. Executive, adaptive recurrence, Graphiti, and learned routing stay blocked.",
+  "next_work": "Gate C2 continues: freeze candidate pools, run S0-S5 selection on identical pools, run the R1/R2/R3 failure diagnostic, and add a stronger dense retriever (rerankers cannot recover records absent from the pool). Executive, adaptive recurrence, Graphiti, and learned routing stay blocked.",
   "qualified_claims": {
     "gate_a0": {
       "claim": "HRM-Text-1B can use correctly supplied external evidence on the controlled synthetic Gate A benchmark.",
@@ -241,6 +241,44 @@
       "receipts": "evidence/gate_c2/{qualification,ood}_coverage/",
       "report": "GATE_C1_V4_REPORT.md",
       "supersedes": "Gate B's finding that BM25 dominates the tested dense stack. That held on the identifier-heavy v2 corpus and does not survive v4."
+    },
+    "gate_c2_query_ladder": {
+      "claim": "Q0-Q3 retrieval-only query ablation on frozen V4. Querying the bridge entity ALONE (Q1) is worse than the original question on both splits and collapses to 0.000 complete-set@50 on OOD, which explains why the V4 ladder's R2 did not beat R1. A fully rendered request (Q3) nearly doubles dense complete-set@10 on qualification (0.214 -> 0.416) and lifts fusion complete-set@50 from 0.426 to 0.614. On OOD even a perfect query reaches only 0.200, so retrieval representation, not query formulation, is the binding constraint there.",
+      "complete_set_at_50_fusion": {
+        "ood": {
+          "Q0": 0.128,
+          "Q1": 0.0,
+          "Q2": 0.1,
+          "Q3": 0.2
+        },
+        "qualification": {
+          "Q0": 0.426,
+          "Q1": 0.464,
+          "Q2": 0.438,
+          "Q3": 0.614
+        }
+      },
+      "implication": "Query formulation is a real opportunity on qualification but is NOT sufficient on OOD. Building a semantic gap reasoner alone would sit on top of an index that cannot exploit a perfect query out of distribution. Retrieval representation must improve alongside it.",
+      "not_a_claim_about": [
+        "downstream answer quality, which was not measured in this ablation",
+        "any learned query formulator, since Q1-Q3 are oracle-constructed",
+        "selection, which is measured separately on frozen candidate pools"
+      ],
+      "partial_proof_at_50_fusion": {
+        "ood": {
+          "Q0": 0.449,
+          "Q1": 0.472,
+          "Q2": 0.605,
+          "Q3": 0.528
+        },
+        "qualification": {
+          "Q0": 0.623,
+          "Q1": 0.658,
+          "Q2": 0.688,
+          "Q3": 0.765
+        }
+      },
+      "report": "GATE_C1_V4_REPORT.md"
     }
   },
   "version": "3.7.1"
