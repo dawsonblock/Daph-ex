@@ -33,7 +33,7 @@
     "gate_c1_structural_generalization_iterative_retrieval": "FAIL_MEASURED_ON_V4",
     "gate_c2_i_identity_resolution": "PENDING",
     "gate_c2_r_retrieval_coverage": "PASS_POLICY_FROZEN_c2_candidate_generation_v1",
-    "gate_c2_s_evidence_selection": "IN_PROGRESS_STRUCTURAL_ARMS_BUILT_RETRIEVAL_ONLY",
+    "gate_c2_s_evidence_selection": "PASS_ID_PARTITION_structural_selection_captures_30pct_of_oracle_gap",
     "gate_c2_semantic_information_gap_retrieval": "IN_PROGRESS_COVERAGE_MEASURED",
     "gate_c2c_chain_completion": "FAIL_ON_ONE_BADLY_SPECIFIED_CRITERION",
     "gate_c2c_chain_completion_qualified": "PASS_all_four_regimes_on_identifiable_corpus",
@@ -75,7 +75,7 @@
     "slot_label_echo": "99 -> 0 under precision packing; was an evidence-confusability artefact, not a prompt-interface or reasoning limit",
     "slot_label_echoes": "Track evidence quality, not packet format: 85 -> 28 under precision packing, -> 3 under oracle evidence. F-arms would measure a symptom; implemented but unrun."
   },
-  "next_work": "Budget-6 frozen run for S0/S1/S2/S3/S4/S5 with per-task receipts is completing. Structural arms S2a/S2b/S2c are implemented and pass adversarial fixtures; offline retrieval-only measurement on descv4_id lifts CSR 0.4632 -> 0.6632 and BridgeRetention 0.3571 -> 0.6786, but NO HRM quality is measured for them yet, so no selector-gap-capture claim exists. Next: run S2a/S2b/S2c under HRM at budget 6 on both partitions, then paired analysis and SGC. Holdout untouched.",
+  "next_work": "Structural selection qualified on descv4_id only (S2c +0.1200, SGC 30.8%, CI excludes zero under all groupings). Two follow-ups, in order: (1) S2b/S2c are inert on surface forms because entity extraction fails on truncated subjects (100/100 tasks) -- that is an identity-resolution problem upstream of selection, so the next sprint is alias/description identity resolution, not more selector tuning; (2) only then a packet-budget sweep for S0/S2c/S5. Holdout untouched.",
   "ood_taxonomy": {
     "REFERENTIAL_OOD": {
       "mechanism": "identity resolution + multi-hop retrieval",
@@ -774,6 +774,45 @@
       "status": "DEFECT_FOUND_AND_FIXED_NO_RESULTS_CLAIMED",
       "voided": "The earlier partial descv4_id figures are void: they came from an uncommitted /tmp script that wrote no manifest before timing out, and they included the dead S3 arm. They are not carried forward as evidence.",
       "why_it_mattered": "Read naively, that arm said 'cross-encoder reranking does not help', which would have been a false negative about a component the roadmap depends on. The arm had not reranked anything."
+    },
+    "gate_c2s_selector_ladder_budget6": {
+      "ablation": "relation-only retains answers but destroys bridges (BridgeRetention 0.000); structure-only (S2b) retains bridges but collapses answer retention to 0.394 and LOSES quality (dQ=-0.100); structure plus relation as one component is the only combination that improves both and the only one that moves quality.",
+      "ceilings": {
+        "descv4_id": {
+          "baseline_S0": 0.36,
+          "reader_interface_residual_under_perfect_selection": 0.25,
+          "selector_ceiling_S5": 0.75,
+          "selector_opportunity": 0.39
+        },
+        "descv4_surface": {
+          "baseline_S0": 0.13,
+          "reader_interface_residual_under_perfect_selection": 0.32,
+          "selector_ceiling_S5": 0.68,
+          "selector_opportunity": 0.55
+        },
+        "note": "S5 is the ceiling for SELECTION over the frozen candidate pool. It is not the pipeline ceiling and must not be conflated with R5-style oracle-evidence arms, which bypass more of the pipeline."
+      },
+      "claim": "At packet budget 6 over the frozen pools, oracle selection is worth +0.390 quality on descv4_id (0.360 -> 0.750) and +0.550 on descv4_surface (0.130 -> 0.680), so evidence selection is a real and large lever. Of the runtime arms, only S2c_chain_plus_relation separates from S0 on descv4_id: dQ=+0.1200 with a paired grouped-bootstrap CI excluding zero under ALL THREE groupings (family [0.04,0.21], source_cluster [0.030,0.214], template [0.010,0.228]), capturing 30.8% of the oracle opportunity. S1/S2/S3/S4 and S2a/S2b do not separate from S0 on that partition.",
+      "connected_proof_retention": "VALID_METRIC_BUT_NONDISCRIMINATIVE_ON_V4_PATH_TOPOLOGY",
+      "experiment_verdict": "STRUCTURAL_SELECTION_QUALIFIED_ON_ID_PARTITION_ONLY",
+      "mechanism_evidence": "Correct->wrong flips attribute pointwise failures to role loss: S1 loses the identity record on 10 of 13, S3 the answer record on 10 of 16, S4 answer on 8 and identity on 4 of 13. S2c's 22 fixes break down as 14 answer newly retained, 8 bridge newly retained, 7 both jointly, 15 with distractors reduced, and 7 with no new role retained -- so the gain is partly the intended structural recovery and partly a cleaner packet, NOT purely the claimed mechanism.",
+      "not_a_claim_about": [
+        "packet budgets other than 6, which were not swept",
+        "S2b/S2c behaviour on surface forms, where they were inert and unmeasured",
+        "promotion of any selector into the default pipeline",
+        "the candidate-pool ceiling, which sits upstream and is unmeasured here",
+        "the reserved c2_cal_holdout, untouched"
+      ],
+      "receipts": [
+        "evidence/gate_c2/selector_ladder/selector_ladder.json",
+        "evidence/gate_c2/selector_ladder/paired_analysis.json",
+        "evidence/gate_c2/selector_ladder/cells.jsonl",
+        "evidence/gate_c2/selector_ladder/tasks.jsonl"
+      ],
+      "report": "configs/gate_c2_protocol.json",
+      "status": "MEASURED_BOTH_PARTITIONS_BUDGET_6",
+      "surface_partition_defect": "S2b and S2c are INERT on descv4_surface: differs_from_s0=0.00 on every task. Question subjects there are truncated surface forms ('Ojos tension' vs canonical 'Ojos tension block'), so entity extraction yields no question entity on 100/100 tasks, no chains are enumerated, and packing falls back to pool order. Their surface figures are S0 replayed and are NOT measurements of those arms.",
+      "uncomfortable_result": "On descv4_surface the rescoped relation-keyword control is the only arm with a significant gain: dQ=+0.1700, CI excluding zero under all three groupings, SGC 30.9%. It needs no entity extraction, so it still works where identity resolution fails. This does not rehabilitate it as a chain selector -- its BridgeRetention is 0.000 on descv4_id -- but it is not merely an artifact either."
     }
   },
   "testing_policy": "Tests assert structured state, never exact strings against narrative prose. Three separate failures came from matching capitalisation in text written separately from the assertion; the pattern was wrong, not merely careless. Prose is rendered from state, and state is what is tested.",

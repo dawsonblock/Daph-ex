@@ -1,0 +1,497 @@
+{
+  "arm_classification": {
+    "S0_raw": "baseline_pool_order",
+    "S1_relevance": "negative_control_pointwise_lexical_relevance",
+    "S2_connectivity": "relation_keyword_control_INVALID_HYPOTHESIS_IMPLEMENTATION",
+    "S2a_entity_connectivity": "structural_entity_connectivity",
+    "S2b_chain_completion": "structural_bounded_chain_enumeration",
+    "S2c_chain_plus_relation": "structural_chain_with_relation_component",
+    "S3_cross_encoder": "negative_control_pointwise_cross_encoder",
+    "S4_cross_encoder_strong": "negative_control_pointwise_cross_encoder_strong",
+    "S5_oracle": "ceiling_oracle_selection_within_retrieved_pool"
+  },
+  "arm_models": {
+    "S3_cross_encoder": {
+      "model_id": "cross-encoder/ms-marco-MiniLM-L-12-v2",
+      "revision": "7b0235231ca2674cb8ca8f022859a6eba2b1c968"
+    },
+    "S4_cross_encoder_strong": {
+      "model_id": "Alibaba-NLP/gte-reranker-modernbert-base",
+      "revision": "f7481e6055501a30fb19d090657df9ec1f79ab2c"
+    }
+  },
+  "budgets": [
+    6
+  ],
+  "cells": [
+    {
+      "AnswerRetention": 0.596,
+      "BridgeRetention": 0.3571,
+      "CSR_given_complete_set_available": 0.4632,
+      "DistractorCount": 4.71,
+      "GoldDensity": 0.215,
+      "IdentityRetention": 1.0,
+      "SelectedTokens": 63.8,
+      "arm": "S0_raw",
+      "budget": 6,
+      "csr_eligible_tasks": 95,
+      "differs_from_s0": 0.0,
+      "partition": "descv4_id",
+      "quality": 0.36,
+      "role_eligible_tasks": {
+        "answer": 99,
+        "bridge": 56,
+        "identity": 50
+      },
+      "seconds": 117.9,
+      "status": "MEASURED",
+      "tasks": 100
+    },
+    {
+      "AnswerRetention": 0.596,
+      "BridgeRetention": 0.1429,
+      "CSR_given_complete_set_available": 0.2421,
+      "DistractorCount": 5.26,
+      "GoldDensity": 0.1233,
+      "IdentityRetention": 0.14,
+      "SelectedTokens": 71.6,
+      "arm": "S1_relevance",
+      "budget": 6,
+      "csr_eligible_tasks": 95,
+      "differs_from_s0": 0.96,
+      "partition": "descv4_id",
+      "quality": 0.33,
+      "role_eligible_tasks": {
+        "answer": 99,
+        "bridge": 56,
+        "identity": 50
+      },
+      "seconds": 118.1,
+      "status": "MEASURED",
+      "tasks": 100
+    },
+    {
+      "AnswerRetention": 0.7273,
+      "BridgeRetention": 0.0,
+      "CSR_given_complete_set_available": 0.3579,
+      "DistractorCount": 4.78,
+      "GoldDensity": 0.2033,
+      "IdentityRetention": 1.0,
+      "SelectedTokens": 63.6,
+      "arm": "S2_connectivity",
+      "budget": 6,
+      "csr_eligible_tasks": 95,
+      "differs_from_s0": 1.0,
+      "partition": "descv4_id",
+      "quality": 0.37,
+      "role_eligible_tasks": {
+        "answer": 99,
+        "bridge": 56,
+        "identity": 50
+      },
+      "seconds": 118.4,
+      "status": "MEASURED",
+      "tasks": 100
+    },
+    {
+      "AnswerRetention": 0.5152,
+      "BridgeRetention": 0.3214,
+      "CSR_given_complete_set_available": 0.3053,
+      "DistractorCount": 4.84,
+      "GoldDensity": 0.1933,
+      "IdentityRetention": 0.94,
+      "SelectedTokens": 68.0,
+      "arm": "S3_cross_encoder",
+      "budget": 6,
+      "csr_eligible_tasks": 95,
+      "differs_from_s0": 1.0,
+      "partition": "descv4_id",
+      "quality": 0.31,
+      "role_eligible_tasks": {
+        "answer": 99,
+        "bridge": 56,
+        "identity": 50
+      },
+      "seconds": 137.7,
+      "status": "MEASURED",
+      "tasks": 100
+    },
+    {
+      "AnswerRetention": 0.4848,
+      "BridgeRetention": 0.3214,
+      "CSR_given_complete_set_available": 0.2947,
+      "DistractorCount": 5.01,
+      "GoldDensity": 0.165,
+      "IdentityRetention": 0.66,
+      "SelectedTokens": 70.3,
+      "arm": "S4_cross_encoder_strong",
+      "budget": 6,
+      "csr_eligible_tasks": 95,
+      "differs_from_s0": 1.0,
+      "partition": "descv4_id",
+      "quality": 0.31,
+      "role_eligible_tasks": {
+        "answer": 99,
+        "bridge": 56,
+        "identity": 50
+      },
+      "seconds": 208.2,
+      "status": "MEASURED",
+      "tasks": 100
+    },
+    {
+      "AnswerRetention": 1.0,
+      "BridgeRetention": 1.0,
+      "CSR_given_complete_set_available": 1.0,
+      "DistractorCount": 0.0,
+      "GoldDensity": 1.0,
+      "IdentityRetention": 1.0,
+      "SelectedTokens": 21.6,
+      "arm": "S5_oracle",
+      "budget": 6,
+      "csr_eligible_tasks": 95,
+      "differs_from_s0": 1.0,
+      "partition": "descv4_id",
+      "quality": 0.75,
+      "role_eligible_tasks": {
+        "answer": 99,
+        "bridge": 56,
+        "identity": 50
+      },
+      "seconds": 79.6,
+      "status": "MEASURED",
+      "tasks": 100
+    },
+    {
+      "AnswerRetention": 0.2778,
+      "BridgeRetention": 0.0476,
+      "CSR_given_complete_set_available": 0.2162,
+      "DistractorCount": 4.83,
+      "GoldDensity": 0.195,
+      "IdentityRetention": 0.9091,
+      "SelectedTokens": 85.5,
+      "arm": "S0_raw",
+      "budget": 6,
+      "csr_eligible_tasks": 74,
+      "differs_from_s0": 0.0,
+      "partition": "descv4_surface",
+      "quality": 0.13,
+      "role_eligible_tasks": {
+        "answer": 90,
+        "bridge": 42,
+        "identity": 99
+      },
+      "seconds": 123.4,
+      "status": "MEASURED",
+      "tasks": 100
+    },
+    {
+      "AnswerRetention": 0.2,
+      "BridgeRetention": 0.0,
+      "CSR_given_complete_set_available": 0.0405,
+      "DistractorCount": 5.04,
+      "GoldDensity": 0.16,
+      "IdentityRetention": 0.7879,
+      "SelectedTokens": 90.1,
+      "arm": "S1_relevance",
+      "budget": 6,
+      "csr_eligible_tasks": 74,
+      "differs_from_s0": 0.77,
+      "partition": "descv4_surface",
+      "quality": 0.1,
+      "role_eligible_tasks": {
+        "answer": 90,
+        "bridge": 42,
+        "identity": 99
+      },
+      "seconds": 126.6,
+      "status": "MEASURED",
+      "tasks": 100
+    },
+    {
+      "AnswerRetention": 0.6556,
+      "BridgeRetention": 0.0,
+      "CSR_given_complete_set_available": 0.4189,
+      "DistractorCount": 4.42,
+      "GoldDensity": 0.2633,
+      "IdentityRetention": 1.0,
+      "SelectedTokens": 67.3,
+      "arm": "S2_connectivity",
+      "budget": 6,
+      "csr_eligible_tasks": 74,
+      "differs_from_s0": 1.0,
+      "partition": "descv4_surface",
+      "quality": 0.3,
+      "role_eligible_tasks": {
+        "answer": 90,
+        "bridge": 42,
+        "identity": 99
+      },
+      "seconds": 122.6,
+      "status": "MEASURED",
+      "tasks": 100
+    },
+    {
+      "AnswerRetention": 0.1444,
+      "BridgeRetention": 0.0,
+      "CSR_given_complete_set_available": 0.027,
+      "DistractorCount": 5.14,
+      "GoldDensity": 0.1433,
+      "IdentityRetention": 0.7374,
+      "SelectedTokens": 89.7,
+      "arm": "S3_cross_encoder",
+      "budget": 6,
+      "csr_eligible_tasks": 74,
+      "differs_from_s0": 1.0,
+      "partition": "descv4_surface",
+      "quality": 0.05,
+      "role_eligible_tasks": {
+        "answer": 90,
+        "bridge": 42,
+        "identity": 99
+      },
+      "seconds": 148.2,
+      "status": "MEASURED",
+      "tasks": 100
+    },
+    {
+      "AnswerRetention": 0.2889,
+      "BridgeRetention": 0.0,
+      "CSR_given_complete_set_available": 0.0946,
+      "DistractorCount": 5.06,
+      "GoldDensity": 0.1567,
+      "IdentityRetention": 0.6869,
+      "SelectedTokens": 82.1,
+      "arm": "S4_cross_encoder_strong",
+      "budget": 6,
+      "csr_eligible_tasks": 74,
+      "differs_from_s0": 1.0,
+      "partition": "descv4_surface",
+      "quality": 0.15,
+      "role_eligible_tasks": {
+        "answer": 90,
+        "bridge": 42,
+        "identity": 99
+      },
+      "seconds": 214.1,
+      "status": "MEASURED",
+      "tasks": 100
+    },
+    {
+      "AnswerRetention": 1.0,
+      "BridgeRetention": 1.0,
+      "CSR_given_complete_set_available": 1.0,
+      "DistractorCount": 0.0,
+      "GoldDensity": 0.99,
+      "IdentityRetention": 1.0,
+      "SelectedTokens": 28.6,
+      "arm": "S5_oracle",
+      "budget": 6,
+      "csr_eligible_tasks": 74,
+      "differs_from_s0": 1.0,
+      "partition": "descv4_surface",
+      "quality": 0.68,
+      "role_eligible_tasks": {
+        "answer": 90,
+        "bridge": 42,
+        "identity": 99
+      },
+      "seconds": 88.2,
+      "status": "MEASURED",
+      "tasks": 100
+    },
+    {
+      "AnswerRetention": 0.6465,
+      "BridgeRetention": 0.6429,
+      "CSR_given_complete_set_available": 0.6632,
+      "ConnectedProofRetention": 0.6632,
+      "DistractorCount": 4.5,
+      "GoldDensity": 0.25,
+      "IdentityRetention": 1.0,
+      "SelectedTokens": 66.5,
+      "arm": "S2a_entity_connectivity",
+      "budget": 6,
+      "classification": "structural_entity_connectivity",
+      "cpr_eligible_tasks": 95,
+      "csr_eligible_tasks": 95,
+      "differs_from_s0": 1.0,
+      "partition": "descv4_id",
+      "quality": 0.41,
+      "role_eligible_tasks": {
+        "answer": 99,
+        "bridge": 56,
+        "identity": 50
+      },
+      "seconds": 115.1,
+      "status": "MEASURED",
+      "tasks": 100
+    },
+    {
+      "AnswerRetention": 0.3939,
+      "BridgeRetention": 0.6429,
+      "CSR_given_complete_set_available": 0.3895,
+      "ConnectedProofRetention": 0.3895,
+      "DistractorCount": 4.75,
+      "GoldDensity": 0.2083,
+      "IdentityRetention": 1.0,
+      "SelectedTokens": 67.4,
+      "arm": "S2b_chain_completion",
+      "budget": 6,
+      "classification": "structural_bounded_chain_enumeration",
+      "cpr_eligible_tasks": 95,
+      "csr_eligible_tasks": 95,
+      "differs_from_s0": 0.99,
+      "partition": "descv4_id",
+      "quality": 0.26,
+      "role_eligible_tasks": {
+        "answer": 99,
+        "bridge": 56,
+        "identity": 50
+      },
+      "seconds": 112.3,
+      "status": "MEASURED",
+      "tasks": 100
+    },
+    {
+      "AnswerRetention": 0.6869,
+      "BridgeRetention": 0.7679,
+      "CSR_given_complete_set_available": 0.6947,
+      "ConnectedProofRetention": 0.6947,
+      "DistractorCount": 4.39,
+      "GoldDensity": 0.2683,
+      "IdentityRetention": 1.0,
+      "SelectedTokens": 67.9,
+      "arm": "S2c_chain_plus_relation",
+      "budget": 6,
+      "classification": "structural_chain_with_relation_component",
+      "cpr_eligible_tasks": 95,
+      "csr_eligible_tasks": 95,
+      "differs_from_s0": 0.99,
+      "partition": "descv4_id",
+      "quality": 0.48,
+      "role_eligible_tasks": {
+        "answer": 99,
+        "bridge": 56,
+        "identity": 50
+      },
+      "seconds": 114.0,
+      "status": "MEASURED",
+      "tasks": 100
+    },
+    {
+      "AnswerRetention": 0.3667,
+      "BridgeRetention": 0.3571,
+      "CSR_given_complete_set_available": 0.3784,
+      "ConnectedProofRetention": 0.3784,
+      "DistractorCount": 5.0,
+      "GoldDensity": 0.1667,
+      "IdentityRetention": 0.5253,
+      "SelectedTokens": 79.1,
+      "arm": "S2a_entity_connectivity",
+      "budget": 6,
+      "classification": "structural_entity_connectivity",
+      "cpr_eligible_tasks": 74,
+      "csr_eligible_tasks": 74,
+      "differs_from_s0": 1.0,
+      "partition": "descv4_surface",
+      "quality": 0.22,
+      "role_eligible_tasks": {
+        "answer": 90,
+        "bridge": 42,
+        "identity": 99
+      },
+      "seconds": 124.5,
+      "status": "MEASURED",
+      "tasks": 100
+    },
+    {
+      "AnswerRetention": 0.2778,
+      "BridgeRetention": 0.0476,
+      "CSR_given_complete_set_available": 0.2162,
+      "ConnectedProofRetention": 0.2162,
+      "DistractorCount": 4.83,
+      "GoldDensity": 0.195,
+      "IdentityRetention": 0.9091,
+      "SelectedTokens": 85.5,
+      "arm": "S2b_chain_completion",
+      "budget": 6,
+      "classification": "structural_bounded_chain_enumeration",
+      "cpr_eligible_tasks": 74,
+      "csr_eligible_tasks": 74,
+      "differs_from_s0": 0.0,
+      "partition": "descv4_surface",
+      "quality": 0.13,
+      "role_eligible_tasks": {
+        "answer": 90,
+        "bridge": 42,
+        "identity": 99
+      },
+      "seconds": 123.1,
+      "status": "MEASURED",
+      "tasks": 100
+    },
+    {
+      "AnswerRetention": 0.2778,
+      "BridgeRetention": 0.0476,
+      "CSR_given_complete_set_available": 0.2162,
+      "ConnectedProofRetention": 0.2162,
+      "DistractorCount": 4.83,
+      "GoldDensity": 0.195,
+      "IdentityRetention": 0.9091,
+      "SelectedTokens": 85.5,
+      "arm": "S2c_chain_plus_relation",
+      "budget": 6,
+      "classification": "structural_chain_with_relation_component",
+      "cpr_eligible_tasks": 74,
+      "csr_eligible_tasks": 74,
+      "differs_from_s0": 0.0,
+      "partition": "descv4_surface",
+      "quality": 0.13,
+      "role_eligible_tasks": {
+        "answer": 90,
+        "bridge": 42,
+        "identity": 99
+      },
+      "seconds": 122.4,
+      "status": "MEASURED",
+      "tasks": 100
+    }
+  ],
+  "corpus_digests": {
+    "descv4_id": {
+      "evidence": "61fdba8180e58db163ebd6cc312ca49fca93db760ec70c31863d26c766710c56",
+      "tasks": "1179e2a9c8d56032b9ac982a9fd8ed7a9a7cfffefe8690492aa8e03f46713515"
+    },
+    "descv4_surface": {
+      "evidence": "c50f51544c7288c0663d15f7d0d9d3f98d7b355bc7af7bac5c45496b545e80f5",
+      "tasks": "802e5050d3a755adaf31c56e69b10b2fccedd1afa32f0370f32ae57b41a8cda3"
+    }
+  },
+  "created_utc": "2026-08-06T22:49:50Z",
+  "environment": {
+    "platform": "macOS-26.2-arm64-arm-64bit",
+    "python": "3.12.0",
+    "torch": "2.10.0",
+    "transformers": "5.14.1"
+  },
+  "excluded_model": {
+    "model_id": "cross-encoder/ms-marco-MiniLM-L6-v2",
+    "reason": "forward pass returns NaN for every pair under this stack; NaN sort keys left the pool unreordered so the arm reported figures identical to S0"
+  },
+  "gate": "C2_S_SELECTOR_LADDER",
+  "holdout_touched": false,
+  "only_selection_varies": true,
+  "pool_digests": {
+    "descv4_id": "e7f30d09d71ffac091b7794af6e29a18c30413612399cb176eedcb153e90317c",
+    "descv4_surface": "073ac4c4eb907df61d5995496d59305a3473f41dfc978a26390a49527c204198"
+  },
+  "pool_dir": "evidence/gate_c2/candidate_pools/v1",
+  "pool_policy": "c2_candidate_generation_v1",
+  "reader": {
+    "max_new_tokens": 64,
+    "model_id": "sapientinc/HRM-Text-1B",
+    "prompt_condition": "direct",
+    "revision": "9f082d68b8cd0ebc56e33f1c88c45609174c272c"
+  },
+  "upstream_unchanged": true
+}

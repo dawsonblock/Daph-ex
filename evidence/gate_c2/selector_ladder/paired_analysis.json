@@ -1,0 +1,3407 @@
+{
+  "bootstrap_resamples": 10000,
+  "budget": 6,
+  "grouping_keys": [
+    "source_cluster_id",
+    "template_id",
+    "family"
+  ],
+  "partitions": {
+    "descv4_id": {
+      "arms": {
+        "S0_raw": {
+          "aggregate": {
+            "AnswerRetention": 0.596,
+            "BridgeRetention": 0.3571,
+            "CSR_given_complete_set_available": 0.4632,
+            "DistractorCount": 4.71,
+            "GoldDensity": 0.215,
+            "IdentityRetention": 1.0,
+            "SelectedTokens": 63.8,
+            "differs_from_s0": 0.0,
+            "quality": 0.36
+          },
+          "connected_proof_retention_recomputed": 0.4632,
+          "cpr_eligible_tasks": 95
+        },
+        "S1_relevance": {
+          "aggregate": {
+            "AnswerRetention": 0.596,
+            "BridgeRetention": 0.1429,
+            "CSR_given_complete_set_available": 0.2421,
+            "DistractorCount": 5.26,
+            "GoldDensity": 0.1233,
+            "IdentityRetention": 0.14,
+            "SelectedTokens": 71.6,
+            "differs_from_s0": 0.96,
+            "quality": 0.33
+          },
+          "connected_proof_retention_recomputed": 0.2421,
+          "cpr_eligible_tasks": 95,
+          "discards": {
+            "note": "A regression with no role loss cannot be explained by discarding a required record; it is packing order or distractor composition.",
+            "regressions_vs_s0": 13,
+            "regressions_with_no_role_loss": 2,
+            "role_lost_that_s0_kept": {
+              "answer": 3,
+              "bridge": 2,
+              "identity": 10
+            }
+          },
+          "flips": {
+            "both_correct": 23,
+            "both_wrong": 54,
+            "loss_attribution_on_correct_to_wrong": {
+              "answer_lost": 3,
+              "bridge_lost": 2,
+              "identity_lost": 10,
+              "no_role_loss_no_extra_distractor": 2
+            },
+            "net": -3,
+            "s0_correct_arm_wrong": 13,
+            "s0_wrong_arm_correct": 10
+          },
+          "gains": {
+            "gain_pattern": {
+              "answer_newly_retained": 3,
+              "no_new_role_retained": 7
+            },
+            "tasks_fixed_by_arm": 10
+          },
+          "paired_answer_retention": {
+            "ci95": [
+              -0.0842,
+              0.0891
+            ],
+            "ci95_by_grouping": {
+              "family": [
+                -0.08,
+                0.0808
+              ],
+              "source_cluster_id": [
+                -0.0842,
+                0.0891
+              ],
+              "template_id": [
+                -0.0816,
+                0.0833
+              ]
+            },
+            "excludes_zero": false,
+            "governing_grouping": "source_cluster_id",
+            "governing_groups": 24,
+            "groups_by_grouping": {
+              "family": 10,
+              "source_cluster_id": 24,
+              "template_id": 90
+            },
+            "mean_delta": 0.0,
+            "negative_tasks": 8,
+            "neutral_tasks": 83,
+            "paired_tasks": 99,
+            "positive_tasks": 8
+          },
+          "paired_bridge_retention": {
+            "ci95": [
+              -0.375,
+              -0.0545
+            ],
+            "ci95_by_grouping": {
+              "family": [
+                -0.2807,
+                -0.1455
+              ],
+              "source_cluster_id": [
+                -0.375,
+                -0.0545
+              ],
+              "template_id": [
+                -0.35,
+                -0.0862
+              ]
+            },
+            "excludes_zero": true,
+            "governing_grouping": "source_cluster_id",
+            "governing_groups": 24,
+            "groups_by_grouping": {
+              "family": 6,
+              "source_cluster_id": 24,
+              "template_id": 52
+            },
+            "mean_delta": -0.2143,
+            "negative_tasks": 14,
+            "neutral_tasks": 40,
+            "paired_tasks": 56,
+            "positive_tasks": 2
+          },
+          "paired_csr": {
+            "ci95": [
+              -0.3402,
+              -0.1087
+            ],
+            "ci95_by_grouping": {
+              "family": [
+                -0.3402,
+                -0.1087
+              ],
+              "source_cluster_id": [
+                -0.3,
+                -0.1429
+              ],
+              "template_id": [
+                -0.3053,
+                -0.1429
+              ]
+            },
+            "excludes_zero": true,
+            "governing_grouping": "family",
+            "governing_groups": 10,
+            "groups_by_grouping": {
+              "family": 10,
+              "source_cluster_id": 24,
+              "template_id": 86
+            },
+            "mean_delta": -0.2211,
+            "negative_tasks": 21,
+            "neutral_tasks": 74,
+            "paired_tasks": 95,
+            "positive_tasks": 0
+          },
+          "paired_identity_retention": {
+            "ci95": [
+              -0.94,
+              -0.76
+            ],
+            "ci95_by_grouping": {
+              "family": [
+                -0.94,
+                -0.78
+              ],
+              "source_cluster_id": [
+                -0.9412,
+                -0.7647
+              ],
+              "template_id": [
+                -0.94,
+                -0.76
+              ]
+            },
+            "excludes_zero": true,
+            "governing_grouping": "template_id",
+            "governing_groups": 50,
+            "groups_by_grouping": {
+              "family": 10,
+              "source_cluster_id": 24,
+              "template_id": 50
+            },
+            "mean_delta": -0.86,
+            "negative_tasks": 43,
+            "neutral_tasks": 7,
+            "paired_tasks": 50,
+            "positive_tasks": 0
+          },
+          "paired_quality": {
+            "ci95": [
+              -0.1313,
+              0.0784
+            ],
+            "ci95_by_grouping": {
+              "family": [
+                -0.1,
+                0.04
+              ],
+              "source_cluster_id": [
+                -0.1313,
+                0.0784
+              ],
+              "template_id": [
+                -0.1224,
+                0.0619
+              ]
+            },
+            "excludes_zero": false,
+            "governing_grouping": "source_cluster_id",
+            "governing_groups": 24,
+            "groups_by_grouping": {
+              "family": 10,
+              "source_cluster_id": 24,
+              "template_id": 91
+            },
+            "mean_delta": -0.03,
+            "negative_tasks": 13,
+            "neutral_tasks": 77,
+            "paired_tasks": 100,
+            "positive_tasks": 10
+          }
+        },
+        "S2_connectivity": {
+          "aggregate": {
+            "AnswerRetention": 0.7273,
+            "BridgeRetention": 0.0,
+            "CSR_given_complete_set_available": 0.3579,
+            "DistractorCount": 4.78,
+            "GoldDensity": 0.2033,
+            "IdentityRetention": 1.0,
+            "SelectedTokens": 63.6,
+            "differs_from_s0": 1.0,
+            "quality": 0.37
+          },
+          "connected_proof_retention_recomputed": 0.3579,
+          "cpr_eligible_tasks": 95,
+          "discards": {
+            "note": "A regression with no role loss cannot be explained by discarding a required record; it is packing order or distractor composition.",
+            "regressions_vs_s0": 11,
+            "regressions_with_no_role_loss": 5,
+            "role_lost_that_s0_kept": {
+              "answer": 4,
+              "bridge": 3
+            }
+          },
+          "flips": {
+            "both_correct": 25,
+            "both_wrong": 52,
+            "loss_attribution_on_correct_to_wrong": {
+              "answer_lost": 4,
+              "bridge_lost": 3,
+              "no_role_loss_no_extra_distractor": 5
+            },
+            "net": 1,
+            "s0_correct_arm_wrong": 11,
+            "s0_wrong_arm_correct": 12
+          },
+          "gains": {
+            "gain_pattern": {
+              "answer_newly_retained": 3,
+              "distractors_reduced": 2,
+              "no_new_role_retained": 9
+            },
+            "tasks_fixed_by_arm": 12
+          },
+          "paired_answer_retention": {
+            "ci95": [
+              0.0,
+              0.2525
+            ],
+            "ci95_by_grouping": {
+              "family": [
+                0.0,
+                0.2525
+              ],
+              "source_cluster_id": [
+                0.02,
+                0.2474
+              ],
+              "template_id": [
+                0.0104,
+                0.25
+              ]
+            },
+            "excludes_zero": false,
+            "governing_grouping": "family",
+            "governing_groups": 10,
+            "groups_by_grouping": {
+              "family": 10,
+              "source_cluster_id": 24,
+              "template_id": 90
+            },
+            "mean_delta": 0.1313,
+            "negative_tasks": 11,
+            "neutral_tasks": 64,
+            "paired_tasks": 99,
+            "positive_tasks": 24
+          },
+          "paired_bridge_retention": {
+            "ci95": [
+              -0.5085,
+              -0.2075
+            ],
+            "ci95_by_grouping": {
+              "family": [
+                -0.4386,
+                -0.2727
+              ],
+              "source_cluster_id": [
+                -0.5085,
+                -0.2075
+              ],
+              "template_id": [
+                -0.4909,
+                -0.2281
+              ]
+            },
+            "excludes_zero": true,
+            "governing_grouping": "source_cluster_id",
+            "governing_groups": 24,
+            "groups_by_grouping": {
+              "family": 6,
+              "source_cluster_id": 24,
+              "template_id": 52
+            },
+            "mean_delta": -0.3571,
+            "negative_tasks": 20,
+            "neutral_tasks": 36,
+            "paired_tasks": 56,
+            "positive_tasks": 0
+          },
+          "paired_csr": {
+            "ci95": [
+              -0.2,
+              -0.0211
+            ],
+            "ci95_by_grouping": {
+              "family": [
+                -0.1667,
+                -0.0323
+              ],
+              "source_cluster_id": [
+                -0.2,
+                -0.0211
+              ],
+              "template_id": [
+                -0.1837,
+                -0.0323
+              ]
+            },
+            "excludes_zero": true,
+            "governing_grouping": "source_cluster_id",
+            "governing_groups": 24,
+            "groups_by_grouping": {
+              "family": 10,
+              "source_cluster_id": 24,
+              "template_id": 86
+            },
+            "mean_delta": -0.1053,
+            "negative_tasks": 12,
+            "neutral_tasks": 81,
+            "paired_tasks": 95,
+            "positive_tasks": 2
+          },
+          "paired_identity_retention": {
+            "ci95": [
+              0.0,
+              0.0
+            ],
+            "ci95_by_grouping": {
+              "family": [
+                0.0,
+                0.0
+              ],
+              "source_cluster_id": [
+                0.0,
+                0.0
+              ],
+              "template_id": [
+                0.0,
+                0.0
+              ]
+            },
+            "excludes_zero": false,
+            "governing_grouping": "source_cluster_id",
+            "governing_groups": 24,
+            "groups_by_grouping": {
+              "family": 10,
+              "source_cluster_id": 24,
+              "template_id": 50
+            },
+            "mean_delta": 0.0,
+            "negative_tasks": 0,
+            "neutral_tasks": 50,
+            "paired_tasks": 50,
+            "positive_tasks": 0
+          },
+          "paired_quality": {
+            "ci95": [
+              -0.09,
+              0.12
+            ],
+            "ci95_by_grouping": {
+              "family": [
+                -0.09,
+                0.12
+              ],
+              "source_cluster_id": [
+                -0.08,
+                0.1
+              ],
+              "template_id": [
+                -0.0833,
+                0.101
+              ]
+            },
+            "excludes_zero": false,
+            "governing_grouping": "family",
+            "governing_groups": 10,
+            "groups_by_grouping": {
+              "family": 10,
+              "source_cluster_id": 24,
+              "template_id": 91
+            },
+            "mean_delta": 0.01,
+            "negative_tasks": 11,
+            "neutral_tasks": 77,
+            "paired_tasks": 100,
+            "positive_tasks": 12
+          }
+        },
+        "S2a_entity_connectivity": {
+          "aggregate": {
+            "AnswerRetention": 0.6465,
+            "BridgeRetention": 0.6429,
+            "CSR_given_complete_set_available": 0.6632,
+            "DistractorCount": 4.5,
+            "GoldDensity": 0.25,
+            "IdentityRetention": 1.0,
+            "SelectedTokens": 66.5,
+            "differs_from_s0": 1.0,
+            "quality": 0.41
+          },
+          "connected_proof_retention_recomputed": 0.6632,
+          "cpr_eligible_tasks": 95,
+          "discards": {
+            "note": "A regression with no role loss cannot be explained by discarding a required record; it is packing order or distractor composition.",
+            "regressions_vs_s0": 8,
+            "regressions_with_no_role_loss": 4,
+            "role_lost_that_s0_kept": {
+              "answer": 4
+            }
+          },
+          "flips": {
+            "both_correct": 28,
+            "both_wrong": 51,
+            "loss_attribution_on_correct_to_wrong": {
+              "answer_lost": 4,
+              "no_role_loss_no_extra_distractor": 4
+            },
+            "net": 5,
+            "s0_correct_arm_wrong": 8,
+            "s0_wrong_arm_correct": 13
+          },
+          "gains": {
+            "gain_pattern": {
+              "answer_newly_retained": 7,
+              "bridge_and_answer_jointly_recovered": 3,
+              "bridge_newly_retained": 5,
+              "distractors_reduced": 9,
+              "no_new_role_retained": 4
+            },
+            "tasks_fixed_by_arm": 13
+          },
+          "paired_answer_retention": {
+            "ci95": [
+              -0.0594,
+              0.16
+            ],
+            "ci95_by_grouping": {
+              "family": [
+                -0.01,
+                0.1237
+              ],
+              "source_cluster_id": [
+                -0.0312,
+                0.1313
+              ],
+              "template_id": [
+                -0.0594,
+                0.16
+              ]
+            },
+            "excludes_zero": false,
+            "governing_grouping": "template_id",
+            "governing_groups": 90,
+            "groups_by_grouping": {
+              "family": 10,
+              "source_cluster_id": 24,
+              "template_id": 90
+            },
+            "mean_delta": 0.0505,
+            "negative_tasks": 11,
+            "neutral_tasks": 72,
+            "paired_tasks": 99,
+            "positive_tasks": 16
+          },
+          "paired_bridge_retention": {
+            "ci95": [
+              0.1379,
+              0.4286
+            ],
+            "ci95_by_grouping": {
+              "family": [
+                0.1379,
+                0.4286
+              ],
+              "source_cluster_id": [
+                0.1579,
+                0.4211
+              ],
+              "template_id": [
+                0.1404,
+                0.431
+              ]
+            },
+            "excludes_zero": true,
+            "governing_grouping": "family",
+            "governing_groups": 6,
+            "groups_by_grouping": {
+              "family": 6,
+              "source_cluster_id": 24,
+              "template_id": 52
+            },
+            "mean_delta": 0.2857,
+            "negative_tasks": 4,
+            "neutral_tasks": 32,
+            "paired_tasks": 56,
+            "positive_tasks": 20
+          },
+          "paired_csr": {
+            "ci95": [
+              0.1111,
+              0.3011
+            ],
+            "ci95_by_grouping": {
+              "family": [
+                0.1111,
+                0.3011
+              ],
+              "source_cluster_id": [
+                0.117,
+                0.2812
+              ],
+              "template_id": [
+                0.1122,
+                0.2921
+              ]
+            },
+            "excludes_zero": true,
+            "governing_grouping": "family",
+            "governing_groups": 10,
+            "groups_by_grouping": {
+              "family": 10,
+              "source_cluster_id": 24,
+              "template_id": 86
+            },
+            "mean_delta": 0.2,
+            "negative_tasks": 1,
+            "neutral_tasks": 74,
+            "paired_tasks": 95,
+            "positive_tasks": 20
+          },
+          "paired_identity_retention": {
+            "ci95": [
+              0.0,
+              0.0
+            ],
+            "ci95_by_grouping": {
+              "family": [
+                0.0,
+                0.0
+              ],
+              "source_cluster_id": [
+                0.0,
+                0.0
+              ],
+              "template_id": [
+                0.0,
+                0.0
+              ]
+            },
+            "excludes_zero": false,
+            "governing_grouping": "source_cluster_id",
+            "governing_groups": 24,
+            "groups_by_grouping": {
+              "family": 10,
+              "source_cluster_id": 24,
+              "template_id": 50
+            },
+            "mean_delta": 0.0,
+            "negative_tasks": 0,
+            "neutral_tasks": 50,
+            "paired_tasks": 50,
+            "positive_tasks": 0
+          },
+          "paired_quality": {
+            "ci95": [
+              -0.0396,
+              0.14
+            ],
+            "ci95_by_grouping": {
+              "family": [
+                -0.03,
+                0.13
+              ],
+              "source_cluster_id": [
+                -0.04,
+                0.1287
+              ],
+              "template_id": [
+                -0.0396,
+                0.14
+              ]
+            },
+            "excludes_zero": false,
+            "governing_grouping": "template_id",
+            "governing_groups": 91,
+            "groups_by_grouping": {
+              "family": 10,
+              "source_cluster_id": 24,
+              "template_id": 91
+            },
+            "mean_delta": 0.05,
+            "negative_tasks": 8,
+            "neutral_tasks": 79,
+            "paired_tasks": 100,
+            "positive_tasks": 13
+          }
+        },
+        "S2b_chain_completion": {
+          "aggregate": {
+            "AnswerRetention": 0.3939,
+            "BridgeRetention": 0.6429,
+            "CSR_given_complete_set_available": 0.3895,
+            "DistractorCount": 4.75,
+            "GoldDensity": 0.2083,
+            "IdentityRetention": 1.0,
+            "SelectedTokens": 67.4,
+            "differs_from_s0": 0.99,
+            "quality": 0.26
+          },
+          "connected_proof_retention_recomputed": 0.3895,
+          "cpr_eligible_tasks": 95,
+          "discards": {
+            "note": "A regression with no role loss cannot be explained by discarding a required record; it is packing order or distractor composition.",
+            "regressions_vs_s0": 17,
+            "regressions_with_no_role_loss": 6,
+            "role_lost_that_s0_kept": {
+              "answer": 11
+            }
+          },
+          "flips": {
+            "both_correct": 19,
+            "both_wrong": 57,
+            "loss_attribution_on_correct_to_wrong": {
+              "answer_lost": 11,
+              "no_role_loss_no_extra_distractor": 6
+            },
+            "net": -10,
+            "s0_correct_arm_wrong": 17,
+            "s0_wrong_arm_correct": 7
+          },
+          "gains": {
+            "gain_pattern": {
+              "answer_newly_retained": 3,
+              "bridge_and_answer_jointly_recovered": 1,
+              "bridge_newly_retained": 2,
+              "distractors_reduced": 4,
+              "no_new_role_retained": 3
+            },
+            "tasks_fixed_by_arm": 7
+          },
+          "paired_answer_retention": {
+            "ci95": [
+              -0.3131,
+              -0.0938
+            ],
+            "ci95_by_grouping": {
+              "family": [
+                -0.3,
+                -0.1031
+              ],
+              "source_cluster_id": [
+                -0.299,
+                -0.1058
+              ],
+              "template_id": [
+                -0.3131,
+                -0.0938
+              ]
+            },
+            "excludes_zero": true,
+            "governing_grouping": "template_id",
+            "governing_groups": 90,
+            "groups_by_grouping": {
+              "family": 10,
+              "source_cluster_id": 24,
+              "template_id": 90
+            },
+            "mean_delta": -0.202,
+            "negative_tasks": 26,
+            "neutral_tasks": 67,
+            "paired_tasks": 99,
+            "positive_tasks": 6
+          },
+          "paired_bridge_retention": {
+            "ci95": [
+              0.098,
+              0.4643
+            ],
+            "ci95_by_grouping": {
+              "family": [
+                0.2,
+                0.3704
+              ],
+              "source_cluster_id": [
+                0.098,
+                0.4643
+              ],
+              "template_id": [
+                0.1091,
+                0.4576
+              ]
+            },
+            "excludes_zero": true,
+            "governing_grouping": "source_cluster_id",
+            "governing_groups": 24,
+            "groups_by_grouping": {
+              "family": 6,
+              "source_cluster_id": 24,
+              "template_id": 52
+            },
+            "mean_delta": 0.2857,
+            "negative_tasks": 6,
+            "neutral_tasks": 28,
+            "paired_tasks": 56,
+            "positive_tasks": 22
+          },
+          "paired_csr": {
+            "ci95": [
+              -0.1758,
+              0.0408
+            ],
+            "ci95_by_grouping": {
+              "family": [
+                -0.1546,
+                0.0105
+              ],
+              "source_cluster_id": [
+                -0.1758,
+                0.0408
+              ],
+              "template_id": [
+                -0.1684,
+                0.0202
+              ]
+            },
+            "excludes_zero": false,
+            "governing_grouping": "source_cluster_id",
+            "governing_groups": 24,
+            "groups_by_grouping": {
+              "family": 10,
+              "source_cluster_id": 24,
+              "template_id": 86
+            },
+            "mean_delta": -0.0737,
+            "negative_tasks": 14,
+            "neutral_tasks": 74,
+            "paired_tasks": 95,
+            "positive_tasks": 7
+          },
+          "paired_identity_retention": {
+            "ci95": [
+              0.0,
+              0.0
+            ],
+            "ci95_by_grouping": {
+              "family": [
+                0.0,
+                0.0
+              ],
+              "source_cluster_id": [
+                0.0,
+                0.0
+              ],
+              "template_id": [
+                0.0,
+                0.0
+              ]
+            },
+            "excludes_zero": false,
+            "governing_grouping": "source_cluster_id",
+            "governing_groups": 24,
+            "groups_by_grouping": {
+              "family": 10,
+              "source_cluster_id": 24,
+              "template_id": 50
+            },
+            "mean_delta": 0.0,
+            "negative_tasks": 0,
+            "neutral_tasks": 50,
+            "paired_tasks": 50,
+            "positive_tasks": 0
+          },
+          "paired_quality": {
+            "ci95": [
+              -0.202,
+              0.0
+            ],
+            "ci95_by_grouping": {
+              "family": [
+                -0.15,
+                -0.05
+              ],
+              "source_cluster_id": [
+                -0.202,
+                0.0
+              ],
+              "template_id": [
+                -0.1979,
+                -0.0096
+              ]
+            },
+            "excludes_zero": false,
+            "governing_grouping": "source_cluster_id",
+            "governing_groups": 24,
+            "groups_by_grouping": {
+              "family": 10,
+              "source_cluster_id": 24,
+              "template_id": 91
+            },
+            "mean_delta": -0.1,
+            "negative_tasks": 17,
+            "neutral_tasks": 76,
+            "paired_tasks": 100,
+            "positive_tasks": 7
+          }
+        },
+        "S2c_chain_plus_relation": {
+          "aggregate": {
+            "AnswerRetention": 0.6869,
+            "BridgeRetention": 0.7679,
+            "CSR_given_complete_set_available": 0.6947,
+            "DistractorCount": 4.39,
+            "GoldDensity": 0.2683,
+            "IdentityRetention": 1.0,
+            "SelectedTokens": 67.9,
+            "differs_from_s0": 0.99,
+            "quality": 0.48
+          },
+          "connected_proof_retention_recomputed": 0.6947,
+          "cpr_eligible_tasks": 95,
+          "discards": {
+            "note": "A regression with no role loss cannot be explained by discarding a required record; it is packing order or distractor composition.",
+            "regressions_vs_s0": 10,
+            "regressions_with_no_role_loss": 6,
+            "role_lost_that_s0_kept": {
+              "answer": 4
+            }
+          },
+          "flips": {
+            "both_correct": 26,
+            "both_wrong": 42,
+            "loss_attribution_on_correct_to_wrong": {
+              "answer_lost": 4,
+              "no_role_loss_no_extra_distractor": 6
+            },
+            "net": 12,
+            "s0_correct_arm_wrong": 10,
+            "s0_wrong_arm_correct": 22
+          },
+          "gains": {
+            "gain_pattern": {
+              "answer_newly_retained": 14,
+              "bridge_and_answer_jointly_recovered": 7,
+              "bridge_newly_retained": 8,
+              "distractors_reduced": 15,
+              "no_new_role_retained": 7
+            },
+            "tasks_fixed_by_arm": 22
+          },
+          "paired_answer_retention": {
+            "ci95": [
+              -0.0408,
+              0.2245
+            ],
+            "ci95_by_grouping": {
+              "family": [
+                0.0101,
+                0.1771
+              ],
+              "source_cluster_id": [
+                0.0102,
+                0.165
+              ],
+              "template_id": [
+                -0.0408,
+                0.2245
+              ]
+            },
+            "excludes_zero": false,
+            "governing_grouping": "template_id",
+            "governing_groups": 90,
+            "groups_by_grouping": {
+              "family": 10,
+              "source_cluster_id": 24,
+              "template_id": 90
+            },
+            "mean_delta": 0.0909,
+            "negative_tasks": 16,
+            "neutral_tasks": 58,
+            "paired_tasks": 99,
+            "positive_tasks": 25
+          },
+          "paired_bridge_retention": {
+            "ci95": [
+              0.2407,
+              0.5849
+            ],
+            "ci95_by_grouping": {
+              "family": [
+                0.3103,
+                0.5091
+              ],
+              "source_cluster_id": [
+                0.2407,
+                0.5849
+              ],
+              "template_id": [
+                0.25,
+                0.569
+              ]
+            },
+            "excludes_zero": true,
+            "governing_grouping": "source_cluster_id",
+            "governing_groups": 24,
+            "groups_by_grouping": {
+              "family": 6,
+              "source_cluster_id": 24,
+              "template_id": 52
+            },
+            "mean_delta": 0.4107,
+            "negative_tasks": 3,
+            "neutral_tasks": 27,
+            "paired_tasks": 56,
+            "positive_tasks": 26
+          },
+          "paired_csr": {
+            "ci95": [
+              0.102,
+              0.3587
+            ],
+            "ci95_by_grouping": {
+              "family": [
+                0.102,
+                0.3587
+              ],
+              "source_cluster_id": [
+                0.1354,
+                0.3298
+              ],
+              "template_id": [
+                0.117,
+                0.3441
+              ]
+            },
+            "excludes_zero": true,
+            "governing_grouping": "family",
+            "governing_groups": 10,
+            "groups_by_grouping": {
+              "family": 10,
+              "source_cluster_id": 24,
+              "template_id": 86
+            },
+            "mean_delta": 0.2316,
+            "negative_tasks": 6,
+            "neutral_tasks": 61,
+            "paired_tasks": 95,
+            "positive_tasks": 28
+          },
+          "paired_identity_retention": {
+            "ci95": [
+              0.0,
+              0.0
+            ],
+            "ci95_by_grouping": {
+              "family": [
+                0.0,
+                0.0
+              ],
+              "source_cluster_id": [
+                0.0,
+                0.0
+              ],
+              "template_id": [
+                0.0,
+                0.0
+              ]
+            },
+            "excludes_zero": false,
+            "governing_grouping": "source_cluster_id",
+            "governing_groups": 24,
+            "groups_by_grouping": {
+              "family": 10,
+              "source_cluster_id": 24,
+              "template_id": 50
+            },
+            "mean_delta": 0.0,
+            "negative_tasks": 0,
+            "neutral_tasks": 50,
+            "paired_tasks": 50,
+            "positive_tasks": 0
+          },
+          "paired_quality": {
+            "ci95": [
+              0.0098,
+              0.2277
+            ],
+            "ci95_by_grouping": {
+              "family": [
+                0.04,
+                0.21
+              ],
+              "source_cluster_id": [
+                0.0303,
+                0.2136
+              ],
+              "template_id": [
+                0.0098,
+                0.2277
+              ]
+            },
+            "excludes_zero": true,
+            "governing_grouping": "template_id",
+            "governing_groups": 91,
+            "groups_by_grouping": {
+              "family": 10,
+              "source_cluster_id": 24,
+              "template_id": 91
+            },
+            "mean_delta": 0.12,
+            "negative_tasks": 10,
+            "neutral_tasks": 68,
+            "paired_tasks": 100,
+            "positive_tasks": 22
+          }
+        },
+        "S3_cross_encoder": {
+          "aggregate": {
+            "AnswerRetention": 0.5152,
+            "BridgeRetention": 0.3214,
+            "CSR_given_complete_set_available": 0.3053,
+            "DistractorCount": 4.84,
+            "GoldDensity": 0.1933,
+            "IdentityRetention": 0.94,
+            "SelectedTokens": 68.0,
+            "differs_from_s0": 1.0,
+            "quality": 0.31
+          },
+          "connected_proof_retention_recomputed": 0.3053,
+          "cpr_eligible_tasks": 95,
+          "discards": {
+            "note": "A regression with no role loss cannot be explained by discarding a required record; it is packing order or distractor composition.",
+            "regressions_vs_s0": 16,
+            "regressions_with_no_role_loss": 5,
+            "role_lost_that_s0_kept": {
+              "answer": 10,
+              "bridge": 1
+            }
+          },
+          "flips": {
+            "both_correct": 20,
+            "both_wrong": 53,
+            "loss_attribution_on_correct_to_wrong": {
+              "answer_lost": 10,
+              "bridge_lost": 1,
+              "no_role_loss_no_extra_distractor": 5
+            },
+            "net": -5,
+            "s0_correct_arm_wrong": 16,
+            "s0_wrong_arm_correct": 11
+          },
+          "gains": {
+            "gain_pattern": {
+              "answer_newly_retained": 5,
+              "distractors_reduced": 3,
+              "no_new_role_retained": 6
+            },
+            "tasks_fixed_by_arm": 11
+          },
+          "paired_answer_retention": {
+            "ci95": [
+              -0.2121,
+              0.0612
+            ],
+            "ci95_by_grouping": {
+              "family": [
+                -0.2121,
+                0.0612
+              ],
+              "source_cluster_id": [
+                -0.1959,
+                0.0303
+              ],
+              "template_id": [
+                -0.1979,
+                0.0381
+              ]
+            },
+            "excludes_zero": false,
+            "governing_grouping": "family",
+            "governing_groups": 10,
+            "groups_by_grouping": {
+              "family": 10,
+              "source_cluster_id": 24,
+              "template_id": 90
+            },
+            "mean_delta": -0.0808,
+            "negative_tasks": 21,
+            "neutral_tasks": 65,
+            "paired_tasks": 99,
+            "positive_tasks": 13
+          },
+          "paired_bridge_retention": {
+            "ci95": [
+              -0.2321,
+              0.1481
+            ],
+            "ci95_by_grouping": {
+              "family": [
+                -0.2321,
+                0.1481
+              ],
+              "source_cluster_id": [
+                -0.2105,
+                0.1429
+              ],
+              "template_id": [
+                -0.1897,
+                0.1207
+              ]
+            },
+            "excludes_zero": false,
+            "governing_grouping": "family",
+            "governing_groups": 6,
+            "groups_by_grouping": {
+              "family": 6,
+              "source_cluster_id": 24,
+              "template_id": 52
+            },
+            "mean_delta": -0.0357,
+            "negative_tasks": 10,
+            "neutral_tasks": 38,
+            "paired_tasks": 56,
+            "positive_tasks": 8
+          },
+          "paired_csr": {
+            "ci95": [
+              -0.2424,
+              -0.0753
+            ],
+            "ci95_by_grouping": {
+              "family": [
+                -0.2396,
+                -0.0778
+              ],
+              "source_cluster_id": [
+                -0.2424,
+                -0.0753
+              ],
+              "template_id": [
+                -0.2396,
+                -0.0833
+              ]
+            },
+            "excludes_zero": true,
+            "governing_grouping": "source_cluster_id",
+            "governing_groups": 24,
+            "groups_by_grouping": {
+              "family": 10,
+              "source_cluster_id": 24,
+              "template_id": 86
+            },
+            "mean_delta": -0.1579,
+            "negative_tasks": 16,
+            "neutral_tasks": 78,
+            "paired_tasks": 95,
+            "positive_tasks": 1
+          },
+          "paired_identity_retention": {
+            "ci95": [
+              -0.16,
+              0.0
+            ],
+            "ci95_by_grouping": {
+              "family": [
+                -0.16,
+                0.0
+              ],
+              "source_cluster_id": [
+                -0.125,
+                0.0
+              ],
+              "template_id": [
+                -0.14,
+                0.0
+              ]
+            },
+            "excludes_zero": false,
+            "governing_grouping": "family",
+            "governing_groups": 10,
+            "groups_by_grouping": {
+              "family": 10,
+              "source_cluster_id": 24,
+              "template_id": 50
+            },
+            "mean_delta": -0.06,
+            "negative_tasks": 3,
+            "neutral_tasks": 47,
+            "paired_tasks": 50,
+            "positive_tasks": 0
+          },
+          "paired_quality": {
+            "ci95": [
+              -0.1531,
+              0.0583
+            ],
+            "ci95_by_grouping": {
+              "family": [
+                -0.15,
+                0.03
+              ],
+              "source_cluster_id": [
+                -0.1531,
+                0.0583
+              ],
+              "template_id": [
+                -0.15,
+                0.051
+              ]
+            },
+            "excludes_zero": false,
+            "governing_grouping": "source_cluster_id",
+            "governing_groups": 24,
+            "groups_by_grouping": {
+              "family": 10,
+              "source_cluster_id": 24,
+              "template_id": 91
+            },
+            "mean_delta": -0.05,
+            "negative_tasks": 16,
+            "neutral_tasks": 73,
+            "paired_tasks": 100,
+            "positive_tasks": 11
+          }
+        },
+        "S4_cross_encoder_strong": {
+          "aggregate": {
+            "AnswerRetention": 0.4848,
+            "BridgeRetention": 0.3214,
+            "CSR_given_complete_set_available": 0.2947,
+            "DistractorCount": 5.01,
+            "GoldDensity": 0.165,
+            "IdentityRetention": 0.66,
+            "SelectedTokens": 70.3,
+            "differs_from_s0": 1.0,
+            "quality": 0.31
+          },
+          "connected_proof_retention_recomputed": 0.2947,
+          "cpr_eligible_tasks": 95,
+          "discards": {
+            "note": "A regression with no role loss cannot be explained by discarding a required record; it is packing order or distractor composition.",
+            "regressions_vs_s0": 13,
+            "regressions_with_no_role_loss": 2,
+            "role_lost_that_s0_kept": {
+              "answer": 8,
+              "identity": 4
+            }
+          },
+          "flips": {
+            "both_correct": 23,
+            "both_wrong": 56,
+            "loss_attribution_on_correct_to_wrong": {
+              "answer_lost": 8,
+              "identity_lost": 4,
+              "no_role_loss_no_extra_distractor": 2
+            },
+            "net": -5,
+            "s0_correct_arm_wrong": 13,
+            "s0_wrong_arm_correct": 8
+          },
+          "gains": {
+            "gain_pattern": {
+              "answer_newly_retained": 2,
+              "distractors_reduced": 1,
+              "no_new_role_retained": 6
+            },
+            "tasks_fixed_by_arm": 8
+          },
+          "paired_answer_retention": {
+            "ci95": [
+              -0.2121,
+              -0.0099
+            ],
+            "ci95_by_grouping": {
+              "family": [
+                -0.2222,
+                -0.0202
+              ],
+              "source_cluster_id": [
+                -0.2121,
+                -0.0099
+              ],
+              "template_id": [
+                -0.21,
+                -0.0098
+              ]
+            },
+            "excludes_zero": true,
+            "governing_grouping": "source_cluster_id",
+            "governing_groups": 24,
+            "groups_by_grouping": {
+              "family": 10,
+              "source_cluster_id": 24,
+              "template_id": 90
+            },
+            "mean_delta": -0.1111,
+            "negative_tasks": 18,
+            "neutral_tasks": 74,
+            "paired_tasks": 99,
+            "positive_tasks": 7
+          },
+          "paired_bridge_retention": {
+            "ci95": [
+              -0.1754,
+              0.1053
+            ],
+            "ci95_by_grouping": {
+              "family": [
+                -0.1228,
+                0.0357
+              ],
+              "source_cluster_id": [
+                -0.1754,
+                0.1053
+              ],
+              "template_id": [
+                -0.1754,
+                0.1053
+              ]
+            },
+            "excludes_zero": false,
+            "governing_grouping": "source_cluster_id",
+            "governing_groups": 24,
+            "groups_by_grouping": {
+              "family": 6,
+              "source_cluster_id": 24,
+              "template_id": 52
+            },
+            "mean_delta": -0.0357,
+            "negative_tasks": 8,
+            "neutral_tasks": 42,
+            "paired_tasks": 56,
+            "positive_tasks": 6
+          },
+          "paired_csr": {
+            "ci95": [
+              -0.2653,
+              -0.0787
+            ],
+            "ci95_by_grouping": {
+              "family": [
+                -0.2653,
+                -0.0787
+              ],
+              "source_cluster_id": [
+                -0.2526,
+                -0.0947
+              ],
+              "template_id": [
+                -0.2472,
+                -0.0968
+              ]
+            },
+            "excludes_zero": true,
+            "governing_grouping": "family",
+            "governing_groups": 10,
+            "groups_by_grouping": {
+              "family": 10,
+              "source_cluster_id": 24,
+              "template_id": 86
+            },
+            "mean_delta": -0.1684,
+            "negative_tasks": 16,
+            "neutral_tasks": 79,
+            "paired_tasks": 95,
+            "positive_tasks": 0
+          },
+          "paired_identity_retention": {
+            "ci95": [
+              -0.52,
+              -0.18
+            ],
+            "ci95_by_grouping": {
+              "family": [
+                -0.52,
+                -0.18
+              ],
+              "source_cluster_id": [
+                -0.449,
+                -0.2245
+              ],
+              "template_id": [
+                -0.48,
+                -0.22
+              ]
+            },
+            "excludes_zero": true,
+            "governing_grouping": "family",
+            "governing_groups": 10,
+            "groups_by_grouping": {
+              "family": 10,
+              "source_cluster_id": 24,
+              "template_id": 50
+            },
+            "mean_delta": -0.34,
+            "negative_tasks": 17,
+            "neutral_tasks": 33,
+            "paired_tasks": 50,
+            "positive_tasks": 0
+          },
+          "paired_quality": {
+            "ci95": [
+              -0.1414,
+              0.0392
+            ],
+            "ci95_by_grouping": {
+              "family": [
+                -0.13,
+                0.03
+              ],
+              "source_cluster_id": [
+                -0.1354,
+                0.0294
+              ],
+              "template_id": [
+                -0.1414,
+                0.0392
+              ]
+            },
+            "excludes_zero": false,
+            "governing_grouping": "template_id",
+            "governing_groups": 91,
+            "groups_by_grouping": {
+              "family": 10,
+              "source_cluster_id": 24,
+              "template_id": 91
+            },
+            "mean_delta": -0.05,
+            "negative_tasks": 13,
+            "neutral_tasks": 79,
+            "paired_tasks": 100,
+            "positive_tasks": 8
+          }
+        },
+        "S5_oracle": {
+          "aggregate": {
+            "AnswerRetention": 1.0,
+            "BridgeRetention": 1.0,
+            "CSR_given_complete_set_available": 1.0,
+            "DistractorCount": 0.0,
+            "GoldDensity": 1.0,
+            "IdentityRetention": 1.0,
+            "SelectedTokens": 21.6,
+            "differs_from_s0": 1.0,
+            "quality": 0.75
+          },
+          "connected_proof_retention_recomputed": 1.0,
+          "cpr_eligible_tasks": 95,
+          "discards": {
+            "note": "A regression with no role loss cannot be explained by discarding a required record; it is packing order or distractor composition.",
+            "regressions_vs_s0": 3,
+            "regressions_with_no_role_loss": 3,
+            "role_lost_that_s0_kept": {}
+          },
+          "flips": {
+            "both_correct": 33,
+            "both_wrong": 22,
+            "loss_attribution_on_correct_to_wrong": {
+              "no_role_loss_no_extra_distractor": 3
+            },
+            "net": 39,
+            "s0_correct_arm_wrong": 3,
+            "s0_wrong_arm_correct": 42
+          },
+          "gains": {
+            "gain_pattern": {
+              "answer_newly_retained": 29,
+              "bridge_and_answer_jointly_recovered": 18,
+              "bridge_newly_retained": 22,
+              "distractors_reduced": 42,
+              "no_new_role_retained": 9
+            },
+            "tasks_fixed_by_arm": 42
+          },
+          "paired_answer_retention": {
+            "ci95": [
+              0.22,
+              0.5859
+            ],
+            "ci95_by_grouping": {
+              "family": [
+                0.22,
+                0.5859
+              ],
+              "source_cluster_id": [
+                0.3333,
+                0.4747
+              ],
+              "template_id": [
+                0.3048,
+                0.5098
+              ]
+            },
+            "excludes_zero": true,
+            "governing_grouping": "family",
+            "governing_groups": 10,
+            "groups_by_grouping": {
+              "family": 10,
+              "source_cluster_id": 24,
+              "template_id": 90
+            },
+            "mean_delta": 0.404,
+            "negative_tasks": 0,
+            "neutral_tasks": 59,
+            "paired_tasks": 99,
+            "positive_tasks": 40
+          },
+          "paired_bridge_retention": {
+            "ci95": [
+              0.4915,
+              0.7925
+            ],
+            "ci95_by_grouping": {
+              "family": [
+                0.5614,
+                0.7273
+              ],
+              "source_cluster_id": [
+                0.4915,
+                0.7925
+              ],
+              "template_id": [
+                0.5091,
+                0.7719
+              ]
+            },
+            "excludes_zero": true,
+            "governing_grouping": "source_cluster_id",
+            "governing_groups": 24,
+            "groups_by_grouping": {
+              "family": 6,
+              "source_cluster_id": 24,
+              "template_id": 52
+            },
+            "mean_delta": 0.6429,
+            "negative_tasks": 0,
+            "neutral_tasks": 20,
+            "paired_tasks": 56,
+            "positive_tasks": 36
+          },
+          "paired_csr": {
+            "ci95": [
+              0.2828,
+              0.7872
+            ],
+            "ci95_by_grouping": {
+              "family": [
+                0.2828,
+                0.7872
+              ],
+              "source_cluster_id": [
+                0.46,
+                0.6105
+              ],
+              "template_id": [
+                0.4301,
+                0.6421
+              ]
+            },
+            "excludes_zero": true,
+            "governing_grouping": "family",
+            "governing_groups": 10,
+            "groups_by_grouping": {
+              "family": 10,
+              "source_cluster_id": 24,
+              "template_id": 86
+            },
+            "mean_delta": 0.5368,
+            "negative_tasks": 0,
+            "neutral_tasks": 44,
+            "paired_tasks": 95,
+            "positive_tasks": 51
+          },
+          "paired_identity_retention": {
+            "ci95": [
+              0.0,
+              0.0
+            ],
+            "ci95_by_grouping": {
+              "family": [
+                0.0,
+                0.0
+              ],
+              "source_cluster_id": [
+                0.0,
+                0.0
+              ],
+              "template_id": [
+                0.0,
+                0.0
+              ]
+            },
+            "excludes_zero": false,
+            "governing_grouping": "source_cluster_id",
+            "governing_groups": 24,
+            "groups_by_grouping": {
+              "family": 10,
+              "source_cluster_id": 24,
+              "template_id": 50
+            },
+            "mean_delta": 0.0,
+            "negative_tasks": 0,
+            "neutral_tasks": 50,
+            "paired_tasks": 50,
+            "positive_tasks": 0
+          },
+          "paired_quality": {
+            "ci95": [
+              0.23,
+              0.55
+            ],
+            "ci95_by_grouping": {
+              "family": [
+                0.23,
+                0.55
+              ],
+              "source_cluster_id": [
+                0.299,
+                0.4747
+              ],
+              "template_id": [
+                0.2842,
+                0.495
+              ]
+            },
+            "excludes_zero": true,
+            "governing_grouping": "family",
+            "governing_groups": 10,
+            "groups_by_grouping": {
+              "family": 10,
+              "source_cluster_id": 24,
+              "template_id": 91
+            },
+            "mean_delta": 0.39,
+            "negative_tasks": 3,
+            "neutral_tasks": 55,
+            "paired_tasks": 100,
+            "positive_tasks": 42
+          }
+        }
+      },
+      "ceilings": {
+        "baseline": 0.36,
+        "note": "S5 is the ceiling for SELECTION over the frozen pool. It is not the pipeline ceiling: the residual above it is reader/interface/task difficulty, and a separate candidate-pool ceiling sits upstream. R5-style oracle-evidence arms bypass more of the pipeline than S5 and must not be substituted for this number.",
+        "reader_interface_residual_under_perfect_selection": 0.25,
+        "selector_ceiling_within_retrieved_pool": 0.75,
+        "selector_opportunity": 0.39
+      },
+      "s5_headroom": {
+        "absolute_opportunity": 0.39,
+        "recovery_fraction": {
+          "S1_relevance": -0.0769,
+          "S2_connectivity": 0.0256,
+          "S2a_entity_connectivity": 0.1282,
+          "S2b_chain_completion": -0.2564,
+          "S2c_chain_plus_relation": 0.3077,
+          "S3_cross_encoder": -0.1282,
+          "S4_cross_encoder_strong": -0.1282
+        },
+        "s0_quality": 0.36,
+        "s5_quality": 0.75
+      }
+    },
+    "descv4_surface": {
+      "arms": {
+        "S0_raw": {
+          "aggregate": {
+            "AnswerRetention": 0.2778,
+            "BridgeRetention": 0.0476,
+            "CSR_given_complete_set_available": 0.2162,
+            "DistractorCount": 4.83,
+            "GoldDensity": 0.195,
+            "IdentityRetention": 0.9091,
+            "SelectedTokens": 85.5,
+            "differs_from_s0": 0.0,
+            "quality": 0.13
+          },
+          "connected_proof_retention_recomputed": 0.2162,
+          "cpr_eligible_tasks": 74
+        },
+        "S1_relevance": {
+          "aggregate": {
+            "AnswerRetention": 0.2,
+            "BridgeRetention": 0.0,
+            "CSR_given_complete_set_available": 0.0405,
+            "DistractorCount": 5.04,
+            "GoldDensity": 0.16,
+            "IdentityRetention": 0.7879,
+            "SelectedTokens": 90.1,
+            "differs_from_s0": 0.77,
+            "quality": 0.1
+          },
+          "connected_proof_retention_recomputed": 0.0405,
+          "cpr_eligible_tasks": 74,
+          "discards": {
+            "note": "A regression with no role loss cannot be explained by discarding a required record; it is packing order or distractor composition.",
+            "regressions_vs_s0": 9,
+            "regressions_with_no_role_loss": 2,
+            "role_lost_that_s0_kept": {
+              "answer": 7,
+              "identity": 1
+            }
+          },
+          "flips": {
+            "both_correct": 4,
+            "both_wrong": 81,
+            "loss_attribution_on_correct_to_wrong": {
+              "answer_lost": 7,
+              "identity_lost": 1,
+              "no_role_loss_no_extra_distractor": 2
+            },
+            "net": -3,
+            "s0_correct_arm_wrong": 9,
+            "s0_wrong_arm_correct": 6
+          },
+          "gains": {
+            "gain_pattern": {
+              "answer_newly_retained": 2,
+              "distractors_reduced": 1,
+              "no_new_role_retained": 4
+            },
+            "tasks_fixed_by_arm": 6
+          },
+          "paired_answer_retention": {
+            "ci95": [
+              -0.2088,
+              0.0357
+            ],
+            "ci95_by_grouping": {
+              "family": [
+                -0.2088,
+                0.0357
+              ],
+              "source_cluster_id": [
+                -0.1591,
+                0.0
+              ],
+              "template_id": [
+                -0.1724,
+                0.0213
+              ]
+            },
+            "excludes_zero": false,
+            "governing_grouping": "family",
+            "governing_groups": 10,
+            "groups_by_grouping": {
+              "family": 10,
+              "source_cluster_id": 24,
+              "template_id": 82
+            },
+            "mean_delta": -0.0778,
+            "negative_tasks": 13,
+            "neutral_tasks": 71,
+            "paired_tasks": 90,
+            "positive_tasks": 6
+          },
+          "paired_bridge_retention": {
+            "ci95": [
+              -0.122,
+              0.0
+            ],
+            "ci95_by_grouping": {
+              "family": [
+                -0.1163,
+                0.0
+              ],
+              "source_cluster_id": [
+                -0.122,
+                0.0
+              ],
+              "template_id": [
+                -0.122,
+                0.0
+              ]
+            },
+            "excludes_zero": false,
+            "governing_grouping": "source_cluster_id",
+            "governing_groups": 23,
+            "groups_by_grouping": {
+              "family": 6,
+              "source_cluster_id": 23,
+              "template_id": 39
+            },
+            "mean_delta": -0.0476,
+            "negative_tasks": 2,
+            "neutral_tasks": 40,
+            "paired_tasks": 42,
+            "positive_tasks": 0
+          },
+          "paired_csr": {
+            "ci95": [
+              -0.3043,
+              -0.0405
+            ],
+            "ci95_by_grouping": {
+              "family": [
+                -0.3043,
+                -0.0405
+              ],
+              "source_cluster_id": [
+                -0.2571,
+                -0.0986
+              ],
+              "template_id": [
+                -0.2703,
+                -0.0933
+              ]
+            },
+            "excludes_zero": true,
+            "governing_grouping": "family",
+            "governing_groups": 10,
+            "groups_by_grouping": {
+              "family": 10,
+              "source_cluster_id": 24,
+              "template_id": 68
+            },
+            "mean_delta": -0.1757,
+            "negative_tasks": 13,
+            "neutral_tasks": 61,
+            "paired_tasks": 74,
+            "positive_tasks": 0
+          },
+          "paired_identity_retention": {
+            "ci95": [
+              -0.1881,
+              -0.06
+            ],
+            "ci95_by_grouping": {
+              "family": [
+                -0.17,
+                -0.0707
+              ],
+              "source_cluster_id": [
+                -0.1717,
+                -0.0714
+              ],
+              "template_id": [
+                -0.1881,
+                -0.06
+              ]
+            },
+            "excludes_zero": true,
+            "governing_grouping": "template_id",
+            "governing_groups": 88,
+            "groups_by_grouping": {
+              "family": 10,
+              "source_cluster_id": 24,
+              "template_id": 88
+            },
+            "mean_delta": -0.1212,
+            "negative_tasks": 12,
+            "neutral_tasks": 87,
+            "paired_tasks": 99,
+            "positive_tasks": 0
+          },
+          "paired_quality": {
+            "ci95": [
+              -0.1064,
+              0.0412
+            ],
+            "ci95_by_grouping": {
+              "family": [
+                -0.1,
+                0.03
+              ],
+              "source_cluster_id": [
+                -0.0891,
+                0.03
+              ],
+              "template_id": [
+                -0.1064,
+                0.0412
+              ]
+            },
+            "excludes_zero": false,
+            "governing_grouping": "template_id",
+            "governing_groups": 88,
+            "groups_by_grouping": {
+              "family": 10,
+              "source_cluster_id": 24,
+              "template_id": 88
+            },
+            "mean_delta": -0.03,
+            "negative_tasks": 9,
+            "neutral_tasks": 85,
+            "paired_tasks": 100,
+            "positive_tasks": 6
+          }
+        },
+        "S2_connectivity": {
+          "aggregate": {
+            "AnswerRetention": 0.6556,
+            "BridgeRetention": 0.0,
+            "CSR_given_complete_set_available": 0.4189,
+            "DistractorCount": 4.42,
+            "GoldDensity": 0.2633,
+            "IdentityRetention": 1.0,
+            "SelectedTokens": 67.3,
+            "differs_from_s0": 1.0,
+            "quality": 0.3
+          },
+          "connected_proof_retention_recomputed": 0.4189,
+          "cpr_eligible_tasks": 74,
+          "discards": {
+            "note": "A regression with no role loss cannot be explained by discarding a required record; it is packing order or distractor composition.",
+            "regressions_vs_s0": 5,
+            "regressions_with_no_role_loss": 5,
+            "role_lost_that_s0_kept": {}
+          },
+          "flips": {
+            "both_correct": 8,
+            "both_wrong": 65,
+            "loss_attribution_on_correct_to_wrong": {
+              "no_role_loss_no_extra_distractor": 5
+            },
+            "net": 17,
+            "s0_correct_arm_wrong": 5,
+            "s0_wrong_arm_correct": 22
+          },
+          "gains": {
+            "gain_pattern": {
+              "answer_newly_retained": 18,
+              "distractors_reduced": 17,
+              "identity_newly_retained": 2,
+              "no_new_role_retained": 4
+            },
+            "tasks_fixed_by_arm": 22
+          },
+          "paired_answer_retention": {
+            "ci95": [
+              0.2644,
+              0.4891
+            ],
+            "ci95_by_grouping": {
+              "family": [
+                0.2778,
+                0.4778
+              ],
+              "source_cluster_id": [
+                0.2872,
+                0.4674
+              ],
+              "template_id": [
+                0.2644,
+                0.4891
+              ]
+            },
+            "excludes_zero": true,
+            "governing_grouping": "template_id",
+            "governing_groups": 82,
+            "groups_by_grouping": {
+              "family": 10,
+              "source_cluster_id": 24,
+              "template_id": 82
+            },
+            "mean_delta": 0.3778,
+            "negative_tasks": 3,
+            "neutral_tasks": 50,
+            "paired_tasks": 90,
+            "positive_tasks": 37
+          },
+          "paired_bridge_retention": {
+            "ci95": [
+              -0.122,
+              0.0
+            ],
+            "ci95_by_grouping": {
+              "family": [
+                -0.1163,
+                0.0
+              ],
+              "source_cluster_id": [
+                -0.122,
+                0.0
+              ],
+              "template_id": [
+                -0.122,
+                0.0
+              ]
+            },
+            "excludes_zero": false,
+            "governing_grouping": "source_cluster_id",
+            "governing_groups": 23,
+            "groups_by_grouping": {
+              "family": 6,
+              "source_cluster_id": 23,
+              "template_id": 39
+            },
+            "mean_delta": -0.0476,
+            "negative_tasks": 2,
+            "neutral_tasks": 40,
+            "paired_tasks": 42,
+            "positive_tasks": 0
+          },
+          "paired_csr": {
+            "ci95": [
+              0.0517,
+              0.3523
+            ],
+            "ci95_by_grouping": {
+              "family": [
+                0.0517,
+                0.3523
+              ],
+              "source_cluster_id": [
+                0.1125,
+                0.2941
+              ],
+              "template_id": [
+                0.0972,
+                0.3108
+              ]
+            },
+            "excludes_zero": true,
+            "governing_grouping": "family",
+            "governing_groups": 10,
+            "groups_by_grouping": {
+              "family": 10,
+              "source_cluster_id": 24,
+              "template_id": 68
+            },
+            "mean_delta": 0.2027,
+            "negative_tasks": 1,
+            "neutral_tasks": 57,
+            "paired_tasks": 74,
+            "positive_tasks": 16
+          },
+          "paired_identity_retention": {
+            "ci95": [
+              0.04,
+              0.15
+            ],
+            "ci95_by_grouping": {
+              "family": [
+                0.0505,
+                0.1313
+              ],
+              "source_cluster_id": [
+                0.0495,
+                0.1386
+              ],
+              "template_id": [
+                0.04,
+                0.15
+              ]
+            },
+            "excludes_zero": true,
+            "governing_grouping": "template_id",
+            "governing_groups": 88,
+            "groups_by_grouping": {
+              "family": 10,
+              "source_cluster_id": 24,
+              "template_id": 88
+            },
+            "mean_delta": 0.0909,
+            "negative_tasks": 0,
+            "neutral_tasks": 90,
+            "paired_tasks": 99,
+            "positive_tasks": 9
+          },
+          "paired_quality": {
+            "ci95": [
+              0.04,
+              0.31
+            ],
+            "ci95_by_grouping": {
+              "family": [
+                0.04,
+                0.31
+              ],
+              "source_cluster_id": [
+                0.0882,
+                0.2525
+              ],
+              "template_id": [
+                0.07,
+                0.2727
+              ]
+            },
+            "excludes_zero": true,
+            "governing_grouping": "family",
+            "governing_groups": 10,
+            "groups_by_grouping": {
+              "family": 10,
+              "source_cluster_id": 24,
+              "template_id": 88
+            },
+            "mean_delta": 0.17,
+            "negative_tasks": 5,
+            "neutral_tasks": 73,
+            "paired_tasks": 100,
+            "positive_tasks": 22
+          }
+        },
+        "S2a_entity_connectivity": {
+          "aggregate": {
+            "AnswerRetention": 0.3667,
+            "BridgeRetention": 0.3571,
+            "CSR_given_complete_set_available": 0.3784,
+            "DistractorCount": 5.0,
+            "GoldDensity": 0.1667,
+            "IdentityRetention": 0.5253,
+            "SelectedTokens": 79.1,
+            "differs_from_s0": 1.0,
+            "quality": 0.22
+          },
+          "connected_proof_retention_recomputed": 0.3784,
+          "cpr_eligible_tasks": 74,
+          "discards": {
+            "note": "A regression with no role loss cannot be explained by discarding a required record; it is packing order or distractor composition.",
+            "regressions_vs_s0": 8,
+            "regressions_with_no_role_loss": 2,
+            "role_lost_that_s0_kept": {
+              "answer": 4,
+              "identity": 4
+            }
+          },
+          "flips": {
+            "both_correct": 5,
+            "both_wrong": 70,
+            "loss_attribution_on_correct_to_wrong": {
+              "answer_lost": 4,
+              "identity_lost": 4,
+              "no_role_loss_no_extra_distractor": 2
+            },
+            "net": 9,
+            "s0_correct_arm_wrong": 8,
+            "s0_wrong_arm_correct": 17
+          },
+          "gains": {
+            "gain_pattern": {
+              "answer_newly_retained": 14,
+              "bridge_and_answer_jointly_recovered": 6,
+              "bridge_newly_retained": 6,
+              "distractors_reduced": 13,
+              "no_new_role_retained": 3
+            },
+            "tasks_fixed_by_arm": 17
+          },
+          "paired_answer_retention": {
+            "ci95": [
+              -0.044,
+              0.2184
+            ],
+            "ci95_by_grouping": {
+              "family": [
+                -0.0213,
+                0.1932
+              ],
+              "source_cluster_id": [
+                -0.0333,
+                0.2174
+              ],
+              "template_id": [
+                -0.044,
+                0.2184
+              ]
+            },
+            "excludes_zero": false,
+            "governing_grouping": "template_id",
+            "governing_groups": 82,
+            "groups_by_grouping": {
+              "family": 10,
+              "source_cluster_id": 24,
+              "template_id": 82
+            },
+            "mean_delta": 0.0889,
+            "negative_tasks": 14,
+            "neutral_tasks": 54,
+            "paired_tasks": 90,
+            "positive_tasks": 22
+          },
+          "paired_bridge_retention": {
+            "ci95": [
+              0.1163,
+              0.5
+            ],
+            "ci95_by_grouping": {
+              "family": [
+                0.1667,
+                0.4255
+              ],
+              "source_cluster_id": [
+                0.1163,
+                0.5
+              ],
+              "template_id": [
+                0.1429,
+                0.4762
+              ]
+            },
+            "excludes_zero": true,
+            "governing_grouping": "source_cluster_id",
+            "governing_groups": 23,
+            "groups_by_grouping": {
+              "family": 6,
+              "source_cluster_id": 23,
+              "template_id": 39
+            },
+            "mean_delta": 0.3095,
+            "negative_tasks": 2,
+            "neutral_tasks": 25,
+            "paired_tasks": 42,
+            "positive_tasks": 15
+          },
+          "paired_csr": {
+            "ci95": [
+              0.039,
+              0.2933
+            ],
+            "ci95_by_grouping": {
+              "family": [
+                0.0938,
+                0.2338
+              ],
+              "source_cluster_id": [
+                0.039,
+                0.2933
+              ],
+              "template_id": [
+                0.0405,
+                0.2838
+              ]
+            },
+            "excludes_zero": true,
+            "governing_grouping": "source_cluster_id",
+            "governing_groups": 24,
+            "groups_by_grouping": {
+              "family": 10,
+              "source_cluster_id": 24,
+              "template_id": 68
+            },
+            "mean_delta": 0.1622,
+            "negative_tasks": 6,
+            "neutral_tasks": 50,
+            "paired_tasks": 74,
+            "positive_tasks": 18
+          },
+          "paired_identity_retention": {
+            "ci95": [
+              -0.4896,
+              -0.28
+            ],
+            "ci95_by_grouping": {
+              "family": [
+                -0.46,
+                -0.3131
+              ],
+              "source_cluster_id": [
+                -0.4583,
+                -0.3173
+              ],
+              "template_id": [
+                -0.4896,
+                -0.28
+              ]
+            },
+            "excludes_zero": true,
+            "governing_grouping": "template_id",
+            "governing_groups": 88,
+            "groups_by_grouping": {
+              "family": 10,
+              "source_cluster_id": 24,
+              "template_id": 88
+            },
+            "mean_delta": -0.3838,
+            "negative_tasks": 40,
+            "neutral_tasks": 57,
+            "paired_tasks": 99,
+            "positive_tasks": 2
+          },
+          "paired_quality": {
+            "ci95": [
+              -0.01,
+              0.1919
+            ],
+            "ci95_by_grouping": {
+              "family": [
+                0.02,
+                0.17
+              ],
+              "source_cluster_id": [
+                0.0,
+                0.1765
+              ],
+              "template_id": [
+                -0.01,
+                0.1919
+              ]
+            },
+            "excludes_zero": false,
+            "governing_grouping": "template_id",
+            "governing_groups": 88,
+            "groups_by_grouping": {
+              "family": 10,
+              "source_cluster_id": 24,
+              "template_id": 88
+            },
+            "mean_delta": 0.09,
+            "negative_tasks": 8,
+            "neutral_tasks": 75,
+            "paired_tasks": 100,
+            "positive_tasks": 17
+          }
+        },
+        "S2b_chain_completion": {
+          "aggregate": {
+            "AnswerRetention": 0.2778,
+            "BridgeRetention": 0.0476,
+            "CSR_given_complete_set_available": 0.2162,
+            "DistractorCount": 4.83,
+            "GoldDensity": 0.195,
+            "IdentityRetention": 0.9091,
+            "SelectedTokens": 85.5,
+            "differs_from_s0": 0.0,
+            "quality": 0.13
+          },
+          "connected_proof_retention_recomputed": 0.2162,
+          "cpr_eligible_tasks": 74,
+          "discards": {
+            "note": "A regression with no role loss cannot be explained by discarding a required record; it is packing order or distractor composition.",
+            "regressions_vs_s0": 0,
+            "regressions_with_no_role_loss": 0,
+            "role_lost_that_s0_kept": {}
+          },
+          "flips": {
+            "both_correct": 13,
+            "both_wrong": 87,
+            "loss_attribution_on_correct_to_wrong": {},
+            "net": 0,
+            "s0_correct_arm_wrong": 0,
+            "s0_wrong_arm_correct": 0
+          },
+          "gains": {
+            "gain_pattern": {},
+            "tasks_fixed_by_arm": 0
+          },
+          "paired_answer_retention": {
+            "ci95": [
+              0.0,
+              0.0
+            ],
+            "ci95_by_grouping": {
+              "family": [
+                0.0,
+                0.0
+              ],
+              "source_cluster_id": [
+                0.0,
+                0.0
+              ],
+              "template_id": [
+                0.0,
+                0.0
+              ]
+            },
+            "excludes_zero": false,
+            "governing_grouping": "source_cluster_id",
+            "governing_groups": 24,
+            "groups_by_grouping": {
+              "family": 10,
+              "source_cluster_id": 24,
+              "template_id": 82
+            },
+            "mean_delta": 0.0,
+            "negative_tasks": 0,
+            "neutral_tasks": 90,
+            "paired_tasks": 90,
+            "positive_tasks": 0
+          },
+          "paired_bridge_retention": {
+            "ci95": [
+              0.0,
+              0.0
+            ],
+            "ci95_by_grouping": {
+              "family": [
+                0.0,
+                0.0
+              ],
+              "source_cluster_id": [
+                0.0,
+                0.0
+              ],
+              "template_id": [
+                0.0,
+                0.0
+              ]
+            },
+            "excludes_zero": false,
+            "governing_grouping": "source_cluster_id",
+            "governing_groups": 23,
+            "groups_by_grouping": {
+              "family": 6,
+              "source_cluster_id": 23,
+              "template_id": 39
+            },
+            "mean_delta": 0.0,
+            "negative_tasks": 0,
+            "neutral_tasks": 42,
+            "paired_tasks": 42,
+            "positive_tasks": 0
+          },
+          "paired_csr": {
+            "ci95": [
+              0.0,
+              0.0
+            ],
+            "ci95_by_grouping": {
+              "family": [
+                0.0,
+                0.0
+              ],
+              "source_cluster_id": [
+                0.0,
+                0.0
+              ],
+              "template_id": [
+                0.0,
+                0.0
+              ]
+            },
+            "excludes_zero": false,
+            "governing_grouping": "source_cluster_id",
+            "governing_groups": 24,
+            "groups_by_grouping": {
+              "family": 10,
+              "source_cluster_id": 24,
+              "template_id": 68
+            },
+            "mean_delta": 0.0,
+            "negative_tasks": 0,
+            "neutral_tasks": 74,
+            "paired_tasks": 74,
+            "positive_tasks": 0
+          },
+          "paired_identity_retention": {
+            "ci95": [
+              0.0,
+              0.0
+            ],
+            "ci95_by_grouping": {
+              "family": [
+                0.0,
+                0.0
+              ],
+              "source_cluster_id": [
+                0.0,
+                0.0
+              ],
+              "template_id": [
+                0.0,
+                0.0
+              ]
+            },
+            "excludes_zero": false,
+            "governing_grouping": "source_cluster_id",
+            "governing_groups": 24,
+            "groups_by_grouping": {
+              "family": 10,
+              "source_cluster_id": 24,
+              "template_id": 88
+            },
+            "mean_delta": 0.0,
+            "negative_tasks": 0,
+            "neutral_tasks": 99,
+            "paired_tasks": 99,
+            "positive_tasks": 0
+          },
+          "paired_quality": {
+            "ci95": [
+              0.0,
+              0.0
+            ],
+            "ci95_by_grouping": {
+              "family": [
+                0.0,
+                0.0
+              ],
+              "source_cluster_id": [
+                0.0,
+                0.0
+              ],
+              "template_id": [
+                0.0,
+                0.0
+              ]
+            },
+            "excludes_zero": false,
+            "governing_grouping": "source_cluster_id",
+            "governing_groups": 24,
+            "groups_by_grouping": {
+              "family": 10,
+              "source_cluster_id": 24,
+              "template_id": 88
+            },
+            "mean_delta": 0.0,
+            "negative_tasks": 0,
+            "neutral_tasks": 100,
+            "paired_tasks": 100,
+            "positive_tasks": 0
+          }
+        },
+        "S2c_chain_plus_relation": {
+          "aggregate": {
+            "AnswerRetention": 0.2778,
+            "BridgeRetention": 0.0476,
+            "CSR_given_complete_set_available": 0.2162,
+            "DistractorCount": 4.83,
+            "GoldDensity": 0.195,
+            "IdentityRetention": 0.9091,
+            "SelectedTokens": 85.5,
+            "differs_from_s0": 0.0,
+            "quality": 0.13
+          },
+          "connected_proof_retention_recomputed": 0.2162,
+          "cpr_eligible_tasks": 74,
+          "discards": {
+            "note": "A regression with no role loss cannot be explained by discarding a required record; it is packing order or distractor composition.",
+            "regressions_vs_s0": 0,
+            "regressions_with_no_role_loss": 0,
+            "role_lost_that_s0_kept": {}
+          },
+          "flips": {
+            "both_correct": 13,
+            "both_wrong": 87,
+            "loss_attribution_on_correct_to_wrong": {},
+            "net": 0,
+            "s0_correct_arm_wrong": 0,
+            "s0_wrong_arm_correct": 0
+          },
+          "gains": {
+            "gain_pattern": {},
+            "tasks_fixed_by_arm": 0
+          },
+          "paired_answer_retention": {
+            "ci95": [
+              0.0,
+              0.0
+            ],
+            "ci95_by_grouping": {
+              "family": [
+                0.0,
+                0.0
+              ],
+              "source_cluster_id": [
+                0.0,
+                0.0
+              ],
+              "template_id": [
+                0.0,
+                0.0
+              ]
+            },
+            "excludes_zero": false,
+            "governing_grouping": "source_cluster_id",
+            "governing_groups": 24,
+            "groups_by_grouping": {
+              "family": 10,
+              "source_cluster_id": 24,
+              "template_id": 82
+            },
+            "mean_delta": 0.0,
+            "negative_tasks": 0,
+            "neutral_tasks": 90,
+            "paired_tasks": 90,
+            "positive_tasks": 0
+          },
+          "paired_bridge_retention": {
+            "ci95": [
+              0.0,
+              0.0
+            ],
+            "ci95_by_grouping": {
+              "family": [
+                0.0,
+                0.0
+              ],
+              "source_cluster_id": [
+                0.0,
+                0.0
+              ],
+              "template_id": [
+                0.0,
+                0.0
+              ]
+            },
+            "excludes_zero": false,
+            "governing_grouping": "source_cluster_id",
+            "governing_groups": 23,
+            "groups_by_grouping": {
+              "family": 6,
+              "source_cluster_id": 23,
+              "template_id": 39
+            },
+            "mean_delta": 0.0,
+            "negative_tasks": 0,
+            "neutral_tasks": 42,
+            "paired_tasks": 42,
+            "positive_tasks": 0
+          },
+          "paired_csr": {
+            "ci95": [
+              0.0,
+              0.0
+            ],
+            "ci95_by_grouping": {
+              "family": [
+                0.0,
+                0.0
+              ],
+              "source_cluster_id": [
+                0.0,
+                0.0
+              ],
+              "template_id": [
+                0.0,
+                0.0
+              ]
+            },
+            "excludes_zero": false,
+            "governing_grouping": "source_cluster_id",
+            "governing_groups": 24,
+            "groups_by_grouping": {
+              "family": 10,
+              "source_cluster_id": 24,
+              "template_id": 68
+            },
+            "mean_delta": 0.0,
+            "negative_tasks": 0,
+            "neutral_tasks": 74,
+            "paired_tasks": 74,
+            "positive_tasks": 0
+          },
+          "paired_identity_retention": {
+            "ci95": [
+              0.0,
+              0.0
+            ],
+            "ci95_by_grouping": {
+              "family": [
+                0.0,
+                0.0
+              ],
+              "source_cluster_id": [
+                0.0,
+                0.0
+              ],
+              "template_id": [
+                0.0,
+                0.0
+              ]
+            },
+            "excludes_zero": false,
+            "governing_grouping": "source_cluster_id",
+            "governing_groups": 24,
+            "groups_by_grouping": {
+              "family": 10,
+              "source_cluster_id": 24,
+              "template_id": 88
+            },
+            "mean_delta": 0.0,
+            "negative_tasks": 0,
+            "neutral_tasks": 99,
+            "paired_tasks": 99,
+            "positive_tasks": 0
+          },
+          "paired_quality": {
+            "ci95": [
+              0.0,
+              0.0
+            ],
+            "ci95_by_grouping": {
+              "family": [
+                0.0,
+                0.0
+              ],
+              "source_cluster_id": [
+                0.0,
+                0.0
+              ],
+              "template_id": [
+                0.0,
+                0.0
+              ]
+            },
+            "excludes_zero": false,
+            "governing_grouping": "source_cluster_id",
+            "governing_groups": 24,
+            "groups_by_grouping": {
+              "family": 10,
+              "source_cluster_id": 24,
+              "template_id": 88
+            },
+            "mean_delta": 0.0,
+            "negative_tasks": 0,
+            "neutral_tasks": 100,
+            "paired_tasks": 100,
+            "positive_tasks": 0
+          }
+        },
+        "S3_cross_encoder": {
+          "aggregate": {
+            "AnswerRetention": 0.1444,
+            "BridgeRetention": 0.0,
+            "CSR_given_complete_set_available": 0.027,
+            "DistractorCount": 5.14,
+            "GoldDensity": 0.1433,
+            "IdentityRetention": 0.7374,
+            "SelectedTokens": 89.7,
+            "differs_from_s0": 1.0,
+            "quality": 0.05
+          },
+          "connected_proof_retention_recomputed": 0.027,
+          "cpr_eligible_tasks": 74,
+          "discards": {
+            "note": "A regression with no role loss cannot be explained by discarding a required record; it is packing order or distractor composition.",
+            "regressions_vs_s0": 11,
+            "regressions_with_no_role_loss": 3,
+            "role_lost_that_s0_kept": {
+              "answer": 7,
+              "identity": 1
+            }
+          },
+          "flips": {
+            "both_correct": 2,
+            "both_wrong": 84,
+            "loss_attribution_on_correct_to_wrong": {
+              "answer_lost": 7,
+              "identity_lost": 1,
+              "no_role_loss_no_extra_distractor": 3
+            },
+            "net": -8,
+            "s0_correct_arm_wrong": 11,
+            "s0_wrong_arm_correct": 3
+          },
+          "gains": {
+            "gain_pattern": {
+              "answer_newly_retained": 1,
+              "no_new_role_retained": 2
+            },
+            "tasks_fixed_by_arm": 3
+          },
+          "paired_answer_retention": {
+            "ci95": [
+              -0.25,
+              -0.023
+            ],
+            "ci95_by_grouping": {
+              "family": [
+                -0.25,
+                -0.023
+              ],
+              "source_cluster_id": [
+                -0.2247,
+                -0.043
+              ],
+              "template_id": [
+                -0.236,
+                -0.0323
+              ]
+            },
+            "excludes_zero": true,
+            "governing_grouping": "family",
+            "governing_groups": 10,
+            "groups_by_grouping": {
+              "family": 10,
+              "source_cluster_id": 24,
+              "template_id": 82
+            },
+            "mean_delta": -0.1333,
+            "negative_tasks": 18,
+            "neutral_tasks": 66,
+            "paired_tasks": 90,
+            "positive_tasks": 6
+          },
+          "paired_bridge_retention": {
+            "ci95": [
+              -0.122,
+              0.0
+            ],
+            "ci95_by_grouping": {
+              "family": [
+                -0.1163,
+                0.0
+              ],
+              "source_cluster_id": [
+                -0.122,
+                0.0
+              ],
+              "template_id": [
+                -0.122,
+                0.0
+              ]
+            },
+            "excludes_zero": false,
+            "governing_grouping": "source_cluster_id",
+            "governing_groups": 23,
+            "groups_by_grouping": {
+              "family": 6,
+              "source_cluster_id": 23,
+              "template_id": 39
+            },
+            "mean_delta": -0.0476,
+            "negative_tasks": 2,
+            "neutral_tasks": 40,
+            "paired_tasks": 42,
+            "positive_tasks": 0
+          },
+          "paired_csr": {
+            "ci95": [
+              -0.3291,
+              -0.0405
+            ],
+            "ci95_by_grouping": {
+              "family": [
+                -0.3291,
+                -0.0405
+              ],
+              "source_cluster_id": [
+                -0.2714,
+                -0.1127
+              ],
+              "template_id": [
+                -0.2838,
+                -0.1053
+              ]
+            },
+            "excludes_zero": true,
+            "governing_grouping": "family",
+            "governing_groups": 10,
+            "groups_by_grouping": {
+              "family": 10,
+              "source_cluster_id": 24,
+              "template_id": 68
+            },
+            "mean_delta": -0.1892,
+            "negative_tasks": 14,
+            "neutral_tasks": 60,
+            "paired_tasks": 74,
+            "positive_tasks": 0
+          },
+          "paired_identity_retention": {
+            "ci95": [
+              -0.2621,
+              -0.0825
+            ],
+            "ci95_by_grouping": {
+              "family": [
+                -0.2525,
+                -0.0816
+              ],
+              "source_cluster_id": [
+                -0.25,
+                -0.0891
+              ],
+              "template_id": [
+                -0.2621,
+                -0.0825
+              ]
+            },
+            "excludes_zero": true,
+            "governing_grouping": "template_id",
+            "governing_groups": 88,
+            "groups_by_grouping": {
+              "family": 10,
+              "source_cluster_id": 24,
+              "template_id": 88
+            },
+            "mean_delta": -0.1717,
+            "negative_tasks": 20,
+            "neutral_tasks": 76,
+            "paired_tasks": 99,
+            "positive_tasks": 3
+          },
+          "paired_quality": {
+            "ci95": [
+              -0.1531,
+              -0.01
+            ],
+            "ci95_by_grouping": {
+              "family": [
+                -0.15,
+                -0.02
+              ],
+              "source_cluster_id": [
+                -0.1414,
+                -0.0198
+              ],
+              "template_id": [
+                -0.1531,
+                -0.01
+              ]
+            },
+            "excludes_zero": true,
+            "governing_grouping": "template_id",
+            "governing_groups": 88,
+            "groups_by_grouping": {
+              "family": 10,
+              "source_cluster_id": 24,
+              "template_id": 88
+            },
+            "mean_delta": -0.08,
+            "negative_tasks": 11,
+            "neutral_tasks": 86,
+            "paired_tasks": 100,
+            "positive_tasks": 3
+          }
+        },
+        "S4_cross_encoder_strong": {
+          "aggregate": {
+            "AnswerRetention": 0.2889,
+            "BridgeRetention": 0.0,
+            "CSR_given_complete_set_available": 0.0946,
+            "DistractorCount": 5.06,
+            "GoldDensity": 0.1567,
+            "IdentityRetention": 0.6869,
+            "SelectedTokens": 82.1,
+            "differs_from_s0": 1.0,
+            "quality": 0.15
+          },
+          "connected_proof_retention_recomputed": 0.0946,
+          "cpr_eligible_tasks": 74,
+          "discards": {
+            "note": "A regression with no role loss cannot be explained by discarding a required record; it is packing order or distractor composition.",
+            "regressions_vs_s0": 10,
+            "regressions_with_no_role_loss": 2,
+            "role_lost_that_s0_kept": {
+              "answer": 5,
+              "identity": 5
+            }
+          },
+          "flips": {
+            "both_correct": 3,
+            "both_wrong": 75,
+            "loss_attribution_on_correct_to_wrong": {
+              "answer_lost": 5,
+              "identity_lost": 5,
+              "no_role_loss_no_extra_distractor": 2
+            },
+            "net": 2,
+            "s0_correct_arm_wrong": 10,
+            "s0_wrong_arm_correct": 12
+          },
+          "gains": {
+            "gain_pattern": {
+              "answer_newly_retained": 6,
+              "distractors_reduced": 6,
+              "no_new_role_retained": 6
+            },
+            "tasks_fixed_by_arm": 12
+          },
+          "paired_answer_retention": {
+            "ci95": [
+              -0.1667,
+              0.191
+            ],
+            "ci95_by_grouping": {
+              "family": [
+                -0.1667,
+                0.191
+              ],
+              "source_cluster_id": [
+                -0.0761,
+                0.1163
+              ],
+              "template_id": [
+                -0.1183,
+                0.1429
+              ]
+            },
+            "excludes_zero": false,
+            "governing_grouping": "family",
+            "governing_groups": 10,
+            "groups_by_grouping": {
+              "family": 10,
+              "source_cluster_id": 24,
+              "template_id": 82
+            },
+            "mean_delta": 0.0111,
+            "negative_tasks": 17,
+            "neutral_tasks": 55,
+            "paired_tasks": 90,
+            "positive_tasks": 18
+          },
+          "paired_bridge_retention": {
+            "ci95": [
+              -0.122,
+              0.0
+            ],
+            "ci95_by_grouping": {
+              "family": [
+                -0.1163,
+                0.0
+              ],
+              "source_cluster_id": [
+                -0.122,
+                0.0
+              ],
+              "template_id": [
+                -0.122,
+                0.0
+              ]
+            },
+            "excludes_zero": false,
+            "governing_grouping": "source_cluster_id",
+            "governing_groups": 23,
+            "groups_by_grouping": {
+              "family": 6,
+              "source_cluster_id": 23,
+              "template_id": 39
+            },
+            "mean_delta": -0.0476,
+            "negative_tasks": 2,
+            "neutral_tasks": 40,
+            "paired_tasks": 42,
+            "positive_tasks": 0
+          },
+          "paired_csr": {
+            "ci95": [
+              -0.2875,
+              0.0455
+            ],
+            "ci95_by_grouping": {
+              "family": [
+                -0.2875,
+                0.0455
+              ],
+              "source_cluster_id": [
+                -0.2125,
+                -0.039
+              ],
+              "template_id": [
+                -0.2338,
+                -0.0135
+              ]
+            },
+            "excludes_zero": false,
+            "governing_grouping": "family",
+            "governing_groups": 10,
+            "groups_by_grouping": {
+              "family": 10,
+              "source_cluster_id": 24,
+              "template_id": 68
+            },
+            "mean_delta": -0.1216,
+            "negative_tasks": 14,
+            "neutral_tasks": 55,
+            "paired_tasks": 74,
+            "positive_tasks": 5
+          },
+          "paired_identity_retention": {
+            "ci95": [
+              -0.3125,
+              -0.134
+            ],
+            "ci95_by_grouping": {
+              "family": [
+                -0.3131,
+                -0.14
+              ],
+              "source_cluster_id": [
+                -0.299,
+                -0.1414
+              ],
+              "template_id": [
+                -0.3125,
+                -0.134
+              ]
+            },
+            "excludes_zero": true,
+            "governing_grouping": "template_id",
+            "governing_groups": 88,
+            "groups_by_grouping": {
+              "family": 10,
+              "source_cluster_id": 24,
+              "template_id": 88
+            },
+            "mean_delta": -0.2222,
+            "negative_tasks": 24,
+            "neutral_tasks": 73,
+            "paired_tasks": 99,
+            "positive_tasks": 2
+          },
+          "paired_quality": {
+            "ci95": [
+              -0.11,
+              0.17
+            ],
+            "ci95_by_grouping": {
+              "family": [
+                -0.11,
+                0.17
+              ],
+              "source_cluster_id": [
+                -0.0693,
+                0.11
+              ],
+              "template_id": [
+                -0.0729,
+                0.1122
+              ]
+            },
+            "excludes_zero": false,
+            "governing_grouping": "family",
+            "governing_groups": 10,
+            "groups_by_grouping": {
+              "family": 10,
+              "source_cluster_id": 24,
+              "template_id": 88
+            },
+            "mean_delta": 0.02,
+            "negative_tasks": 10,
+            "neutral_tasks": 78,
+            "paired_tasks": 100,
+            "positive_tasks": 12
+          }
+        },
+        "S5_oracle": {
+          "aggregate": {
+            "AnswerRetention": 1.0,
+            "BridgeRetention": 1.0,
+            "CSR_given_complete_set_available": 1.0,
+            "DistractorCount": 0.0,
+            "GoldDensity": 0.99,
+            "IdentityRetention": 1.0,
+            "SelectedTokens": 28.6,
+            "differs_from_s0": 1.0,
+            "quality": 0.68
+          },
+          "connected_proof_retention_recomputed": 1.0,
+          "cpr_eligible_tasks": 74,
+          "discards": {
+            "note": "A regression with no role loss cannot be explained by discarding a required record; it is packing order or distractor composition.",
+            "regressions_vs_s0": 2,
+            "regressions_with_no_role_loss": 2,
+            "role_lost_that_s0_kept": {}
+          },
+          "flips": {
+            "both_correct": 11,
+            "both_wrong": 30,
+            "loss_attribution_on_correct_to_wrong": {
+              "no_role_loss_no_extra_distractor": 2
+            },
+            "net": 55,
+            "s0_correct_arm_wrong": 2,
+            "s0_wrong_arm_correct": 57
+          },
+          "gains": {
+            "gain_pattern": {
+              "answer_newly_retained": 44,
+              "bridge_and_answer_jointly_recovered": 17,
+              "bridge_newly_retained": 23,
+              "distractors_reduced": 57,
+              "identity_newly_retained": 4,
+              "no_new_role_retained": 7
+            },
+            "tasks_fixed_by_arm": 57
+          },
+          "paired_answer_retention": {
+            "ci95": [
+              0.6146,
+              0.8235
+            ],
+            "ci95_by_grouping": {
+              "family": [
+                0.6146,
+                0.8235
+              ],
+              "source_cluster_id": [
+                0.6444,
+                0.7957
+              ],
+              "template_id": [
+                0.625,
+                0.8152
+              ]
+            },
+            "excludes_zero": true,
+            "governing_grouping": "family",
+            "governing_groups": 10,
+            "groups_by_grouping": {
+              "family": 10,
+              "source_cluster_id": 24,
+              "template_id": 82
+            },
+            "mean_delta": 0.7222,
+            "negative_tasks": 0,
+            "neutral_tasks": 25,
+            "paired_tasks": 90,
+            "positive_tasks": 65
+          },
+          "paired_bridge_retention": {
+            "ci95": [
+              0.878,
+              1.0
+            ],
+            "ci95_by_grouping": {
+              "family": [
+                0.8837,
+                1.0
+              ],
+              "source_cluster_id": [
+                0.878,
+                1.0
+              ],
+              "template_id": [
+                0.878,
+                1.0
+              ]
+            },
+            "excludes_zero": true,
+            "governing_grouping": "source_cluster_id",
+            "governing_groups": 23,
+            "groups_by_grouping": {
+              "family": 6,
+              "source_cluster_id": 23,
+              "template_id": 39
+            },
+            "mean_delta": 0.9524,
+            "negative_tasks": 0,
+            "neutral_tasks": 2,
+            "paired_tasks": 42,
+            "positive_tasks": 40
+          },
+          "paired_csr": {
+            "ci95": [
+              0.6353,
+              0.9474
+            ],
+            "ci95_by_grouping": {
+              "family": [
+                0.6353,
+                0.9474
+              ],
+              "source_cluster_id": [
+                0.7027,
+                0.8592
+              ],
+              "template_id": [
+                0.6849,
+                0.8732
+              ]
+            },
+            "excludes_zero": true,
+            "governing_grouping": "family",
+            "governing_groups": 10,
+            "groups_by_grouping": {
+              "family": 10,
+              "source_cluster_id": 24,
+              "template_id": 68
+            },
+            "mean_delta": 0.7838,
+            "negative_tasks": 0,
+            "neutral_tasks": 16,
+            "paired_tasks": 74,
+            "positive_tasks": 58
+          },
+          "paired_identity_retention": {
+            "ci95": [
+              0.04,
+              0.15
+            ],
+            "ci95_by_grouping": {
+              "family": [
+                0.0505,
+                0.1313
+              ],
+              "source_cluster_id": [
+                0.0495,
+                0.1386
+              ],
+              "template_id": [
+                0.04,
+                0.15
+              ]
+            },
+            "excludes_zero": true,
+            "governing_grouping": "template_id",
+            "governing_groups": 88,
+            "groups_by_grouping": {
+              "family": 10,
+              "source_cluster_id": 24,
+              "template_id": 88
+            },
+            "mean_delta": 0.0909,
+            "negative_tasks": 0,
+            "neutral_tasks": 90,
+            "paired_tasks": 99,
+            "positive_tasks": 9
+          },
+          "paired_quality": {
+            "ci95": [
+              0.4356,
+              0.6571
+            ],
+            "ci95_by_grouping": {
+              "family": [
+                0.44,
+                0.66
+              ],
+              "source_cluster_id": [
+                0.4639,
+                0.64
+              ],
+              "template_id": [
+                0.4356,
+                0.6571
+              ]
+            },
+            "excludes_zero": true,
+            "governing_grouping": "template_id",
+            "governing_groups": 88,
+            "groups_by_grouping": {
+              "family": 10,
+              "source_cluster_id": 24,
+              "template_id": 88
+            },
+            "mean_delta": 0.55,
+            "negative_tasks": 2,
+            "neutral_tasks": 41,
+            "paired_tasks": 100,
+            "positive_tasks": 57
+          }
+        }
+      },
+      "ceilings": {
+        "baseline": 0.13,
+        "note": "S5 is the ceiling for SELECTION over the frozen pool. It is not the pipeline ceiling: the residual above it is reader/interface/task difficulty, and a separate candidate-pool ceiling sits upstream. R5-style oracle-evidence arms bypass more of the pipeline than S5 and must not be substituted for this number.",
+        "reader_interface_residual_under_perfect_selection": 0.32,
+        "selector_ceiling_within_retrieved_pool": 0.68,
+        "selector_opportunity": 0.55
+      },
+      "s5_headroom": {
+        "absolute_opportunity": 0.55,
+        "recovery_fraction": {
+          "S1_relevance": -0.0545,
+          "S2_connectivity": 0.3091,
+          "S2a_entity_connectivity": 0.1636,
+          "S2b_chain_completion": 0.0,
+          "S2c_chain_plus_relation": 0.0,
+          "S3_cross_encoder": -0.1455,
+          "S4_cross_encoder_strong": 0.0364
+        },
+        "s0_quality": 0.13,
+        "s5_quality": 0.68
+      }
+    }
+  },
+  "seed": 20260806
+}
