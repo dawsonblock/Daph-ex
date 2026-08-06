@@ -1,0 +1,28 @@
+{
+  "decision": "S1-S4 authorized",
+  "max_delta": 0.55,
+  "min_delta": 0.39,
+  "packet_budget": 6,
+  "partitions": {
+    "descv4_id": {
+      "CSR_S0_given_available": 0.4632,
+      "CSR_S5_given_available": 1.0,
+      "S0_quality": 0.36,
+      "S5_quality": 0.75,
+      "complete_set_available": 0.95,
+      "delta": 0.39,
+      "n": 100
+    },
+    "descv4_surface": {
+      "CSR_S0_given_available": 0.2162,
+      "CSR_S5_given_available": 1.0,
+      "S0_quality": 0.13,
+      "S5_quality": 0.68,
+      "complete_set_available": 0.74,
+      "delta": 0.55,
+      "n": 100
+    }
+  },
+  "tau_selection": 0.05,
+  "verdict": "PASS_SELECTION_OPPORTUNITY"
+}

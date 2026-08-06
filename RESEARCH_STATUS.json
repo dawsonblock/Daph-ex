@@ -15,6 +15,7 @@
     "bounded_chain_completion": "QUALIFIED",
     "bounded_iterative_retrieval": "DOES_NOT_GENERALIZE",
     "calculate_action": "UNQUALIFIED",
+    "candidate_generation_policy": "FROZEN_v1",
     "executive_training": "BLOCKED",
     "graphiti_temporal_memory": "BLOCKED",
     "infini_consolidation": "BLOCKED",
@@ -23,6 +24,7 @@
     "single_pass_retrieval": "QUALIFIED",
     "turbovec": "BLOCKED"
   },
+  "environment_note": "Installing FlagEmbedding downgraded transformers to 4.57.6, and the HRM adapter's pinned-version guard refused to load rather than silently using a different architecture. FlagEmbedding is removed; transformers restored to 5.14.1. The guard did exactly its job.",
   "gates": {
     "gate_a0_controlled_evidence_use": "PASS",
     "gate_a1_structural_generalization": "PENDING_AWAITING_V4",
@@ -30,8 +32,8 @@
     "gate_c0_controlled_iterative_retrieval": "MECHANISM_SUCCESS_PROMOTION_BLOCKED_BY_BENCHMARK_STRUCTURE",
     "gate_c1_structural_generalization_iterative_retrieval": "FAIL_MEASURED_ON_V4",
     "gate_c2_i_identity_resolution": "PENDING",
-    "gate_c2_r_retrieval_coverage": "FAIL_CANDIDATE_COVERAGE_NO_ARM_PROMOTABLE",
-    "gate_c2_s_evidence_selection": "PENDING",
+    "gate_c2_r_retrieval_coverage": "PASS_POLICY_FROZEN_c2_candidate_generation_v1",
+    "gate_c2_s_evidence_selection": "PASS_SELECTION_OPPORTUNITY_S1_S4_AUTHORIZED",
     "gate_c2_semantic_information_gap_retrieval": "IN_PROGRESS_COVERAGE_MEASURED",
     "gate_c2c_chain_completion": "FAIL_ON_ONE_BADLY_SPECIFIED_CRITERION",
     "gate_c2c_chain_completion_qualified": "PASS_all_four_regimes_on_identifiable_corpus",
@@ -73,7 +75,7 @@
     "slot_label_echo": "99 -> 0 under precision packing; was an evidence-confusability artefact, not a prompt-interface or reasoning limit",
     "slot_label_echoes": "Track evidence quality, not packet format: 85 -> 28 under precision packing, -> 3 under oracle evidence. F-arms would measure a symptom; implemented but unrun."
   },
-  "next_work": "Chain completion is QUALIFIED across all four well-posed regimes. Next: freeze the candidate-generation policy (P2 fusion + C4 chain completion), emit immutable candidate pools, compute availability ceilings, then the S0/S5 selection gate at tau=0.05. Reproduce the BGE description effect on the identifiable corpus before citing it. Holdout still untouched.",
+  "next_work": "S1-S4 selectors are authorized by measured oracle opportunity (+0.39/+0.55). Build them on the frozen pools with an identical packet budget: S1 relevance, S2 relation/connectivity, S3 lightweight reranker, S4 stronger cross-encoder. Report CSR given availability alongside quality. Also reproduce the BGE description effect on the identifiable corpus before citing it. Holdout untouched.",
   "ood_taxonomy": {
     "REFERENTIAL_OOD": {
       "mechanism": "identity resolution + multi-hop retrieval",
@@ -282,6 +284,20 @@
       "report": "GATE_C2_DEV_SWEEP_REPORT.md",
       "status": "FROZEN_BEFORE_EVALUATION",
       "v4_separation": "Disjoint entity heads (minerals vs V4's birds), disjoint roles, disjoint source styles, c2cal- task-id namespace, zero evidence-id collisions. Enforced by test, not just by construction."
+    },
+    "gate_c2_candidate_pools_frozen": {
+      "claim": "Candidate-generation policy c2_candidate_generation_v1 (P2 RRF bm25+bge k=10, plus C4 bounded chain completion, depth <= 2, runtime canonicalization) is frozen with immutable pools. Availability ceilings: complete-set 0.95 / 0.74, answer record 0.99 / 0.90, identity 1.00 / 0.99, partial proof 0.98 / 0.88.",
+      "not_a_claim_about": [
+        "selector performance",
+        "downstream quality beyond the S0/S5 gate"
+      ],
+      "provenance": "Pools carry policy_id, policy_version, p2/c4 config hashes, embedding config hash, query hash, per-candidate lexical/dense/fusion scores, follow-up depth, follow-up query digests, and the runtime canonicalization trace. Proof labels are excluded and stay evaluator-side.",
+      "receipts": [
+        "evidence/gate_c2/candidate_pools/v1/manifest.json",
+        "evidence/gate_c2/candidate_pools/v1/RESULTS.sha256"
+      ],
+      "report": "configs/gate_c2_protocol.json",
+      "status": "FROZEN"
     },
     "gate_c2_coverage": {
       "claim": "Retrieval coverage measured without the reader on frozen V4. Dense beats BM25 on BOTH splits, reversing the Gate B ordering, and rank fusion beats either alone. Coverage remains the dominant constraint.",
@@ -676,6 +692,41 @@
       "status": "MEASURED_RECEIPTED",
       "the_normalizer_worked": "Oracle-gap closure was the right endpoint and it changed the diagnosis rather than merely the arithmetic. Under v2's absolute deltas, description looked like a near-miss (+0.08 vs +0.10). Normalized, it is a near-total failure: 0.025 of an available 0.800. The two prior protocols were hiding the single regime where the mechanism genuinely does not work.",
       "what_this_isolates": "Chain completion is real and large for abbreviation and alias -- where a retrieved identity record names a canonical entity that runtime parsing can extract. Description references resolve through prose ('the ancillary unit charted during survey season'), and the canonicalization parser recovers them far less reliably, so the follow-up query is built from a subject it never resolved. C5 reaching 1.000 proves the evidence is retrievable given the right query, so this is a canonicalization-coverage failure, not a retrieval-ceiling failure."
+    },
+    "gate_c2s_selection_opportunity": {
+      "claim": "On frozen candidate pools with an identical 6-record packet budget, oracle selection beats raw top-N by +0.39 (descv4_id) and +0.55 (descv4_surface) HRM verified quality, against a predeclared tau of 0.05. Selection has a large real opportunity; S1-S4 are authorized.",
+      "experiment_verdict": "PASS_SELECTION_OPPORTUNITY",
+      "mechanism_effect_observed": true,
+      "not_a_claim_about": [
+        "any runtime selector, none of which has been built or measured",
+        "the reserved holdout, still untouched",
+        "candidate discovery, which is frozen and held constant here"
+      ],
+      "receipts": [
+        "evidence/gate_c2/selection_gate/s0_vs_s5.json",
+        "evidence/gate_c2/selection_gate/RESULTS.sha256"
+      ],
+      "report": "configs/gate_c2_protocol.json",
+      "results": {
+        "descv4_id": {
+          "CSR_S0": 0.4632,
+          "CSR_S5": 1.0,
+          "S0": 0.36,
+          "S5": 0.75,
+          "complete_set_available": 0.95,
+          "delta": 0.39
+        },
+        "descv4_surface": {
+          "CSR_S0": 0.2162,
+          "CSR_S5": 1.0,
+          "S0": 0.13,
+          "S5": 0.68,
+          "complete_set_available": 0.74,
+          "delta": 0.55
+        }
+      },
+      "status": "MEASURED_RECEIPTED",
+      "why_conditional_metrics_matter": "Retrieval is not being blamed for selection. Complete evidence is AVAILABLE in the pool for 0.95 and 0.74 of tasks, yet raw top-N retains it for only 0.46 and 0.22 of those available cases. The gap is selection discarding evidence the retriever already found."
     }
   },
   "testing_policy": "Tests assert structured state, never exact strings against narrative prose. Three separate failures came from matching capitalisation in text written separately from the assertion; the pattern was wrong, not merely careless. Prose is rendered from state, and state is what is tested.",
