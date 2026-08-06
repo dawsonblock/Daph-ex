@@ -33,7 +33,7 @@
     "gate_c1_structural_generalization_iterative_retrieval": "FAIL_MEASURED_ON_V4",
     "gate_c2_i_identity_resolution": "PENDING",
     "gate_c2_r_retrieval_coverage": "PASS_POLICY_FROZEN_c2_candidate_generation_v1",
-    "gate_c2_s_evidence_selection": "IN_PROGRESS_ARM_DEFECT_FIXED_CANONICAL_RUN_PENDING",
+    "gate_c2_s_evidence_selection": "IN_PROGRESS_STRUCTURAL_ARMS_BUILT_RETRIEVAL_ONLY",
     "gate_c2_semantic_information_gap_retrieval": "IN_PROGRESS_COVERAGE_MEASURED",
     "gate_c2c_chain_completion": "FAIL_ON_ONE_BADLY_SPECIFIED_CRITERION",
     "gate_c2c_chain_completion_qualified": "PASS_all_four_regimes_on_identifiable_corpus",
@@ -75,7 +75,7 @@
     "slot_label_echo": "99 -> 0 under precision packing; was an evidence-confusability artefact, not a prompt-interface or reasoning limit",
     "slot_label_echoes": "Track evidence quality, not packet format: 85 -> 28 under precision packing, -> 3 under oracle evidence. F-arms would measure a symptom; implemented but unrun."
   },
-  "next_work": "Canonical selector-ladder run in progress via scripts/run_selector_ladder.py over the frozen pools: arms S0/S1/S2/S3/S4/S5, budgets {2,4,6,8,10}, both descv4 partitions, incremental durable cells and a no-op detector per arm. No selector figures are claimed until that run writes its manifest. Holdout untouched.",
+  "next_work": "Budget-6 frozen run for S0/S1/S2/S3/S4/S5 with per-task receipts is completing. Structural arms S2a/S2b/S2c are implemented and pass adversarial fixtures; offline retrieval-only measurement on descv4_id lifts CSR 0.4632 -> 0.6632 and BridgeRetention 0.3571 -> 0.6786, but NO HRM quality is measured for them yet, so no selector-gap-capture claim exists. Next: run S2a/S2b/S2c under HRM at budget 6 on both partitions, then paired analysis and SGC. Holdout untouched.",
   "ood_taxonomy": {
     "REFERENTIAL_OOD": {
       "mechanism": "identity resolution + multi-hop retrieval",
@@ -692,6 +692,24 @@
       "status": "MEASURED_RECEIPTED",
       "the_normalizer_worked": "Oracle-gap closure was the right endpoint and it changed the diagnosis rather than merely the arithmetic. Under v2's absolute deltas, description looked like a near-miss (+0.08 vs +0.10). Normalized, it is a near-total failure: 0.025 of an available 0.800. The two prior protocols were hiding the single regime where the mechanism genuinely does not work.",
       "what_this_isolates": "Chain completion is real and large for abbreviation and alias -- where a retrieved identity record names a canonical entity that runtime parsing can extract. Description references resolve through prose ('the ancillary unit charted during survey season'), and the canonicalization parser recovers them far less reliably, so the follow-up query is built from a subject it never resolved. C5 reaching 1.000 proves the evidence is retrievable given the right query, so this is a canonicalization-coverage failure, not a retrieval-ceiling failure."
+    },
+    "gate_c2s_relation_keyword_control": {
+      "claim": "The arm labelled S2_connectivity computes exactly as implemented but does not instantiate the chain-selection hypothesis it was built for. Its dominant term rewards records containing the target relation string. In this corpus 0/56 bridge records contain the target relation while 99/99 answer records do, so the arm cannot retain a bridge record: BridgeRetention=0.000 is arithmetically forced, not incidental. It fills 91.3% of each packet with relation-string matches, of which 79.3% of the packet are relation-matching records that are not required.",
+      "distinguished_from": "the ms-marco-MiniLM-L6-v2 arm, which was COMPUTATIONALLY invalid (NaN scores). This arm computes correctly; only its scientific interpretation was wrong. Its receipts are valid and retained.",
+      "experiment_verdict": "VALID_RECEIPTS_INVALID_HYPOTHESIS_IMPLEMENTATION",
+      "kept_as": "negative control: target-relation keyword matching is insufficient for multi-hop packing and causes systematic distractor selection",
+      "not_a_claim_about": [
+        "whether relational chain selection works, which it does not test",
+        "the target relation being illegitimate input; it appears verbatim in 200/200 questions",
+        "the structural arms S2a/S2b/S2c, measured separately",
+        "final answer quality, where it was indistinguishable from S0",
+        "the reserved c2_cal_holdout, untouched"
+      ],
+      "receipts": [
+        "evidence/gate_c2/selector_ladder/cells.jsonl"
+      ],
+      "report": "configs/gate_c2_protocol.json",
+      "status": "RESCOPED_NOT_VOIDED_negative_control"
     },
     "gate_c2s_selection_opportunity": {
       "claim": "On frozen candidate pools with an identical 6-record packet budget, oracle selection beats raw top-N by +0.39 (descv4_id) and +0.55 (descv4_surface) HRM verified quality, against a predeclared tau of 0.05. Selection has a large real opportunity; S1-S4 are authorized.",

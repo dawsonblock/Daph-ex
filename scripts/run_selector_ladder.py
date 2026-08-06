@@ -49,6 +49,29 @@ from hrm_adaptive_memory.retrieval_bench.selectors import (
     s2_connectivity,
     s5_oracle,
 )
+from hrm_adaptive_memory.retrieval_bench.selectors.chain import (
+    s2a_entity_connectivity,
+    s2b_chain_completion,
+    s2c_chain_plus_relation,
+)
+
+# What each arm is scientifically, so a receipt cannot be read as more than it
+# is. S2_connectivity computes exactly as implemented but does not instantiate
+# the chain-selection hypothesis it was built for: in this corpus 0/56 bridge
+# records contain the target relation string while 99/99 answer records do, so
+# target-relation matching cannot retain a bridge. Its results are kept as a
+# negative control, not voided.
+ARM_CLASSIFICATION = {
+    "S0_raw": "baseline_pool_order",
+    "S1_relevance": "negative_control_pointwise_lexical_relevance",
+    "S2_connectivity": "relation_keyword_control_INVALID_HYPOTHESIS_IMPLEMENTATION",
+    "S3_cross_encoder": "negative_control_pointwise_cross_encoder",
+    "S4_cross_encoder_strong": "negative_control_pointwise_cross_encoder_strong",
+    "S2a_entity_connectivity": "structural_entity_connectivity",
+    "S2b_chain_completion": "structural_bounded_chain_enumeration",
+    "S2c_chain_plus_relation": "structural_chain_with_relation_component",
+    "S5_oracle": "ceiling_oracle_selection_within_retrieved_pool",
+}
 
 POOL_DIR = ROOT / "evidence/gate_c2/candidate_pools/v1"
 CORPUS = ROOT / "data/hrm/controlled_gate_c2_description_valid_v4"
@@ -87,6 +110,33 @@ def classify_records(meta: dict) -> dict[str, set[str]]:
     return {"identity": identity, "answer": answer, "bridge": bridge}
 
 
+def connected_proof_retained(meta: dict, selected: set[str], pool_ids: set[str]) -> bool | None:
+    """Does the packet keep a connected proof path from question side to answer?
+
+    Evaluator-only. Reachability is computed over proof edges RESTRICTED to
+    selected records, so dropping any record on the only path breaks it.
+
+    On this corpus the proof graph is a simple directed path and
+    required_evidence_ids covers every record on it, so this coincides with CSR
+    by construction. It is implemented as genuine reachability because that is
+    the correct definition and it diverges the moment a corpus has branching or
+    redundant proofs.
+    """
+    edges = meta["proof_edges"]
+    if not all(edge["record_id"] in pool_ids for edge in edges):
+        return None  # the path was never fully retrievable; not a selection failure
+    targets = {edge["target"] for edge in edges}
+    roots = [edge["source"] for edge in edges if edge["source"] not in targets]
+    if not roots:
+        return None
+    reachable = set(roots)
+    for _ in range(len(edges)):
+        for edge in edges:
+            if edge["source"] in reachable and edge["record_id"] in selected:
+                reachable.add(edge["target"])
+    return meta["answer_node"] in reachable
+
+
 def conditional(hits: int, eligible: int) -> float | None:
     """Rate over eligible tasks only; None when nothing was eligible.
 
@@ -123,6 +173,8 @@ def main() -> None:
                         help="primary budget first; the sweep follows")
     parser.add_argument("--limit", type=int, default=0)
     parser.add_argument("--skip-s4", action="store_true")
+    parser.add_argument("--arms", default="",
+                        help="comma-separated arm subset; empty means all")
     args = parser.parse_args()
 
     import torch
@@ -152,6 +204,9 @@ def main() -> None:
     arms: list[tuple[str, object]] = [
         ("S0_raw", s0_raw), ("S1_relevance", s1_relevance),
         ("S2_connectivity", s2_connectivity),
+        ("S2a_entity_connectivity", s2a_entity_connectivity),
+        ("S2b_chain_completion", s2b_chain_completion),
+        ("S2c_chain_plus_relation", s2c_chain_plus_relation),
         ("S3_cross_encoder", make_cross_encoder_selector(*S3_MODEL)),
     ]
     if not args.skip_s4:
@@ -161,6 +216,12 @@ def main() -> None:
             print(f"S4 unavailable ({type(exc).__name__}: {exc}); continuing without it",
                   flush=True)
     arms.append(("S5_oracle", s5_oracle))
+    if args.arms:
+        wanted = {a.strip() for a in args.arms.split(",")}
+        unknown = wanted - {name for name, _ in arms}
+        if unknown:
+            raise SystemExit(f"unknown arms requested: {sorted(unknown)}")
+        arms = [(name, fn) for name, fn in arms if name in wanted]
 
     budgets = [int(b) for b in args.budgets.split(",")]
     data = {part: load_partition(part) for part in PARTITIONS}
@@ -184,10 +245,12 @@ def main() -> None:
                 role_hit = {"answer": 0, "bridge": 0, "identity": 0}
                 role_elig = {"answer": 0, "bridge": 0, "identity": 0}
                 gold_density = 0.0
+                cpr_hit = cpr_elig = 0
                 distractors = 0
                 tokens = 0
                 differs = 0
                 degenerate: str | None = None
+                task_rows: list[dict] = []
                 for task_row in tasks:
                     meta = task_row["_oracle_metadata"]
                     candidates = pools[task_row["task_id"]]["candidates"]
@@ -209,19 +272,55 @@ def main() -> None:
                         task_row["question"], [texts[i] for i in selected if i in texts])
                     generated = adapter.generate(prompt, condition=condition,
                                                  max_new_tokens=max_new)
-                    score, _ = verify_answer(task, str(generated["text"]))
+                    score, exact = verify_answer(task, str(generated["text"]))
                     quality += score
-                    if required <= pool_ids:
+                    csr_eligible = required <= pool_ids
+                    csr_ok = csr_eligible and required <= chosen
+                    if csr_eligible:
                         csr_elig += 1
-                        csr_hit += int(required <= chosen)
-                    for role, records in classify_records(meta).items():
+                        csr_hit += int(csr_ok)
+                    roles = classify_records(meta)
+                    per_role: dict[str, bool | None] = {}
+                    for role, records in roles.items():
                         available = records & pool_ids
                         if available:
                             role_elig[role] += 1
-                            role_hit[role] += int(bool(available & chosen))
-                    gold_density += len(required & chosen) / max(1, len(selected))
+                            retained = bool(available & chosen)
+                            role_hit[role] += int(retained)
+                            per_role[role] = retained
+                        else:
+                            per_role[role] = None
+                    cpr = connected_proof_retained(meta, chosen, pool_ids)
+                    if cpr is not None:
+                        cpr_elig += 1
+                        cpr_hit += int(cpr)
+                    density = len(required & chosen) / max(1, len(selected))
+                    gold_density += density
                     distractors += len(chosen - required)
-                    tokens += sum(len(texts[i].split()) for i in selected if i in texts)
+                    selected_tokens = sum(len(texts[i].split()) for i in selected if i in texts)
+                    tokens += selected_tokens
+                    # Per-task rows make paired deltas and the discard analysis
+                    # possible; aggregate means alone cannot support either.
+                    task_rows.append({
+                        "partition": part, "budget": budget, "arm": name,
+                        "task_id": task_row["task_id"], "family": task_row.get("family"),
+                        "template_id": task_row.get("template_id"),
+                        "source_cluster_id": task_row.get("source_cluster_id"),
+                        "quality": score, "exact_match": bool(exact),
+                        "csr_eligible": csr_eligible, "csr_ok": csr_ok,
+                        "connected_proof_retained": cpr,
+                        "role_retained": per_role,
+                        "roles_available": {r: sorted(v & pool_ids) for r, v in roles.items()},
+                        "roles_dropped": sorted(
+                            r for r, v in roles.items()
+                            if (v & pool_ids) and not (v & pool_ids & chosen)),
+                        "selected": list(selected), "n_selected": len(selected),
+                        "required": sorted(required),
+                        "gold_density": round(density, 4),
+                        "distractors": len(chosen - required),
+                        "selected_tokens": selected_tokens,
+                        "differs_from_s0": selected != s0_pick[task_row["task_id"]],
+                    })
 
                 n = len(tasks)
                 if degenerate is not None:
@@ -231,6 +330,7 @@ def main() -> None:
                 else:
                     cell = {
                         "partition": part, "budget": budget, "arm": name, "status": "MEASURED",
+                        "classification": ARM_CLASSIFICATION.get(name, "unclassified"),
                         "tasks": n,
                         "quality": round(quality / n, 4),
                         "CSR_given_complete_set_available": conditional(csr_hit, csr_elig),
@@ -240,6 +340,8 @@ def main() -> None:
                         "IdentityRetention": conditional(role_hit["identity"],
                                                          role_elig["identity"]),
                         "role_eligible_tasks": dict(role_elig),
+                        "ConnectedProofRetention": conditional(cpr_hit, cpr_elig),
+                        "cpr_eligible_tasks": cpr_elig,
                         "GoldDensity": round(gold_density / n, 4),
                         "DistractorCount": round(distractors / n, 2),
                         "SelectedTokens": round(tokens / n, 1),
@@ -254,6 +356,10 @@ def main() -> None:
                           f"differs_S0={cell['differs_from_s0']:.2f}", flush=True)
                 with cells_path.open("a") as handle:
                     handle.write(json.dumps(cell, sort_keys=True) + "\n")
+                if task_rows:
+                    with (out_dir / "tasks.jsonl").open("a") as handle:
+                        for row in task_rows:
+                            handle.write(json.dumps(row, sort_keys=True) + "\n")
                 done.add((part, budget, name))
 
     cells = [json.loads(l) for l in cells_path.read_text().splitlines() if l.strip()]
@@ -270,6 +376,7 @@ def main() -> None:
         "only_selection_varies": True,
         "holdout_touched": False,
         "budgets": budgets,
+        "arm_classification": ARM_CLASSIFICATION,
         "arm_models": {"S3_cross_encoder": {"model_id": S3_MODEL[0], "revision": S3_MODEL[1]},
                        "S4_cross_encoder_strong": {"model_id": S4_MODEL[0],
                                                    "revision": S4_MODEL[1]}},
