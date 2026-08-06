@@ -1,5 +1,21 @@
 # Gate C1 report — structural generalization of bounded iterative retrieval
 
+> **AMENDED after publication.** Four corpus defects were found after this
+> evaluation ran: evidence-level source-style contamination in both directions,
+> an alias regime that is really prefix truncation, description-regime tasks
+> that are **unanswerable from evidence** (0 of 120 have their subject anywhere
+> in their own evidence, so 48% of the OOD split is impossible for any
+> retriever), and a non-oracle `oracle_bridge` arm.
+>
+> **All OOD numbers below are voided as quantitative measurements.** The
+> qualification decomposition stands (qualification has no description regime).
+> The qualitative conclusion also stands, because it is provable from code and
+> corpus text alone: the entity extractor matches 0 of 250 OOD questions and 0
+> of 160 `natural_name` qualification questions, so zero follow-ups fired.
+>
+> Details: `data/hrm/controlled_gate_a_v3/V3_KNOWN_LIMITATIONS.md`.
+> Superseded by `controlled_gate_a_v4`.
+
 **Verdict: `FAIL_STRUCTURAL_GENERALIZATION`.** The mechanism that reached the
 oracle ceiling on v2 does not survive v3, and on the out-of-distribution split
 it contributes **nothing at all**.

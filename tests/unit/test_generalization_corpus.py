@@ -114,3 +114,35 @@ def test_splits_were_frozen_before_evaluation():
         tasks, _ = load(split)
         manifest = json.loads((V3 / split / "dataset_manifest.json").read_text())
         assert manifest["task_count"] == len(tasks)
+
+
+def test_style_holdout_is_checked_on_evidence_records_not_task_labels():
+    """v3's holdout test read task metadata and passed while the claim was false.
+
+    `task["metadata"]["source_style"]` records only the first record's style, so
+    a chain whose second hop drew from the global style tuple could smuggle a
+    held-out style into the split. Any corpus claiming a style holdout must be
+    checked against every evidence record.
+    """
+
+    _, qualification_evidence = load("qualification")
+    _, ood_evidence = load("ood")
+    q_styles = {row["metadata"]["source_style"] for row in qualification_evidence}
+    o_styles = {row["metadata"]["source_style"] for row in ood_evidence}
+    overlap = q_styles & o_styles
+    if V3.name == "controlled_gate_a_v3":
+        # v3 is retained as historical evidence with this defect documented.
+        limitations = V3 / "V3_KNOWN_LIMITATIONS.md"
+        assert limitations.exists(), (
+            "v3 violates its own style holdout and must ship the erratum documenting it"
+        )
+        assert overlap, "erratum describes a violation that is no longer present"
+        return
+    assert not overlap, f"evidence-level style holdout violated: {sorted(overlap)}"
+
+
+def test_v3_limitations_are_recorded_rather_than_silently_fixed():
+    text = (V3 / "V3_KNOWN_LIMITATIONS.md").read_text()
+    for required in ("source-style holdout is violated", "does not produce aliases",
+                     "not answerable from evidence", "is not an oracle"):
+        assert required in text, f"erratum omits: {required}"

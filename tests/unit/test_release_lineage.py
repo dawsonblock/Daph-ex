@@ -43,6 +43,7 @@ def test_research_status_declares_every_gate():
         "gate_a0_controlled_evidence_use", "gate_a1_structural_generalization",
         "gate_b_single_pass_retrieval", "gate_c0_controlled_iterative_retrieval",
         "gate_c1_structural_generalization_iterative_retrieval",
+        "gate_c2_semantic_information_gap_retrieval",
         "gate_n1_natural_external_memory",
         "gate_d_conditional_retrieval_opportunity", "gate_e_learned_retrieval_control",
         "gate_f_recurrence_opportunity", "gate_g_adaptive_recurrence",

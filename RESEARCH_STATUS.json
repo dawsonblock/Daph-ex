@@ -2,7 +2,8 @@
   "benchmark_lineage": {
     "controlled_gate_a_v1": "SUPERSEDED_answer_leaked_into_one_question",
     "controlled_gate_a_v2": "CANONICAL_for_gate_a0_and_gate_b",
-    "controlled_gate_a_v3": "REQUIRED_gate_c_is_undecidable_without_it"
+    "controlled_gate_a_v3": "HISTORICAL_qualitative_only_four_defects_documented",
+    "controlled_gate_a_v4": "REQUIRED_supersedes_v3"
   },
   "canonical_package": "hrm_adaptive_memory",
   "capabilities": {
@@ -21,10 +22,11 @@
   },
   "gates": {
     "gate_a0_controlled_evidence_use": "PASS",
-    "gate_a1_structural_generalization": "FAIL_MECHANISM_INERT_OUT_OF_DISTRIBUTION",
+    "gate_a1_structural_generalization": "PENDING_AWAITING_V4",
     "gate_b_single_pass_retrieval": "PASS",
     "gate_c0_controlled_iterative_retrieval": "MECHANISM_SUCCESS_PROMOTION_BLOCKED_BY_BENCHMARK_STRUCTURE",
-    "gate_c1_structural_generalization_iterative_retrieval": "FAIL_STRUCTURAL_GENERALIZATION",
+    "gate_c1_structural_generalization_iterative_retrieval": "FAIL_QUALITATIVE_ONLY_OOD_MEASUREMENT_VOIDED",
+    "gate_c2_semantic_information_gap_retrieval": "PENDING",
     "gate_d_conditional_retrieval_opportunity": "PENDING_ACTION_TOO_WEAK_TO_MEASURE",
     "gate_e_learned_retrieval_control": "BLOCKED",
     "gate_f_recurrence_opportunity": "BLOCKED",
@@ -37,7 +39,8 @@
     "gate_n1_natural_external_memory": "PENDING"
   },
   "known_instrument_limitations": {
-    "oracle_bridge_arm": "Derives the bridge by re-running extract_entities, so it fails identically to the deterministic arm wherever extraction fails. The OOD bridge/retrieval split is therefore unresolved. Fix: read latent bridge identity from generator metadata."
+    "oracle_bridge_arm": "Derives the bridge by re-running extract_entities, so it fails identically to the deterministic arm wherever extraction fails. The OOD bridge/retrieval split is therefore unresolved. Fix: read latent bridge identity from generator metadata.",
+    "v3_corpus": "Evidence-level style contamination both directions; alias regime is prefix truncation; 0/120 description tasks answerable from evidence; oracle_bridge reuses the extractor under test."
   },
   "negative_results": {
     "adaptive_retrieval_trigger": "91 of 91 follow-ups positive, 0 negative; a fixed two-pass policy suffices and Gate D is expected to FAIL on this corpus",
@@ -47,7 +50,7 @@
     "slot_label_echo": "99 -> 0 under precision packing; was an evidence-confusability artefact, not a prompt-interface or reasoning limit",
     "slot_label_echoes": "Track evidence quality, not packet format: 85 -> 28 under precision packing, -> 3 under oracle evidence. F-arms would measure a symptom; implemented but unrun."
   },
-  "next_work": "Information-gap / query-formulation layer independent of surface identifier shape: explicit known/target/missing-relation/candidate-bridge state, querying for the missing relation on the bridge rather than the bridge's name. Measured target: 0.394 -> 0.540 on qualification; the whole 0.080 -> 0.764 OOD span is unclaimed. Prerequisites: fix the oracle_bridge instrument, and replace entity anchoring with relation-aware connectivity.",
+  "next_work": "Build controlled_gate_a_v4: split-local style selection enforced at the evidence-record level, genuine aliases with explicit alias evidence, inferable description identities, evaluator-only proof graphs with a formal inferability audit, and an R0-R5 oracle ladder built from generator metadata. Then re-run the 3260ce0 mechanism unchanged for a clean baseline before building the semantic information-gap layer (Gate C2).",
   "qualified_claims": {
     "gate_a0": {
       "claim": "HRM-Text-1B can use correctly supplied external evidence on the controlled synthetic Gate A benchmark.",
@@ -91,7 +94,8 @@
       "why_not_promoted": "Bridge structure exists in only 1 of 5 families, so a family-clustered bootstrap cannot certify a family-concentrated effect: LCB95 is +0.0000 for family, +0.0659 for template_id, +0.1080 for source_cluster_id."
     },
     "gate_c1": {
-      "claim": "Bounded two-pass retrieval with entity-anchored packing does NOT generalize: it scores 0.394 on v3 qualification against a 0.828 oracle-evidence ceiling, and is entirely inert out of distribution (0.080 vs 0.764), where the entity extractor matches nothing.",
+      "amended": "OOD measurements voided after four corpus defects were found; see data/hrm/controlled_gate_a_v3/V3_KNOWN_LIMITATIONS.md",
+      "claim": "Bounded two-pass retrieval with entity-anchored packing is identifier-dependent: ENTITY_PATTERN matches 0/250 v3 OOD questions and 0/160 natural_name qualification questions, so zero follow-ups fire. On v3 qualification it scores 0.394 against a 0.828 oracle-evidence ceiling.",
       "decomposition_qualification": {
         "bridge": 0.146,
         "iteration": 0.1,
@@ -100,9 +104,10 @@
         "selection": 0.048
       },
       "not_a_claim_about": [
-        "the reader, which scores 0.828 and 0.764 given perfect evidence",
-        "dense or semantic retrieval, which was not the mechanism under test",
-        "the OOD bridge/retrieval split, which the oracle_bridge instrument cannot currently resolve"
+        "any quantitative OOD figure, which is voided: 48% of the v3 OOD split is unanswerable from evidence",
+        "source-style generalization, since the v3 holdout is violated at the evidence level",
+        "alias resolution, since the v3 alias regime is prefix truncation",
+        "the reader, which scores 0.828 given perfect evidence"
       ],
       "report": "GATE_C1_REPORT.md",
       "root_cause": "The mechanism performed lexical identifier chaining, not bridge inference. ENTITY_PATTERN requires a hyphen-digit suffix; it matches 0/250 OOD questions and 0/160 natural_name questions inside qualification, so zero follow-ups fire.",
