@@ -30,7 +30,7 @@
         "change_log"
       ],
       "task_count": 120,
-      "task_sha256": "9fdb88a882c5e78d5faf54359ddddf21ea813c65d49a2e7a3ef33339fe3e3435",
+      "task_sha256": "2c337cc662170d8fda549fef336ffbacbf02b0f318cf248315100f6a21f5f47f",
       "template_count": 120
     },
     "ood": {
@@ -51,7 +51,7 @@
         "message"
       ],
       "task_count": 250,
-      "task_sha256": "5a0631be154ff55c99fb1a1f3eff2ba2941cb767486c7597b91211eaeaf1ee75",
+      "task_sha256": "555cb5e7cf7067d1872d9466a7ae2c5c94d71d78e556eeec0d721515fdf6f6a5",
       "template_count": 80
     },
     "qualification": {
@@ -75,7 +75,7 @@
         "change_log"
       ],
       "task_count": 500,
-      "task_sha256": "fab1c7e504c7c7ee34b84110f63a50cd52fbb06dfe8aaa27150673b1794dda8a",
+      "task_sha256": "96d5793dc904b0fc903907c5b4d8cbbc3b98fa506bec30caecf29b8181403365",
       "template_count": 160
     }
   },

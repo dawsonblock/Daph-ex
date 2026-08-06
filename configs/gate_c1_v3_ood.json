@@ -5,7 +5,7 @@
     "notes": "greedy; generation limit identical across arms"
   },
   "evaluation_mode": "CAPABILITY_USE",
-  "evidence_corpus_sha256": "4fef258312bd5903173cd6935e3fedabd8238f41be8706927e0acbbe3eeb812d",
+  "evidence_corpus_sha256": "0c00abcf1eb819e4a50d0aff458b83dde68d03164f656ca629be6a9b196a33bf",
   "evidence_path": "data/hrm/controlled_gate_a_v3/ood/evidence.jsonl",
   "include_hard_distractor": true,
   "lambda_evidence_tokens": 0.0,
@@ -30,7 +30,7 @@
     "grouped_lcb_requirement": "LCB95 > 0 for every grouping key",
     "minimum_mean_quality_gain": 0.05
   },
-  "task_dataset_sha256": "eccbff08d8b452e332972f3786f18690a5454e3ef469309c5ed353590f84a92b",
+  "task_dataset_sha256": "1f2b75e07ead830cb74395b6675313560f6b64543c638ce86f778085377fc79a",
   "tasks_path": "data/hrm/controlled_gate_a_v3/ood/oracle_tasks.jsonl",
   "tier": "QUALIFICATION"
 }

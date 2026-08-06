@@ -24,8 +24,11 @@ What changes from v2, and why:
   positive, zero, *and* negative — the precondition for Gate D meaning anything.
 - **Ambiguous bridges.** Several linked entities, only one of which is useful,
   plus dead ends, conflicts, and superseded links.
-- **Non-numeric answers.** Symbolic labels, enums, booleans, entity names, and
-  small JSON fields, so results cannot depend on numeric extraction.
+- **Non-numeric answers.** Symbolic labels, enums, booleans, and values embedded
+  in JSON-structured records, so results cannot depend on numeric extraction.
+  A `json_field` answer is the *value*, not the JSON wrapper: the development
+  split showed that demanding unrequested JSON syntax measures formatting
+  compliance rather than evidence use (0/28 despite correct extraction).
 
 Answers are generated as latent symbols and rendered last, so an answer cannot
 leak into a question or a distractor by construction.
@@ -249,27 +252,41 @@ def _row(*, evidence_id: str, source_id: str, content: str, family: str,
 # Answer rendering: latent symbol first, surface last
 # ---------------------------------------------------------------------------
 
-def _render_answer(rng: random.Random, kind: str, used: set[str]) -> tuple[str, str]:
-    """Return (rendered_answer, answer_kind); never reuses a value in one task."""
+def _render_answer(rng: random.Random, kind: str, used: set[str]) -> tuple[str, str, str]:
+    """Return (gold_answer, evidence_surface, answer_kind).
+
+    ``evidence_surface`` is how the value appears inside a record, which is not
+    always the answer itself: a `json_field` value is *embedded* in a JSON
+    object in the evidence while the answer remains the bare value. Requiring
+    the model to reproduce JSON syntax that the question never asked for would
+    measure formatting compliance rather than evidence use — the development
+    split showed exactly that, scoring 0/28 on json answers whose values the
+    model had in fact extracted correctly.
+    """
 
     for _ in range(50):
         if kind == "symbolic":
             value = rng.choice(_SYMBOLIC_ANSWERS)
+            surface = value
         elif kind == "enum":
             value = rng.choice(_ENUM_ANSWERS)
+            surface = value
         elif kind == "boolean":
             value = rng.choice(_BOOLEAN_ANSWERS)
-        elif kind == "json":
-            value = f'{{"{rng.choice(_JSON_KEYS)}": "{rng.choice(_ENUM_ANSWERS)}"}}'
+            surface = value
+        elif kind == "json_field":
+            value = rng.choice(_ENUM_ANSWERS)
+            surface = f'{{"{rng.choice(_JSON_KEYS)}": "{value}"}}'
         else:
             value = str(rng.randrange(1000, 9999))
+            surface = value
         if value not in used:
             used.add(value)
-            return value, kind
+            return value, surface, kind
     raise RuntimeError("Exhausted answer vocabulary")
 
 
-ANSWER_KINDS = ("numeric", "symbolic", "enum", "boolean", "json")
+ANSWER_KINDS = ("numeric", "symbolic", "enum", "boolean", "json_field")
 
 # How many mutually distinct values each kind can supply within one task. A
 # boolean cannot furnish a gold answer plus four distinct near-duplicates, so
@@ -277,7 +294,7 @@ ANSWER_KINDS = ("numeric", "symbolic", "enum", "boolean", "json")
 ANSWER_KIND_CAPACITY = {
     "numeric": 8000, "symbolic": len(_SYMBOLIC_ANSWERS),
     "enum": len(_ENUM_ANSWERS), "boolean": len(_BOOLEAN_ANSWERS),
-    "json": len(_JSON_KEYS) * len(_ENUM_ANSWERS),
+    "json_field": len(_ENUM_ANSWERS),
 }
 
 # Distinct values a family must be able to render (gold plus contrasts).
@@ -312,13 +329,13 @@ def _build_single_hop(
     variant: int,
 ) -> tuple[dict, list[dict], OpportunityGroup]:
     subject = _make_entity(rng, f"{task_id}#subject", regime, "asset")
-    answer, kind = _render_answer(rng, answer_kind, used)
+    answer, surface, kind = _render_answer(rng, answer_kind, used)
     required = f"{task_id}/fact"
     template_id = f"{style}-{variant % 4}"
     rows = [_row(
         evidence_id=required, source_id=f"{cluster}/primary", family=family,
         source_cluster_id=cluster, kind="required", style=style, template_id=template_id,
-        content=_render(style, variant, subject.surface, relation, answer),
+        content=_render(style, variant, subject.surface, relation, surface),
     )]
     question = _question(family, variant, subject.query_surface, relation)
     task = {
@@ -337,7 +354,7 @@ def _build_chain(
 
     subject = _make_entity(rng, f"{task_id}#subject", regime, "asset")
     bridge = _make_entity(rng, f"{task_id}#bridge", regime, "config")
-    answer, kind = _render_answer(rng, answer_kind, used)
+    answer, surface, kind = _render_answer(rng, answer_kind, used)
     first, second = f"{task_id}/link", f"{task_id}/value"
     template_id = f"{style}-{variant % 4}"
     second_style = SOURCE_STYLES[(SOURCE_STYLES.index(style) + 1) % len(SOURCE_STYLES)]
@@ -350,7 +367,7 @@ def _build_chain(
         _row(evidence_id=second, source_id=f"{cluster}/value", family=family,
              source_cluster_id=cluster, kind="required", style=second_style,
              template_id=f"{second_style}-{(variant + 1) % 4}",
-             content=_render(second_style, variant + 1, bridge.surface, second_relation, answer)),
+             content=_render(second_style, variant + 1, bridge.surface, second_relation, surface)),
     ]
 
     # Ambiguity: additional linked entities that are *not* the useful bridge.
@@ -371,13 +388,13 @@ def _build_chain(
             evidence_id=f"{task_id}/direct", source_id=f"{cluster}/summary",
             family=family, source_cluster_id=cluster, kind="direct_answer",
             style=style, template_id=f"{style}-{(variant + 3) % 4}",
-            content=_render(style, variant + 3, subject.surface, second_relation, answer),
+            content=_render(style, variant + 3, subject.surface, second_relation, surface),
         ))
     if opportunity == OpportunityGroup.C_SECOND_PASS_CONFUSING:
         # The bridge resolves to several plausible values; only the accepted
         # one is correct, so a naive second pass imports confusion.
         for index in range(2):
-            wrong, _ = _render_answer(rng, answer_kind, used)
+            _, wrong, _kind = _render_answer(rng, answer_kind, used)
             rows.append(_row(
                 evidence_id=f"{task_id}/rejected-{index}", source_id=f"{cluster}/rejected-{index}",
                 family=family, source_cluster_id=cluster, kind="rejected_candidate",
@@ -404,8 +421,8 @@ def _build_temporal(
     """Supersession: an older record is present and must be rejected."""
 
     subject = _make_entity(rng, f"{task_id}#subject", regime, "asset")
-    answer, kind = _render_answer(rng, answer_kind, used)
-    stale, _ = _render_answer(rng, answer_kind, used)
+    answer, surface, kind = _render_answer(rng, answer_kind, used)
+    _, stale, _stale_kind = _render_answer(rng, answer_kind, used)
     template_id = f"{style}-{variant % 4}"
     rows: list[dict] = []
     opportunity = OpportunityGroup.A_ONE_PASS_SUFFICIENT
@@ -431,7 +448,7 @@ def _build_temporal(
         source_cluster_id=cluster, kind="required_current", style="change_log",
         template_id="change_log-0", valid_from="2031-06-01",
         content=f"Revision 2 (effective 2031-06-01) supersedes revision 1: "
-                f"{holder} {relation} is now {answer}."))
+                f"{holder} {relation} is now {surface}."))
     rows.append(_row(
         evidence_id=stale_id, source_id=f"{cluster}/revision-1", family=family,
         source_cluster_id=cluster, kind="superseded", style="change_log",
@@ -457,28 +474,28 @@ def _build_distractor_heavy(
     """Adversarial near-duplicates varying entity, relation, status, and time."""
 
     subject = _make_entity(rng, f"{task_id}#subject", regime, "asset")
-    answer, kind = _render_answer(rng, answer_kind, used)
+    answer, surface, kind = _render_answer(rng, answer_kind, used)
     required = f"{task_id}/accepted"
     template_id = f"{style}-{variant % 4}"
     rows = [_row(
         evidence_id=required, source_id=f"{cluster}/accepted", family=family,
         source_cluster_id=cluster, kind="required", style=style, template_id=template_id,
-        content=_render(style, variant, subject.surface, relation, answer))]
+        content=_render(style, variant, subject.surface, relation, surface))]
 
     near_entity = _make_entity(rng, f"{task_id}#near", regime, "asset")
     variants = [
         # different entity, same relation
         (_render(style, variant, near_entity.surface, relation,
-                 _render_answer(rng, answer_kind, used)[0]), "near_entity"),
+                 _render_answer(rng, answer_kind, used)[1]), "near_entity"),
         # same entity, different relation
         (_render(style, variant, subject.surface, f"calibration {relation}",
-                 _render_answer(rng, answer_kind, used)[0]), "near_relation"),
+                 _render_answer(rng, answer_kind, used)[1]), "near_relation"),
         # same entity and relation, rejected status
         (_render(style, variant, subject.surface, f"proposed {relation}",
-                 _render_answer(rng, answer_kind, used)[0]) + " Status: rejected.", "near_status"),
+                 _render_answer(rng, answer_kind, used)[1]) + " Status: rejected.", "near_status"),
         # same entity and relation, superseded in time
         (f"Formerly, {subject.surface} {relation} was "
-         f"{_render_answer(rng, answer_kind, used)[0]}; this record is historical.", "near_temporal"),
+         f"{_render_answer(rng, answer_kind, used)[1]}; this record is historical.", "near_temporal"),
     ]
     for index, (content, kind_label) in enumerate(variants):
         rows.append(_row(

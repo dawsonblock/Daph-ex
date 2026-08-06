@@ -4,7 +4,7 @@
     "symbolic",
     "enum",
     "boolean",
-    "json"
+    "json_field"
   ],
   "claim_strength": "CONTROLLED_SYNTHETIC_BENCHMARK_ONLY",
   "dataset_id": "controlled-gate-a-v3-development",
@@ -14,7 +14,7 @@
     "abbreviation"
   ],
   "evidence_count": 474,
-  "evidence_sha256": "4b2bd78274612e27749f5849964c53170f9f2197956cb3b4beebce5fee23911f",
+  "evidence_sha256": "3b543b41c6baacade105998b97b4b12b3acb700cd8031f87f21b5eea8780941b",
   "families": [
     "entity_attribute",
     "ownership_chain",
@@ -62,7 +62,7 @@
   ],
   "split": "development",
   "task_count": 120,
-  "task_sha256": "9fdb88a882c5e78d5faf54359ddddf21ea813c65d49a2e7a3ef33339fe3e3435",
+  "task_sha256": "2c337cc662170d8fda549fef336ffbacbf02b0f318cf248315100f6a21f5f47f",
   "tasks_per_family": 12,
   "template_count": 120
 }

@@ -37,11 +37,104 @@ from hrm_adaptive_memory.evidence.sufficiency import SufficiencyVerdict
 from hrm_adaptive_memory.experiments.context_study import OracleTask, verify_answer
 from hrm_adaptive_memory.retrieval.iterative import TwoPassRetriever
 
-ARMS = ("one_pass", "one_pass_selected", "two_pass_selected", "two_pass_calculate")
+ARMS = (
+    "one_pass", "one_pass_selected", "two_pass_selected", "two_pass_calculate",
+    # Oracle decomposition (Gate C1): I2 isolates bridge/query-selection
+    # headroom, I3 isolates everything downstream of a perfect evidence set.
+    "oracle_bridge", "oracle_evidence",
+)
 
 
 def _sha256(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
+
+
+class _OracleResult:
+    """Mimics IterativeResult for the two oracle arms."""
+
+    def __init__(self, records, receipt_fields):
+        from types import SimpleNamespace
+        self.records = tuple(records)
+        self.report = SimpleNamespace(verdict=SimpleNamespace(value="ORACLE"))
+        self.receipt = SimpleNamespace(**receipt_fields)
+
+
+def _view(index, evidence_id, rank):
+    from hrm_adaptive_memory.evidence.state import EvidenceRecordView
+    record = index[evidence_id]
+    return EvidenceRecordView.from_retrieved(SimpleNamespaceRecord(record, rank))
+
+
+class SimpleNamespaceRecord:
+    def __init__(self, record, rank):
+        self.evidence_id = record.evidence_id
+        self.source_id = record.source_id
+        self.content = record.content
+        self.token_count = record.token_count
+        self.rank = rank
+
+
+def _oracle_evidence_result(task, index):
+    """I3: the required evidence set, perfectly retrieved and perfectly selected."""
+
+    records = [
+        _view(index, value, rank)
+        for rank, value in enumerate(task.oracle_evidence_ids, 1)
+        if value in index
+    ]
+    ids = tuple(row.evidence_id for row in records)
+    return _OracleResult(records, {
+        "selected_ids": ids, "first_pass_ids": ids, "second_pass_ids": (),
+        "merged_ids": ids, "followup_query": None, "retrieval_calls": 0,
+        "latency_ms": 0.0, "first_state": {"bridge_entities": []},
+        "passes": 0,
+    })
+
+
+def _oracle_bridge_result(task, index, backend, retriever, k):
+    """I2: the true linking entity is given, but retrieval and packing are real."""
+
+    from hrm_adaptive_memory.evidence.packing import select_evidence
+    from hrm_adaptive_memory.evidence.state import (
+        EvidenceRecordView, build_evidence_state, extract_entities,
+    )
+
+    first = asyncio.run(backend.search(task.question, k=k))
+    first_views = [EvidenceRecordView.from_retrieved(row) for row in first.evidence]
+    # The oracle bridge is the entity shared by the required records but absent
+    # from the question — exactly what a perfect reformulator would ask for.
+    question_entities = set(extract_entities(task.question))
+    counts: dict[str, int] = {}
+    for value in task.required_evidence_ids:
+        if value not in index:
+            continue
+        for entity in set(extract_entities(index[value].content)):
+            counts[entity] = counts.get(entity, 0) + 1
+    shared = [e for e, c in counts.items() if c >= 2 and e not in question_entities]
+
+    merged = list(first_views)
+    calls = 1
+    followup = shared[0] if shared else None
+    if followup is not None:
+        second = asyncio.run(backend.search(followup, k=k))
+        merged += [EvidenceRecordView.from_retrieved(row) for row in second.evidence]
+        calls += 1
+    unique: dict[str, object] = {}
+    for row in merged:
+        unique.setdefault(row.evidence_id, row)
+    pool = tuple(unique.values())
+    state = build_evidence_state(question=task.question, records=pool)
+    anchors = set(state.required_entities) | set(state.linked_entities)
+    if followup is not None:
+        anchors.add(followup)
+    selected, _ = select_evidence(pool, anchor_entities=tuple(anchors))
+    return _OracleResult(selected, {
+        "selected_ids": tuple(r.evidence_id for r in selected),
+        "first_pass_ids": tuple(r.evidence_id for r in first_views),
+        "second_pass_ids": (), "merged_ids": tuple(unique),
+        "followup_query": followup, "retrieval_calls": calls, "latency_ms": 0.0,
+        "first_state": {"bridge_entities": shared}, "passes": calls,
+    })
 
 
 def main() -> None:
@@ -96,6 +189,7 @@ def main() -> None:
         metadata=dict(row.get("metadata", {})),
     ) for row in evidence_rows]
     backend = CanonicalRetrievalBackend(CanonicalRetrievalMode.BM25, records)
+    index = {row.evidence_id: row for row in records}
 
     arms = [value for value in args.arms.split(",") if value]
     output = Path(args.output)
@@ -111,9 +205,14 @@ def main() -> None:
         rows = []
         started = time.perf_counter()
         for task in tasks:
-            result = asyncio.run(retriever.retrieve(
-                task.question, select=arm != "one_pass",
-            ))
+            if arm == "oracle_evidence":
+                result = _oracle_evidence_result(task, index)
+            elif arm == "oracle_bridge":
+                result = _oracle_bridge_result(task, index, backend, retriever, args.k)
+            else:
+                result = asyncio.run(retriever.retrieve(
+                    task.question, select=arm != "one_pass",
+                ))
             calculation = None
             answered_by = "model"
             if arm == "two_pass_calculate" and result.report.verdict == SufficiencyVerdict.NEEDS_CALCULATION:
