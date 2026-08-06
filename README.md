@@ -175,7 +175,16 @@ The canonical Qwen path, legacy hybrid path, standalone marginal-utility package
 
 Gate B also established that retrieval **precision** is a binding constraint: holding required evidence present, answer quality falls 1.00 → 0.67 → 0.39 as distractors move from random to same-template to the retriever's own top-k ([diagnostic](evidence/gate_b/packing_diagnostic/packing_diagnostic.json)). Retrieving more is therefore counterproductive on its own.
 
-**Gate C — NOT PASSED (benchmark, not mechanism).** Bounded two-pass retrieval
+**Gate C1 — FAILED (structural generalization).** The v2 mechanism does not
+survive `controlled_gate_a_v3`: 0.394 on qualification against a 0.828
+oracle-evidence ceiling, and **entirely inert** out of distribution (0.080 vs
+0.764) where the entity extractor matches nothing at all — 0/250 questions
+([report](GATE_C1_REPORT.md)). The mechanism was performing lexical identifier
+chaining, not bridge inference. The reader is not the bottleneck: given perfect
+evidence it scores 0.828/0.764 on a corpus of aliases, descriptions, unseen
+source styles, and non-numeric answers.
+
+**Gate C0 — mechanism success, promotion blocked (v2).** Bounded two-pass retrieval
 with entity-anchored precision packing reaches the oracle ceiling — 1.000 answer
 quality and 1.000 complete-evidence-set recovery, zero failures across 500 tasks
 ([report](GATE_C_REPORT.md)). It fails one pre-declared check: bridge structure

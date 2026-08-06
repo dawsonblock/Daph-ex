@@ -1,0 +1,999 @@
+{
+  "gate": "C1_STRUCTURAL_GENERALIZATION",
+  "splits": {
+    "ood": {
+      "arms": {
+        "one_pass": {
+          "complete_set_success": 0.188,
+          "mean_retrieval_calls": 1.0,
+          "quality": 0.08,
+          "slot_label_echoes": 53
+        },
+        "one_pass_selected": {
+          "complete_set_success": 0.148,
+          "mean_retrieval_calls": 1.0,
+          "quality": 0.08,
+          "slot_label_echoes": 16
+        },
+        "oracle_bridge": {
+          "complete_set_success": 0.148,
+          "mean_retrieval_calls": 1.0,
+          "quality": 0.08,
+          "slot_label_echoes": 16
+        },
+        "oracle_evidence": {
+          "complete_set_success": 1.0,
+          "mean_retrieval_calls": 0.0,
+          "quality": 0.764,
+          "slot_label_echoes": 0
+        },
+        "two_pass_calculate": {
+          "complete_set_success": 0.148,
+          "mean_retrieval_calls": 1.0,
+          "quality": 0.08,
+          "slot_label_echoes": 14
+        },
+        "two_pass_selected": {
+          "complete_set_success": 0.148,
+          "mean_retrieval_calls": 1.0,
+          "quality": 0.08,
+          "slot_label_echoes": 16
+        }
+      },
+      "by_axis": {
+        "answer_kind": {
+          "boolean": {
+            "delta": {
+              "bridge": 0.0,
+              "iteration": 0.0,
+              "reader_error": 0.6,
+              "retrieval": 0.3,
+              "selection": 0.0
+            },
+            "n": 10,
+            "q_one_pass": 0.1,
+            "q_one_pass_selected": 0.1,
+            "q_oracle_bridge": 0.1,
+            "q_oracle_evidence": 0.4,
+            "q_two_pass_calculate": 0.1,
+            "q_two_pass_selected": 0.1
+          },
+          "enum": {
+            "delta": {
+              "bridge": 0.0,
+              "iteration": 0.0,
+              "reader_error": 0.3103,
+              "retrieval": 0.6552,
+              "selection": 0.0173
+            },
+            "n": 58,
+            "q_one_pass": 0.0172,
+            "q_one_pass_selected": 0.0345,
+            "q_oracle_bridge": 0.0345,
+            "q_oracle_evidence": 0.6897,
+            "q_two_pass_calculate": 0.0345,
+            "q_two_pass_selected": 0.0345
+          },
+          "json_field": {
+            "delta": {
+              "bridge": 0.0,
+              "iteration": 0.0,
+              "reader_error": 0.2414,
+              "retrieval": 0.6896,
+              "selection": 0.0
+            },
+            "n": 58,
+            "q_one_pass": 0.069,
+            "q_one_pass_selected": 0.069,
+            "q_oracle_bridge": 0.069,
+            "q_oracle_evidence": 0.7586,
+            "q_two_pass_calculate": 0.069,
+            "q_two_pass_selected": 0.069
+          },
+          "numeric": {
+            "delta": {
+              "bridge": 0.0,
+              "iteration": 0.0,
+              "reader_error": 0.0455,
+              "retrieval": 0.7878,
+              "selection": -0.0303
+            },
+            "n": 66,
+            "q_one_pass": 0.197,
+            "q_one_pass_selected": 0.1667,
+            "q_oracle_bridge": 0.1667,
+            "q_oracle_evidence": 0.9545,
+            "q_two_pass_calculate": 0.1667,
+            "q_two_pass_selected": 0.1667
+          },
+          "symbolic": {
+            "delta": {
+              "bridge": 0.0,
+              "iteration": 0.0,
+              "reader_error": 0.3103,
+              "retrieval": 0.6552,
+              "selection": 0.0173
+            },
+            "n": 58,
+            "q_one_pass": 0.0172,
+            "q_one_pass_selected": 0.0345,
+            "q_oracle_bridge": 0.0345,
+            "q_oracle_evidence": 0.6897,
+            "q_two_pass_calculate": 0.0345,
+            "q_two_pass_selected": 0.0345
+          }
+        },
+        "entity_regime": {
+          "alias": {
+            "delta": {
+              "bridge": 0.0,
+              "iteration": 0.0,
+              "reader_error": 0.1615,
+              "retrieval": 0.7231,
+              "selection": -0.0077
+            },
+            "n": 130,
+            "q_one_pass": 0.1231,
+            "q_one_pass_selected": 0.1154,
+            "q_oracle_bridge": 0.1154,
+            "q_oracle_evidence": 0.8385,
+            "q_two_pass_calculate": 0.1154,
+            "q_two_pass_selected": 0.1154
+          },
+          "description": {
+            "delta": {
+              "bridge": 0.0,
+              "iteration": 0.0,
+              "reader_error": 0.3167,
+              "retrieval": 0.6416,
+              "selection": 0.0084
+            },
+            "n": 120,
+            "q_one_pass": 0.0333,
+            "q_one_pass_selected": 0.0417,
+            "q_oracle_bridge": 0.0417,
+            "q_oracle_evidence": 0.6833,
+            "q_two_pass_calculate": 0.0417,
+            "q_two_pass_selected": 0.0417
+          }
+        },
+        "family": {
+          "configuration_chain": {
+            "delta": {
+              "bridge": 0.0,
+              "iteration": 0.0,
+              "reader_error": 0.0,
+              "retrieval": 0.92,
+              "selection": 0.04
+            },
+            "n": 25,
+            "q_one_pass": 0.04,
+            "q_one_pass_selected": 0.08,
+            "q_oracle_bridge": 0.08,
+            "q_oracle_evidence": 1.0,
+            "q_two_pass_calculate": 0.08,
+            "q_two_pass_selected": 0.08
+          },
+          "dependency_chain": {
+            "delta": {
+              "bridge": 0.0,
+              "iteration": 0.0,
+              "reader_error": 0.24,
+              "retrieval": 0.72,
+              "selection": 0.04
+            },
+            "n": 25,
+            "q_one_pass": 0.0,
+            "q_one_pass_selected": 0.04,
+            "q_oracle_bridge": 0.04,
+            "q_oracle_evidence": 0.76,
+            "q_two_pass_calculate": 0.04,
+            "q_two_pass_selected": 0.04
+          },
+          "distractor_heavy": {
+            "delta": {
+              "bridge": 0.0,
+              "iteration": 0.0,
+              "reader_error": 0.04,
+              "retrieval": 0.76,
+              "selection": -0.04
+            },
+            "n": 25,
+            "q_one_pass": 0.24,
+            "q_one_pass_selected": 0.2,
+            "q_oracle_bridge": 0.2,
+            "q_oracle_evidence": 0.96,
+            "q_two_pass_calculate": 0.2,
+            "q_two_pass_selected": 0.2
+          },
+          "entity_attribute": {
+            "delta": {
+              "bridge": 0.0,
+              "iteration": 0.0,
+              "reader_error": 0.12,
+              "retrieval": 0.68,
+              "selection": -0.12
+            },
+            "n": 25,
+            "q_one_pass": 0.32,
+            "q_one_pass_selected": 0.2,
+            "q_oracle_bridge": 0.2,
+            "q_oracle_evidence": 0.88,
+            "q_two_pass_calculate": 0.2,
+            "q_two_pass_selected": 0.2
+          },
+          "location_chain": {
+            "delta": {
+              "bridge": 0.0,
+              "iteration": 0.0,
+              "reader_error": 0.2,
+              "retrieval": 0.8,
+              "selection": -0.04
+            },
+            "n": 25,
+            "q_one_pass": 0.04,
+            "q_one_pass_selected": 0.0,
+            "q_oracle_bridge": 0.0,
+            "q_oracle_evidence": 0.8,
+            "q_two_pass_calculate": 0.0,
+            "q_two_pass_selected": 0.0
+          },
+          "numeric_chain": {
+            "delta": {
+              "bridge": 0.0,
+              "iteration": 0.0,
+              "reader_error": 0.44,
+              "retrieval": 0.56,
+              "selection": 0.0
+            },
+            "n": 25,
+            "q_one_pass": 0.0,
+            "q_one_pass_selected": 0.0,
+            "q_oracle_bridge": 0.0,
+            "q_oracle_evidence": 0.56,
+            "q_two_pass_calculate": 0.0,
+            "q_two_pass_selected": 0.0
+          },
+          "ownership_chain": {
+            "delta": {
+              "bridge": 0.0,
+              "iteration": 0.0,
+              "reader_error": 0.24,
+              "retrieval": 0.64,
+              "selection": 0.08
+            },
+            "n": 25,
+            "q_one_pass": 0.04,
+            "q_one_pass_selected": 0.12,
+            "q_oracle_bridge": 0.12,
+            "q_oracle_evidence": 0.76,
+            "q_two_pass_calculate": 0.12,
+            "q_two_pass_selected": 0.12
+          },
+          "procedural_chain": {
+            "delta": {
+              "bridge": 0.0,
+              "iteration": 0.0,
+              "reader_error": 0.56,
+              "retrieval": 0.44,
+              "selection": 0.0
+            },
+            "n": 25,
+            "q_one_pass": 0.0,
+            "q_one_pass_selected": 0.0,
+            "q_oracle_bridge": 0.0,
+            "q_oracle_evidence": 0.44,
+            "q_two_pass_calculate": 0.0,
+            "q_two_pass_selected": 0.0
+          },
+          "temporal_chain": {
+            "delta": {
+              "bridge": 0.0,
+              "iteration": 0.0,
+              "reader_error": 0.36,
+              "retrieval": 0.6,
+              "selection": 0.04
+            },
+            "n": 25,
+            "q_one_pass": 0.0,
+            "q_one_pass_selected": 0.04,
+            "q_oracle_bridge": 0.04,
+            "q_oracle_evidence": 0.64,
+            "q_two_pass_calculate": 0.04,
+            "q_two_pass_selected": 0.04
+          },
+          "temporal_update": {
+            "delta": {
+              "bridge": 0.0,
+              "iteration": 0.0,
+              "reader_error": 0.16,
+              "retrieval": 0.72,
+              "selection": 0.0
+            },
+            "n": 25,
+            "q_one_pass": 0.12,
+            "q_one_pass_selected": 0.12,
+            "q_oracle_bridge": 0.12,
+            "q_oracle_evidence": 0.84,
+            "q_two_pass_calculate": 0.12,
+            "q_two_pass_selected": 0.12
+          }
+        },
+        "opportunity_group": {
+          "A_ONE_PASS_SUFFICIENT": {
+            "delta": {
+              "bridge": 0.0,
+              "iteration": 0.0,
+              "reader_error": 0.1067,
+              "retrieval": 0.72,
+              "selection": -0.0534
+            },
+            "n": 75,
+            "q_one_pass": 0.2267,
+            "q_one_pass_selected": 0.1733,
+            "q_oracle_bridge": 0.1733,
+            "q_oracle_evidence": 0.8933,
+            "q_two_pass_calculate": 0.1733,
+            "q_two_pass_selected": 0.1733
+          },
+          "B_SECOND_PASS_REQUIRED": {
+            "delta": {
+              "bridge": 0.0,
+              "iteration": 0.0,
+              "reader_error": 0.2718,
+              "retrieval": 0.6991,
+              "selection": 0.0194
+            },
+            "n": 103,
+            "q_one_pass": 0.0097,
+            "q_one_pass_selected": 0.0291,
+            "q_oracle_bridge": 0.0291,
+            "q_oracle_evidence": 0.7282,
+            "q_two_pass_calculate": 0.0291,
+            "q_two_pass_selected": 0.0291
+          },
+          "C_SECOND_PASS_CONFUSING": {
+            "delta": {
+              "bridge": 0.0,
+              "iteration": 0.0,
+              "reader_error": 0.3056,
+              "retrieval": 0.6388,
+              "selection": 0.0278
+            },
+            "n": 36,
+            "q_one_pass": 0.0278,
+            "q_one_pass_selected": 0.0556,
+            "q_oracle_bridge": 0.0556,
+            "q_oracle_evidence": 0.6944,
+            "q_two_pass_calculate": 0.0556,
+            "q_two_pass_selected": 0.0556
+          },
+          "D_SECOND_PASS_SUPPRESS": {
+            "delta": {
+              "bridge": 0.0,
+              "iteration": 0.0,
+              "reader_error": 0.3333,
+              "retrieval": 0.6111,
+              "selection": 0.0278
+            },
+            "n": 36,
+            "q_one_pass": 0.0278,
+            "q_one_pass_selected": 0.0556,
+            "q_oracle_bridge": 0.0556,
+            "q_oracle_evidence": 0.6667,
+            "q_two_pass_calculate": 0.0556,
+            "q_two_pass_selected": 0.0556
+          }
+        },
+        "source_style": {
+          "message": {
+            "delta": {
+              "bridge": 0.0,
+              "iteration": 0.0,
+              "reader_error": 0.3167,
+              "retrieval": 0.6416,
+              "selection": 0.0084
+            },
+            "n": 120,
+            "q_one_pass": 0.0333,
+            "q_one_pass_selected": 0.0417,
+            "q_oracle_bridge": 0.0417,
+            "q_oracle_evidence": 0.6833,
+            "q_two_pass_calculate": 0.0417,
+            "q_two_pass_selected": 0.0417
+          },
+          "table_text": {
+            "delta": {
+              "bridge": 0.0,
+              "iteration": 0.0,
+              "reader_error": 0.1615,
+              "retrieval": 0.7231,
+              "selection": -0.0077
+            },
+            "n": 130,
+            "q_one_pass": 0.1231,
+            "q_one_pass_selected": 0.1154,
+            "q_oracle_bridge": 0.1154,
+            "q_oracle_evidence": 0.8385,
+            "q_two_pass_calculate": 0.1154,
+            "q_two_pass_selected": 0.1154
+          }
+        }
+      },
+      "decomposition": {
+        "bridge": 0.0,
+        "iteration": 0.0,
+        "reader_error": 0.236,
+        "retrieval": 0.684,
+        "selection": 0.0
+      },
+      "gate_d": {
+        "always_one_pass": 0.08,
+        "always_two_pass": 0.08,
+        "best_fixed_policy": 0.08,
+        "followup_delta_partition": {
+          "neutral": 250
+        },
+        "heterogeneous": false,
+        "opportunity": 0.0,
+        "oracle_trigger": 0.08,
+        "partition_by_opportunity_group": {
+          "A_ONE_PASS_SUFFICIENT": {
+            "neutral": 75
+          },
+          "B_SECOND_PASS_REQUIRED": {
+            "neutral": 103
+          },
+          "C_SECOND_PASS_CONFUSING": {
+            "neutral": 36
+          },
+          "D_SECOND_PASS_SUPPRESS": {
+            "neutral": 36
+          }
+        }
+      },
+      "iteration_lcb95_by_group": {
+        "entity_regime": {
+          "group_count": 2,
+          "groups_with_effect": 0,
+          "lcb95": 0.0
+        },
+        "family": {
+          "group_count": 10,
+          "groups_with_effect": 0,
+          "lcb95": 0.0
+        },
+        "source_style": {
+          "group_count": 2,
+          "groups_with_effect": 0,
+          "lcb95": 0.0
+        }
+      },
+      "receipts": "evidence/gate_c/v3_ood",
+      "task_count": 250
+    },
+    "qualification": {
+      "arms": {
+        "one_pass": {
+          "complete_set_success": 0.464,
+          "mean_retrieval_calls": 1.0,
+          "quality": 0.246,
+          "slot_label_echoes": 85
+        },
+        "one_pass_selected": {
+          "complete_set_success": 0.45,
+          "mean_retrieval_calls": 1.0,
+          "quality": 0.294,
+          "slot_label_echoes": 28
+        },
+        "oracle_bridge": {
+          "complete_set_success": 0.8,
+          "mean_retrieval_calls": 1.38,
+          "quality": 0.54,
+          "slot_label_echoes": 31
+        },
+        "oracle_evidence": {
+          "complete_set_success": 1.0,
+          "mean_retrieval_calls": 0.0,
+          "quality": 0.828,
+          "slot_label_echoes": 3
+        },
+        "two_pass_calculate": {
+          "complete_set_success": 0.586,
+          "mean_retrieval_calls": 1.422,
+          "quality": 0.386,
+          "slot_label_echoes": 28
+        },
+        "two_pass_selected": {
+          "complete_set_success": 0.586,
+          "mean_retrieval_calls": 1.422,
+          "quality": 0.394,
+          "slot_label_echoes": 29
+        }
+      },
+      "by_axis": {
+        "answer_kind": {
+          "boolean": {
+            "delta": {
+              "bridge": 0.0,
+              "iteration": 0.1,
+              "reader_error": 0.35,
+              "retrieval": 0.05,
+              "selection": 0.1
+            },
+            "n": 20,
+            "q_one_pass": 0.4,
+            "q_one_pass_selected": 0.5,
+            "q_oracle_bridge": 0.6,
+            "q_oracle_evidence": 0.65,
+            "q_two_pass_calculate": 0.6,
+            "q_two_pass_selected": 0.6
+          },
+          "enum": {
+            "delta": {
+              "bridge": 0.0948,
+              "iteration": 0.0776,
+              "reader_error": 0.3017,
+              "retrieval": 0.3276,
+              "selection": 0.0517
+            },
+            "n": 116,
+            "q_one_pass": 0.1466,
+            "q_one_pass_selected": 0.1983,
+            "q_oracle_bridge": 0.3707,
+            "q_oracle_evidence": 0.6983,
+            "q_two_pass_calculate": 0.2759,
+            "q_two_pass_selected": 0.2759
+          },
+          "json_field": {
+            "delta": {
+              "bridge": 0.0,
+              "iteration": 0.0604,
+              "reader_error": 0.2845,
+              "retrieval": 0.181,
+              "selection": 0.1207
+            },
+            "n": 116,
+            "q_one_pass": 0.3534,
+            "q_one_pass_selected": 0.4741,
+            "q_oracle_bridge": 0.5345,
+            "q_oracle_evidence": 0.7155,
+            "q_two_pass_calculate": 0.5345,
+            "q_two_pass_selected": 0.5345
+          },
+          "numeric": {
+            "delta": {
+              "bridge": 0.3226,
+              "iteration": 0.0725,
+              "reader_error": 0.0161,
+              "retrieval": 0.3065,
+              "selection": 0.0162
+            },
+            "n": 124,
+            "q_one_pass": 0.2661,
+            "q_one_pass_selected": 0.2823,
+            "q_oracle_bridge": 0.6774,
+            "q_oracle_evidence": 0.9839,
+            "q_two_pass_calculate": 0.3306,
+            "q_two_pass_selected": 0.3548
+          },
+          "symbolic": {
+            "delta": {
+              "bridge": 0.1775,
+              "iteration": 0.1855,
+              "reader_error": 0.0726,
+              "retrieval": 0.3709,
+              "selection": 0.0
+            },
+            "n": 124,
+            "q_one_pass": 0.1935,
+            "q_one_pass_selected": 0.1935,
+            "q_oracle_bridge": 0.5565,
+            "q_oracle_evidence": 0.9274,
+            "q_two_pass_calculate": 0.371,
+            "q_two_pass_selected": 0.379
+          }
+        },
+        "entity_regime": {
+          "abbreviation": {
+            "delta": {
+              "bridge": 0.2,
+              "iteration": 0.1529,
+              "reader_error": 0.2,
+              "retrieval": 0.1118,
+              "selection": 0.0412
+            },
+            "n": 170,
+            "q_one_pass": 0.2941,
+            "q_one_pass_selected": 0.3353,
+            "q_oracle_bridge": 0.6882,
+            "q_oracle_evidence": 0.8,
+            "q_two_pass_calculate": 0.4824,
+            "q_two_pass_selected": 0.4882
+          },
+          "exact_id": {
+            "delta": {
+              "bridge": 0.2294,
+              "iteration": 0.1412,
+              "reader_error": 0.1529,
+              "retrieval": 0.1412,
+              "selection": 0.0941
+            },
+            "n": 170,
+            "q_one_pass": 0.2412,
+            "q_one_pass_selected": 0.3353,
+            "q_oracle_bridge": 0.7059,
+            "q_oracle_evidence": 0.8471,
+            "q_two_pass_calculate": 0.4706,
+            "q_two_pass_selected": 0.4765
+          },
+          "natural_name": {
+            "delta": {
+              "bridge": 0.0,
+              "iteration": 0.0,
+              "reader_error": 0.1625,
+              "retrieval": 0.6313,
+              "selection": 0.0062
+            },
+            "n": 160,
+            "q_one_pass": 0.2,
+            "q_one_pass_selected": 0.2062,
+            "q_oracle_bridge": 0.2062,
+            "q_oracle_evidence": 0.8375,
+            "q_two_pass_calculate": 0.1938,
+            "q_two_pass_selected": 0.2062
+          }
+        },
+        "family": {
+          "configuration_chain": {
+            "delta": {
+              "bridge": 0.3,
+              "iteration": 0.12,
+              "reader_error": 0.08,
+              "retrieval": 0.32,
+              "selection": 0.0
+            },
+            "n": 50,
+            "q_one_pass": 0.18,
+            "q_one_pass_selected": 0.18,
+            "q_oracle_bridge": 0.6,
+            "q_oracle_evidence": 0.92,
+            "q_two_pass_calculate": 0.3,
+            "q_two_pass_selected": 0.3
+          },
+          "dependency_chain": {
+            "delta": {
+              "bridge": 0.3,
+              "iteration": 0.1,
+              "reader_error": 0.22,
+              "retrieval": 0.28,
+              "selection": 0.06
+            },
+            "n": 50,
+            "q_one_pass": 0.04,
+            "q_one_pass_selected": 0.1,
+            "q_oracle_bridge": 0.5,
+            "q_oracle_evidence": 0.78,
+            "q_two_pass_calculate": 0.2,
+            "q_two_pass_selected": 0.2
+          },
+          "distractor_heavy": {
+            "delta": {
+              "bridge": 0.0,
+              "iteration": 0.0,
+              "reader_error": 0.2,
+              "retrieval": 0.32,
+              "selection": 0.28
+            },
+            "n": 50,
+            "q_one_pass": 0.2,
+            "q_one_pass_selected": 0.48,
+            "q_oracle_bridge": 0.48,
+            "q_oracle_evidence": 0.8,
+            "q_two_pass_calculate": 0.44,
+            "q_two_pass_selected": 0.48
+          },
+          "entity_attribute": {
+            "delta": {
+              "bridge": 0.0,
+              "iteration": 0.0,
+              "reader_error": 0.1,
+              "retrieval": 0.14,
+              "selection": -0.06
+            },
+            "n": 50,
+            "q_one_pass": 0.82,
+            "q_one_pass_selected": 0.76,
+            "q_oracle_bridge": 0.76,
+            "q_oracle_evidence": 0.9,
+            "q_two_pass_calculate": 0.72,
+            "q_two_pass_selected": 0.76
+          },
+          "location_chain": {
+            "delta": {
+              "bridge": 0.28,
+              "iteration": 0.08,
+              "reader_error": 0.12,
+              "retrieval": 0.38,
+              "selection": 0.08
+            },
+            "n": 50,
+            "q_one_pass": 0.06,
+            "q_one_pass_selected": 0.14,
+            "q_oracle_bridge": 0.5,
+            "q_oracle_evidence": 0.88,
+            "q_two_pass_calculate": 0.22,
+            "q_two_pass_selected": 0.22
+          },
+          "numeric_chain": {
+            "delta": {
+              "bridge": 0.2,
+              "iteration": 0.14,
+              "reader_error": 0.28,
+              "retrieval": 0.3,
+              "selection": 0.06
+            },
+            "n": 50,
+            "q_one_pass": 0.02,
+            "q_one_pass_selected": 0.08,
+            "q_oracle_bridge": 0.42,
+            "q_oracle_evidence": 0.72,
+            "q_two_pass_calculate": 0.22,
+            "q_two_pass_selected": 0.22
+          },
+          "ownership_chain": {
+            "delta": {
+              "bridge": 0.16,
+              "iteration": 0.18,
+              "reader_error": 0.12,
+              "retrieval": 0.3,
+              "selection": 0.02
+            },
+            "n": 50,
+            "q_one_pass": 0.22,
+            "q_one_pass_selected": 0.24,
+            "q_oracle_bridge": 0.58,
+            "q_oracle_evidence": 0.88,
+            "q_two_pass_calculate": 0.42,
+            "q_two_pass_selected": 0.42
+          },
+          "procedural_chain": {
+            "delta": {
+              "bridge": 0.08,
+              "iteration": 0.04,
+              "reader_error": 0.28,
+              "retrieval": 0.56,
+              "selection": 0.0
+            },
+            "n": 50,
+            "q_one_pass": 0.04,
+            "q_one_pass_selected": 0.04,
+            "q_oracle_bridge": 0.16,
+            "q_oracle_evidence": 0.72,
+            "q_two_pass_calculate": 0.08,
+            "q_two_pass_selected": 0.08
+          },
+          "temporal_chain": {
+            "delta": {
+              "bridge": 0.14,
+              "iteration": 0.34,
+              "reader_error": 0.3,
+              "retrieval": 0.22,
+              "selection": -0.04
+            },
+            "n": 50,
+            "q_one_pass": 0.04,
+            "q_one_pass_selected": 0.0,
+            "q_oracle_bridge": 0.48,
+            "q_oracle_evidence": 0.7,
+            "q_two_pass_calculate": 0.34,
+            "q_two_pass_selected": 0.34
+          },
+          "temporal_update": {
+            "delta": {
+              "bridge": 0.0,
+              "iteration": 0.0,
+              "reader_error": 0.02,
+              "retrieval": 0.06,
+              "selection": 0.08
+            },
+            "n": 50,
+            "q_one_pass": 0.84,
+            "q_one_pass_selected": 0.92,
+            "q_oracle_bridge": 0.92,
+            "q_oracle_evidence": 0.98,
+            "q_two_pass_calculate": 0.92,
+            "q_two_pass_selected": 0.92
+          }
+        },
+        "opportunity_group": {
+          "A_ONE_PASS_SUFFICIENT": {
+            "delta": {
+              "bridge": 0.0,
+              "iteration": 0.0,
+              "reader_error": 0.1067,
+              "retrieval": 0.1733,
+              "selection": 0.1
+            },
+            "n": 150,
+            "q_one_pass": 0.62,
+            "q_one_pass_selected": 0.72,
+            "q_oracle_bridge": 0.72,
+            "q_oracle_evidence": 0.8933,
+            "q_two_pass_calculate": 0.6933,
+            "q_two_pass_selected": 0.72
+          },
+          "B_SECOND_PASS_REQUIRED": {
+            "delta": {
+              "bridge": 0.3155,
+              "iteration": 0.1942,
+              "reader_error": 0.1165,
+              "retrieval": 0.3641,
+              "selection": -0.0291
+            },
+            "n": 206,
+            "q_one_pass": 0.0388,
+            "q_one_pass_selected": 0.0097,
+            "q_oracle_bridge": 0.5194,
+            "q_oracle_evidence": 0.8835,
+            "q_two_pass_calculate": 0.2039,
+            "q_two_pass_selected": 0.2039
+          },
+          "C_SECOND_PASS_CONFUSING": {
+            "delta": {
+              "bridge": 0.1528,
+              "iteration": 0.0972,
+              "reader_error": 0.25,
+              "retrieval": 0.4444,
+              "selection": 0.0556
+            },
+            "n": 72,
+            "q_one_pass": 0.0,
+            "q_one_pass_selected": 0.0556,
+            "q_oracle_bridge": 0.3056,
+            "q_oracle_evidence": 0.75,
+            "q_two_pass_calculate": 0.1528,
+            "q_two_pass_selected": 0.1528
+          },
+          "D_SECOND_PASS_SUPPRESS": {
+            "delta": {
+              "bridge": -0.0417,
+              "iteration": 0.0417,
+              "reader_error": 0.3889,
+              "retrieval": 0.1528,
+              "selection": 0.1527
+            },
+            "n": 72,
+            "q_one_pass": 0.3056,
+            "q_one_pass_selected": 0.4583,
+            "q_oracle_bridge": 0.4583,
+            "q_oracle_evidence": 0.6111,
+            "q_two_pass_calculate": 0.5,
+            "q_two_pass_selected": 0.5
+          }
+        },
+        "source_style": {
+          "change_log": {
+            "delta": {
+              "bridge": 0.1615,
+              "iteration": 0.1923,
+              "reader_error": 0.0923,
+              "retrieval": 0.3385,
+              "selection": 0.0077
+            },
+            "n": 130,
+            "q_one_pass": 0.2077,
+            "q_one_pass_selected": 0.2154,
+            "q_oracle_bridge": 0.5692,
+            "q_oracle_evidence": 0.9077,
+            "q_two_pass_calculate": 0.4,
+            "q_two_pass_selected": 0.4077
+          },
+          "formal_registry": {
+            "delta": {
+              "bridge": 0.3077,
+              "iteration": 0.0769,
+              "reader_error": 0.0385,
+              "retrieval": 0.2846,
+              "selection": 0.0231
+            },
+            "n": 130,
+            "q_one_pass": 0.2692,
+            "q_one_pass_selected": 0.2923,
+            "q_oracle_bridge": 0.6769,
+            "q_oracle_evidence": 0.9615,
+            "q_two_pass_calculate": 0.3462,
+            "q_two_pass_selected": 0.3692
+          },
+          "key_value_log": {
+            "delta": {
+              "bridge": 0.1084,
+              "iteration": 0.0833,
+              "reader_error": 0.2583,
+              "retrieval": 0.35,
+              "selection": 0.0417
+            },
+            "n": 120,
+            "q_one_pass": 0.1583,
+            "q_one_pass_selected": 0.2,
+            "q_oracle_bridge": 0.3917,
+            "q_oracle_evidence": 0.7417,
+            "q_two_pass_calculate": 0.2833,
+            "q_two_pass_selected": 0.2833
+          },
+          "technical_note": {
+            "delta": {
+              "bridge": -0.0084,
+              "iteration": 0.0417,
+              "reader_error": 0.3167,
+              "retrieval": 0.175,
+              "selection": 0.125
+            },
+            "n": 120,
+            "q_one_pass": 0.35,
+            "q_one_pass_selected": 0.475,
+            "q_oracle_bridge": 0.5083,
+            "q_oracle_evidence": 0.6833,
+            "q_two_pass_calculate": 0.5167,
+            "q_two_pass_selected": 0.5167
+          }
+        }
+      },
+      "decomposition": {
+        "bridge": 0.146,
+        "iteration": 0.1,
+        "reader_error": 0.172,
+        "retrieval": 0.288,
+        "selection": 0.048
+      },
+      "gate_d": {
+        "always_one_pass": 0.294,
+        "always_two_pass": 0.394,
+        "best_fixed_policy": 0.394,
+        "followup_delta_partition": {
+          "neutral": 450,
+          "positive": 50
+        },
+        "heterogeneous": false,
+        "opportunity": 0.0,
+        "oracle_trigger": 0.394,
+        "partition_by_opportunity_group": {
+          "A_ONE_PASS_SUFFICIENT": {
+            "neutral": 150
+          },
+          "B_SECOND_PASS_REQUIRED": {
+            "neutral": 166,
+            "positive": 40
+          },
+          "C_SECOND_PASS_CONFUSING": {
+            "neutral": 65,
+            "positive": 7
+          },
+          "D_SECOND_PASS_SUPPRESS": {
+            "neutral": 69,
+            "positive": 3
+          }
+        }
+      },
+      "iteration_lcb95_by_group": {
+        "entity_regime": {
+          "group_count": 3,
+          "groups_with_effect": 2,
+          "lcb95": 0.049
+        },
+        "family": {
+          "group_count": 10,
+          "groups_with_effect": 7,
+          "lcb95": 0.052
+        },
+        "source_style": {
+          "group_count": 4,
+          "groups_with_effect": 4,
+          "lcb95": 0.06
+        }
+      },
+      "receipts": "evidence/gate_c/v3_qualification",
+      "task_count": 500
+    }
+  }
+}
