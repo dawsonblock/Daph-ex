@@ -1,4 +1,4 @@
-# DAPH-HRM adaptive memory control plane v3.7.0
+# DAPH-HRM adaptive memory control plane v3.7.1
 
 Pretrained-compatible adaptive computation with a physically ordered four-level effort hierarchy.
 
@@ -10,11 +10,13 @@ Pretrained-compatible adaptive computation with a physically ordered four-level 
 | `daph/` | LEGACY_QWEN_EXFUSION — frozen; tests kept passing, no new HRM work |
 | `daph_metareasoner/` | LEGACY_METAREASONING — frozen; tests kept passing, no new HRM work |
 
-Gate A0 (evidence use) and Gate B (single-pass retrieval) have **passed**; the
-active scientific target is Gate C, bounded iterative retrieval. Memory-stack
-expansion (RuVector, TurboVec, Graphiti, adaptive recurrence, learned
-executive) stays blocked until its prerequisite gate passes. Current state is
-machine-readable in [RESEARCH_STATUS.json](RESEARCH_STATUS.json).
+Gate A0 (evidence use) and Gate B (single-pass retrieval) have **passed**. Gate C
+(bounded iterative retrieval) has been measured and is **not certified** — the
+mechanism saturates the corpus while the corpus cannot certify it, so the active
+work is benchmark construction (`controlled_gate_a_v3`), not new mechanism.
+Memory-stack expansion (RuVector, TurboVec, Graphiti, adaptive recurrence,
+learned executive) stays blocked until its prerequisite gate passes. Current
+state is machine-readable in [RESEARCH_STATUS.json](RESEARCH_STATUS.json).
 
 The central design principle established by Gate B is that second-hop recall
 and evidence precision must be optimised **jointly** — raising recall while
@@ -173,4 +175,18 @@ The canonical Qwen path, legacy hybrid path, standalone marginal-utility package
 
 Gate B also established that retrieval **precision** is a binding constraint: holding required evidence present, answer quality falls 1.00 → 0.67 → 0.39 as distractors move from random to same-template to the retriever's own top-k ([diagnostic](evidence/gate_b/packing_diagnostic/packing_diagnostic.json)). Retrieving more is therefore counterproductive on its own.
 
-Gate C (bounded iterative retrieval) is under measurement. Adaptive retrieval, adaptive recurrence, executive training, Graphiti, RuVector, TurboVec, AgentDB procedural memory, Infini consolidation, and PixelRAG all remain blocked pending their own gates. Neither E3 task utility nor a learned controller is scientifically qualified.
+**Gate C — NOT PASSED (benchmark, not mechanism).** Bounded two-pass retrieval
+with entity-anchored precision packing reaches the oracle ceiling — 1.000 answer
+quality and 1.000 complete-evidence-set recovery, zero failures across 500 tasks
+([report](GATE_C_REPORT.md)). It fails one pre-declared check: bridge structure
+exists in only one family of five, so a family-clustered bootstrap cannot certify
+a family-concentrated effect (LCB95 +0.0000 family, +0.0659 template, +0.1080
+source cluster). The bar was not moved; the corpus is the limiting factor, and
+`controlled_gate_a_v3` is the required next work.
+
+Three negative results from Gate C constrain what follows: the deterministic
+calculator produced 100 answers for **+0.000** quality and is not promoted;
+91 of 91 follow-ups were positive with none negative, so a fixed two-pass policy
+suffices and no learned trigger is justified; and the `[E4]` slot-label echo
+(99 → 0 under precision packing) was an evidence-confusability artefact, not a
+prompt-interface or reasoning limit. Adaptive retrieval, adaptive recurrence, executive training, Graphiti, RuVector, TurboVec, AgentDB procedural memory, Infini consolidation, and PixelRAG all remain blocked pending their own gates. Neither E3 task utility nor a learned controller is scientifically qualified.

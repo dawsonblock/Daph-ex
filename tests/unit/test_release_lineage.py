@@ -48,8 +48,11 @@ def test_research_status_declares_every_gate():
         "gate_j_persistent_memory", "gate_k_consolidation", "gate_l_latent_memory",
     }
     assert set(gates) == expected
-    permitted = {"PASS", "FAIL", "PENDING", "IN_PROGRESS", "BLOCKED"}
-    assert set(gates.values()) <= permitted
+    # A gate may also fail for a reason that is about the benchmark rather
+    # than the mechanism; that distinction must survive in the status file.
+    permitted_prefixes = ("PASS", "FAIL", "PENDING", "IN_PROGRESS", "BLOCKED")
+    for name, value in gates.items():
+        assert value.startswith(permitted_prefixes), f"{name} has unknown status {value!r}"
 
 
 def test_readme_does_not_claim_gate_a_is_unrun():
@@ -111,5 +114,8 @@ def test_benchmark_lineage_records_superseded_corpora():
     lineage = _status()["benchmark_lineage"]
     assert lineage["controlled_gate_a_v1"].startswith("SUPERSEDED")
     assert lineage["controlled_gate_a_v2"].startswith("CANONICAL")
-    for name in lineage:
-        assert (ROOT / "data" / "hrm" / name).exists() or lineage[name].startswith("PLANNED")
+    for name, note in lineage.items():
+        built = (ROOT / "data" / "hrm" / name).exists()
+        assert built or note.startswith(("PLANNED", "REQUIRED")), (
+            f"{name} is neither built nor marked as future work: {note!r}"
+        )

@@ -131,7 +131,7 @@ from .merge import (
     is_ssm_core_param,
 )
 
-__version__ = "3.7.0"
+__version__ = "3.7.1"
 __all__ = [
     "DAPHConfigV3",
     "LatentMoE",

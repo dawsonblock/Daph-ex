@@ -1,11 +1,28 @@
 {
-  "version": "3.7.0",
+  "benchmark_lineage": {
+    "controlled_gate_a_v1": "SUPERSEDED_answer_leaked_into_one_question",
+    "controlled_gate_a_v2": "CANONICAL_for_gate_a0_and_gate_b",
+    "controlled_gate_a_v3": "REQUIRED_gate_c_is_undecidable_without_it"
+  },
   "canonical_package": "hrm_adaptive_memory",
+  "capabilities": {
+    "adaptive_recurrence": "BLOCKED",
+    "adaptive_retrieval": "BLOCKED",
+    "agentdb_procedural_memory": "BLOCKED",
+    "bounded_iterative_retrieval": "MECHANISM_SATURATES_CORPUS_NOT_CERTIFIED",
+    "executive_training": "BLOCKED",
+    "graphiti_temporal_memory": "BLOCKED",
+    "infini_consolidation": "BLOCKED",
+    "pixelrag": "BLOCKED",
+    "ruvector": "BLOCKED",
+    "single_pass_retrieval": "QUALIFIED",
+    "turbovec": "BLOCKED"
+  },
   "gates": {
     "gate_a0_controlled_evidence_use": "PASS",
     "gate_a1_structural_generalization": "PENDING",
     "gate_b_single_pass_retrieval": "PASS",
-    "gate_c_iterative_retrieval": "IN_PROGRESS",
+    "gate_c_iterative_retrieval": "FAIL_UNDERPOWERED_BENCHMARK",
     "gate_d_conditional_retrieval_opportunity": "PENDING",
     "gate_e_learned_retrieval_control": "BLOCKED",
     "gate_f_recurrence_opportunity": "BLOCKED",
@@ -16,47 +33,52 @@
     "gate_k_consolidation": "BLOCKED",
     "gate_l_latent_memory": "BLOCKED"
   },
-  "capabilities": {
-    "single_pass_retrieval": "QUALIFIED",
-    "bounded_iterative_retrieval": "UNDER_MEASUREMENT",
-    "adaptive_retrieval": "BLOCKED",
-    "adaptive_recurrence": "BLOCKED",
-    "executive_training": "BLOCKED",
-    "graphiti_temporal_memory": "BLOCKED",
-    "ruvector": "BLOCKED",
-    "turbovec": "BLOCKED",
-    "agentdb_procedural_memory": "BLOCKED",
-    "infini_consolidation": "BLOCKED",
-    "pixelrag": "BLOCKED"
+  "negative_results": {
+    "adaptive_retrieval_trigger": "91 of 91 follow-ups positive, 0 negative; a fixed two-pass policy suffices and Gate D is expected to FAIL on this corpus",
+    "calculate_action": "100 answers produced, +0.000 marginal quality; NOT promoted",
+    "slot_label_echo": "99 -> 0 under precision packing; was an evidence-confusability artefact, not a prompt-interface or reasoning limit"
   },
+  "next_work": "controlled_gate_a_v3: >=40 distinct templates, >=20 real source styles, bridge structure across multiple families. Required for both Gate A1 and a decidable Gate C.",
   "qualified_claims": {
     "gate_a0": {
       "claim": "HRM-Text-1B can use correctly supplied external evidence on the controlled synthetic Gate A benchmark.",
+      "grouped_bootstrap_lcb95": 0.994,
+      "mean_b3_minus_b0": 0.998,
       "not_a_claim_about": [
         "general long-term memory",
         "natural-document memory",
         "open-domain RAG",
         "persistent cognition"
       ],
-      "mean_b3_minus_b0": 0.998,
-      "grouped_bootstrap_lcb95": 0.994,
       "report": "evidence/gate_a/qualified_run_002/gate_a_report_v2r1.json"
     },
     "gate_b": {
+      "best_arm": "bm25",
       "claim": "Lexical retrieval (BM25) dominates the tested dense representation on this identifier-heavy synthetic corpus, and recovers enough complete evidence sets to lift downstream answer quality far above the no-evidence baseline.",
+      "complete_set_success": 0.818,
+      "downstream_quality": 0.8,
       "not_a_claim_about": [
         "dense retrieval being inferior in general",
         "any dense stack other than MiniLM-L6-v2 single-vector mean-pooled cosine"
       ],
-      "best_arm": "bm25",
-      "complete_set_success": 0.818,
-      "downstream_quality": 0.800,
       "report": "GATE_B_REPORT.md"
+    },
+    "gate_c": {
+      "claim": "Bounded two-pass retrieval with entity-anchored precision packing reaches the oracle ceiling (1.000 quality, 1.000 complete-evidence-set recovery) with zero failures on the controlled synthetic corpus.",
+      "marginal_utility": {
+        "calculate": 0.0,
+        "followup": 0.182,
+        "packing": 0.018
+      },
+      "not_a_claim_about": [
+        "generalisation to unseen templates, source styles, or entity formats",
+        "natural documents",
+        "any effect certified at family granularity"
+      ],
+      "report": "GATE_C_REPORT.md",
+      "verdict": "FAIL_ITERATIVE_RETRIEVAL",
+      "why_fail": "Bridge structure exists in only 1 of 5 families, so a family-clustered bootstrap cannot certify a family-concentrated effect: LCB95 is +0.0000 for family, +0.0659 for template_id, +0.1080 for source_cluster_id."
     }
   },
-  "benchmark_lineage": {
-    "controlled_gate_a_v1": "SUPERSEDED_answer_leaked_into_one_question",
-    "controlled_gate_a_v2": "CANONICAL_for_gate_a0_and_gate_b",
-    "controlled_gate_a_v3": "PLANNED_structural_variation_for_gate_a1"
-  }
+  "version": "3.7.1"
 }

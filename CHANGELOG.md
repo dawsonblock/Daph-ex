@@ -1,5 +1,23 @@
 # Changelog
 
+## 3.7.1 — Gate C measured; mechanism saturates, benchmark does not certify
+
+- Bounded two-pass retrieval + entity-anchored precision packing reaches the
+  oracle ceiling: 1.000 quality, 1.000 complete-evidence-set recovery, zero
+  failures across all 500 tasks and all twelve taxonomy classes.
+- Verdict is nonetheless FAIL_ITERATIVE_RETRIEVAL: under Gate A's own rule
+  (LCB95 > 0 for every grouping key) the family view yields +0.0000 because
+  bridge structure exists in only one family of five. The threshold was frozen
+  before results were read and was not moved.
+- Marginal utility: precision packing +0.018, bounded follow-up +0.182,
+  deterministic calculator +0.000.
+- Negative results recorded: CALCULATE is not promoted; adaptive retrieval is
+  not justified (91/91 follow-ups positive, so Gate D should be expected to
+  fail here); the slot-label echo was an evidence-confusability artefact.
+- Fixed an evidence-selection defect that discarded an already-retrieved second
+  hop because anchoring used question entities only; the affected run is
+  retained and voided rather than overwritten.
+
 ## 3.7.0 — Gate A0 and Gate B qualified; lineage repaired
 
 Release integrity: 3.6.1 shipped newer science under stale metadata (pyproject

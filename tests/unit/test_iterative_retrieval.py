@@ -304,3 +304,30 @@ def test_linked_entities_are_exposed_for_anchoring():
     )
     assert {row.evidence_id for row in selected} == {"a", "b"}
     assert receipt.dropped_unanchored_ids == ()
+
+
+def test_retrieval_and_selection_never_read_gold_labels():
+    """The follow-up mechanism must be derivable at inference time.
+
+    A reformulator that consulted required_evidence_ids or the gold answer
+    would make Gate C unfalsifiable, so the whole retrieval/selection path is
+    kept structurally label-blind.
+    """
+
+    import inspect
+
+    from hrm_adaptive_memory.evidence import packing, state, sufficiency
+    from hrm_adaptive_memory.retrieval import iterative
+
+    forbidden = ("required_evidence_ids", "oracle_evidence_ids", "gold_answer")
+    for module in (iterative, state, sufficiency, packing):
+        source = inspect.getsource(module)
+        for name in forbidden:
+            assert name not in source, f"{module.__name__} reads gold label {name!r}"
+
+
+def test_followup_query_is_a_bridge_entity_not_an_answer():
+    backend = CanonicalRetrievalBackend(CanonicalRetrievalMode.BM25, corpus_records())
+    result = run(TwoPassRetriever(backend, k=5, followup_k=5).retrieve(QUESTION))
+    assert result.receipt.followup_query == "Adapter-78103"
+    assert "840" not in (result.receipt.followup_query or ""), "answer leaked into the query"
