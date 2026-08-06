@@ -41,7 +41,9 @@ def test_research_status_declares_every_gate():
     gates = _status()["gates"]
     expected = {
         "gate_a0_controlled_evidence_use", "gate_a1_structural_generalization",
-        "gate_b_single_pass_retrieval", "gate_c_iterative_retrieval",
+        "gate_b_single_pass_retrieval", "gate_c0_controlled_iterative_retrieval",
+        "gate_c1_structural_generalization_iterative_retrieval",
+        "gate_n1_natural_external_memory",
         "gate_d_conditional_retrieval_opportunity", "gate_e_learned_retrieval_control",
         "gate_f_recurrence_opportunity", "gate_g_adaptive_recurrence",
         "gate_h_verification_control", "gate_i_unified_executive",
@@ -50,7 +52,8 @@ def test_research_status_declares_every_gate():
     assert set(gates) == expected
     # A gate may also fail for a reason that is about the benchmark rather
     # than the mechanism; that distinction must survive in the status file.
-    permitted_prefixes = ("PASS", "FAIL", "PENDING", "IN_PROGRESS", "BLOCKED")
+    permitted_prefixes = ("PASS", "FAIL", "PENDING", "IN_PROGRESS", "BLOCKED",
+                          "MECHANISM_SUCCESS")
     for name, value in gates.items():
         assert value.startswith(permitted_prefixes), f"{name} has unknown status {value!r}"
 

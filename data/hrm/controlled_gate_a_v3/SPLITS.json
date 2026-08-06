@@ -1,0 +1,90 @@
+{
+  "frozen_before_evaluation": true,
+  "ood_held_out_regimes": [
+    "alias",
+    "description"
+  ],
+  "ood_held_out_styles": [
+    "table_text",
+    "message"
+  ],
+  "splits": {
+    "development": {
+      "entity_regimes": [
+        "exact_id",
+        "natural_name",
+        "abbreviation"
+      ],
+      "evidence_count": 474,
+      "opportunity_groups": [
+        "A_ONE_PASS_SUFFICIENT",
+        "B_SECOND_PASS_REQUIRED",
+        "C_SECOND_PASS_CONFUSING",
+        "D_SECOND_PASS_SUPPRESS"
+      ],
+      "source_cluster_count": 12,
+      "source_styles": [
+        "formal_registry",
+        "technical_note",
+        "key_value_log",
+        "change_log"
+      ],
+      "task_count": 120,
+      "task_sha256": "9fdb88a882c5e78d5faf54359ddddf21ea813c65d49a2e7a3ef33339fe3e3435",
+      "template_count": 120
+    },
+    "ood": {
+      "entity_regimes": [
+        "alias",
+        "description"
+      ],
+      "evidence_count": 983,
+      "opportunity_groups": [
+        "A_ONE_PASS_SUFFICIENT",
+        "B_SECOND_PASS_REQUIRED",
+        "C_SECOND_PASS_CONFUSING",
+        "D_SECOND_PASS_SUPPRESS"
+      ],
+      "source_cluster_count": 24,
+      "source_styles": [
+        "table_text",
+        "message"
+      ],
+      "task_count": 250,
+      "task_sha256": "5a0631be154ff55c99fb1a1f3eff2ba2941cb767486c7597b91211eaeaf1ee75",
+      "template_count": 80
+    },
+    "qualification": {
+      "entity_regimes": [
+        "exact_id",
+        "natural_name",
+        "abbreviation"
+      ],
+      "evidence_count": 1966,
+      "opportunity_groups": [
+        "A_ONE_PASS_SUFFICIENT",
+        "B_SECOND_PASS_REQUIRED",
+        "C_SECOND_PASS_CONFUSING",
+        "D_SECOND_PASS_SUPPRESS"
+      ],
+      "source_cluster_count": 24,
+      "source_styles": [
+        "formal_registry",
+        "technical_note",
+        "key_value_log",
+        "change_log"
+      ],
+      "task_count": 500,
+      "task_sha256": "fab1c7e504c7c7ee34b84110f63a50cd52fbb06dfe8aaa27150673b1794dda8a",
+      "template_count": 160
+    }
+  },
+  "structural_requirements": {
+    "all_four_opportunity_groups": true,
+    "families_at_least_8": true,
+    "ood_shares_no_regime_with_qualification": true,
+    "ood_shares_no_style_with_qualification": true,
+    "source_cluster_count_at_least_20": true,
+    "template_count_at_least_40": true
+  }
+}

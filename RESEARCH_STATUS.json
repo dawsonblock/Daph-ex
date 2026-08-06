@@ -9,7 +9,8 @@
     "adaptive_recurrence": "BLOCKED",
     "adaptive_retrieval": "BLOCKED",
     "agentdb_procedural_memory": "BLOCKED",
-    "bounded_iterative_retrieval": "MECHANISM_SATURATES_CORPUS_NOT_CERTIFIED",
+    "bounded_iterative_retrieval": "MECHANISM_SUCCESS_AWAITING_GENERALIZATION",
+    "calculate_action": "UNQUALIFIED",
     "executive_training": "BLOCKED",
     "graphiti_temporal_memory": "BLOCKED",
     "infini_consolidation": "BLOCKED",
@@ -22,7 +23,8 @@
     "gate_a0_controlled_evidence_use": "PASS",
     "gate_a1_structural_generalization": "PENDING",
     "gate_b_single_pass_retrieval": "PASS",
-    "gate_c_iterative_retrieval": "FAIL_UNDERPOWERED_BENCHMARK",
+    "gate_c0_controlled_iterative_retrieval": "MECHANISM_SUCCESS_PROMOTION_BLOCKED_BY_BENCHMARK_STRUCTURE",
+    "gate_c1_structural_generalization_iterative_retrieval": "PENDING",
     "gate_d_conditional_retrieval_opportunity": "PENDING",
     "gate_e_learned_retrieval_control": "BLOCKED",
     "gate_f_recurrence_opportunity": "BLOCKED",
@@ -31,14 +33,15 @@
     "gate_i_unified_executive": "BLOCKED",
     "gate_j_persistent_memory": "BLOCKED",
     "gate_k_consolidation": "BLOCKED",
-    "gate_l_latent_memory": "BLOCKED"
+    "gate_l_latent_memory": "BLOCKED",
+    "gate_n1_natural_external_memory": "PENDING"
   },
   "negative_results": {
     "adaptive_retrieval_trigger": "91 of 91 follow-ups positive, 0 negative; a fixed two-pass policy suffices and Gate D is expected to FAIL on this corpus",
     "calculate_action": "100 answers produced, +0.000 marginal quality; NOT promoted",
     "slot_label_echo": "99 -> 0 under precision packing; was an evidence-confusability artefact, not a prompt-interface or reasoning limit"
   },
-  "next_work": "controlled_gate_a_v3: >=40 distinct templates, >=20 real source styles, bridge structure across multiple families. Required for both Gate A1 and a decidable Gate C.",
+  "next_work": "controlled_gate_a_v3 structural-generalization corpus: >=8 families with >=5 carrying genuine iterative dependency, >=40 real templates, >=20 genuine source clusters, multiple entity-naming regimes, heterogeneous retrieval opportunity, adversarial near-duplicates, temporal supersession inside multi-hop, and non-numeric answers. Freeze before evaluation, then run the 3260ce0 mechanism UNCHANGED.",
   "qualified_claims": {
     "gate_a0": {
       "claim": "HRM-Text-1B can use correctly supplied external evidence on the controlled synthetic Gate A benchmark.",
@@ -63,21 +66,23 @@
       ],
       "report": "GATE_B_REPORT.md"
     },
-    "gate_c": {
+    "gate_c0": {
       "claim": "Bounded two-pass retrieval with entity-anchored precision packing reaches the oracle ceiling (1.000 quality, 1.000 complete-evidence-set recovery) with zero failures on the controlled synthetic corpus.",
       "marginal_utility": {
         "calculate": 0.0,
         "followup": 0.182,
         "packing": 0.018
       },
+      "mechanistically": "worked: reached the oracle ceiling with zero failures",
       "not_a_claim_about": [
         "generalisation to unseen templates, source styles, or entity formats",
         "natural documents",
         "any effect certified at family granularity"
       ],
       "report": "GATE_C_REPORT.md",
-      "verdict": "FAIL_ITERATIVE_RETRIEVAL",
-      "why_fail": "Bridge structure exists in only 1 of 5 families, so a family-clustered bootstrap cannot certify a family-concentrated effect: LCB95 is +0.0000 for family, +0.0659 for template_id, +0.1080 for source_cluster_id."
+      "statistically": "the pre-declared family-level promotion condition was not met; the rule was kept, the corpus is being replaced",
+      "verdict": "MECHANISM_SUCCESS_PROMOTION_BLOCKED_BY_BENCHMARK_STRUCTURE",
+      "why_not_promoted": "Bridge structure exists in only 1 of 5 families, so a family-clustered bootstrap cannot certify a family-concentrated effect: LCB95 is +0.0000 for family, +0.0659 for template_id, +0.1080 for source_cluster_id."
     }
   },
   "version": "3.7.1"
