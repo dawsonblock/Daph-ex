@@ -1,0 +1,50 @@
+{
+  "arms": {
+    "C0_p2_fusion": "reference; no follow-up",
+    "C1_canonical_relation": "runtime canonical + target relation",
+    "C2_subject_canonical_relation": "original subject + runtime canonical + relation",
+    "C3_two_query_union": "C1 and C2 queries, interleaved union",
+    "C4_bounded_two_step": "C2 then one further state-updated query, depth <= 2",
+    "C5_oracle_next_query": "CEILING ONLY",
+    "C6_oracle_evidence": "CEILING ONLY"
+  },
+  "decisive_conditional_metric": "complete_proof_recovered_given_identity_found",
+  "frozen_before_any_run": true,
+  "hypothesis": "Given that the identity record is already present in the candidate pool (measured recall 0.96-1.00), a bounded runtime-visible follow-up retrieval policy can materially increase recovery of the remaining proof path.",
+  "pools_not_frozen_because": "candidate generation is still changing; freezing pools now would lock in an unqualified policy",
+  "primary_metric": "complete_set@50",
+  "promotion_rules_all_required": {
+    "abbreviation_regression": {
+      "direction": "no_regression",
+      "threshold": -0.02
+    },
+    "alias_complete_set_delta": {
+      "direction": "material_gain",
+      "threshold": 0.1
+    },
+    "canonical_regression": {
+      "direction": "no_regression",
+      "threshold": -0.02
+    },
+    "description_regression": {
+      "direction": "no_regression",
+      "threshold": -0.02
+    },
+    "max_followup_depth": {
+      "direction": "bounded",
+      "threshold": 2
+    },
+    "target_recall_given_identity_delta": {
+      "direction": "material_gain",
+      "threshold": 0.05
+    }
+  },
+  "protocol": "gate_c2c_chain_completion_v1",
+  "reference_arm": {
+    "immutable": true,
+    "name": "C0_p2_fusion",
+    "note": "BM25+BGE RRF, the strongest non-promoted candidate policy"
+  },
+  "runtime_constraint": "C1-C4 must derive the canonical entity by PARSING runtime-visible identity records. Reading canonical identity from _oracle_metadata is permitted only in C5/C6, which are ceilings and never production arms.",
+  "state_constraint": "Both the original subject surface AND the resolved canonical entity must be retained. Replacing one with the other reproduces the measured forgotten-subject defect."
+}

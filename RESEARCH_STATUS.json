@@ -32,6 +32,7 @@
     "gate_c2_r_retrieval_coverage": "FAIL_CANDIDATE_COVERAGE_NO_ARM_PROMOTABLE",
     "gate_c2_s_evidence_selection": "PENDING",
     "gate_c2_semantic_information_gap_retrieval": "IN_PROGRESS_COVERAGE_MEASURED",
+    "gate_c2c_chain_completion": "FAIL_ON_ONE_BADLY_SPECIFIED_CRITERION",
     "gate_d_conditional_retrieval_opportunity": "PENDING_ACTION_TOO_WEAK_TO_MEASURE",
     "gate_e_learned_retrieval_control": "BLOCKED",
     "gate_f_recurrence_opportunity": "BLOCKED",
@@ -68,7 +69,7 @@
     "slot_label_echo": "99 -> 0 under precision packing; was an evidence-confusability artefact, not a prompt-interface or reasoning limit",
     "slot_label_echoes": "Track evidence quality, not packet format: 85 -> 28 under precision packing, -> 3 under oracle evidence. F-arms would measure a symptom; implemented but unrun."
   },
-  "next_work": "Neither arm cleared the frozen bar, so no candidate-generation policy is promoted and pools are not frozen. The alias decomposition redirects the next mechanism: identity records are already retrieved (recall 0.96-1.00), so build chain completion -- given identity in hand, recover the remaining proof records -- rather than identity resolution. Selector work stays blocked; the S0/S5 gate needs a frozen pool first. c2_cal_holdout untouched; V4 immutable.",
+  "next_work": "Decision required from the researcher: the chain-completion mechanism shows large primary-metric gains (alias +0.42, c2_cal_id 0.710 -> 0.980 against a 1.000 ceiling) but fails a criterion I specified with almost no headroom. I am not moving the frozen bar. Options are (a) predeclare a C2-C-v2 protocol with headroom-aware criteria and re-run on the unspent holdout, or (b) accept the FAIL and treat chain completion as unqualified. Pools stay unfrozen; selector and executive stay blocked.",
   "ood_taxonomy": {
     "REFERENTIAL_OOD": {
       "mechanism": "identity resolution + multi-hop retrieval",
@@ -448,6 +449,52 @@
         }
       },
       "report": "GATE_C1_V4_REPORT.md"
+    },
+    "gate_c2c_chain_completion": {
+      "claim": "Bounded runtime chain completion produces large gains on the primary metric but fails a secondary conditional criterion that I specified badly. All four runtime arms clear five of six predeclared checks and fail only target_recall_given_identity_delta.",
+      "complete_set_at_50": {
+        "c2_cal_id": {
+          "C0_reference": 0.71,
+          "C1": 0.96,
+          "C2": 0.98,
+          "C3": 0.96,
+          "C4": 0.97,
+          "C5_oracle_query": 1.0,
+          "C6_oracle_evidence": 1.0
+        },
+        "c2_cal_surface": {
+          "C0_reference": 0.26,
+          "C1": 0.54,
+          "C2": 0.48,
+          "C3": 0.52,
+          "C4": 0.56,
+          "C5_oracle_query": 0.97,
+          "C6_oracle_evidence": 1.0
+        }
+      },
+      "deltas_best_arm_C4": {
+        "abbreviation": 0.52,
+        "alias": 0.42,
+        "canonical": 0.0,
+        "description": 0.18,
+        "mean_followup_depth": 2.0,
+        "target_given_identity": 0.0469
+      },
+      "mechanism_finding": "Chain completion is highly effective. On c2_cal_id complete-set rises 0.710 -> 0.980, essentially reaching the 1.000 oracle-evidence ceiling. On c2_cal_surface it rises 0.260 -> 0.560. Alias improves +0.42 and abbreviation +0.52 against a required +0.10, with zero canonical regression and depth within the bound of 2. Canonicalization is purely runtime: identity statements are parsed out of retrieved candidate text, never read from _oracle_metadata.",
+      "my_specification_error": "Choosing a near-saturated conditional metric as a REQUIRED promotion criterion was a protocol-design mistake, made by me before the run. The correct response is not to move the bar after seeing results -- that would destroy the value of predeclaring. The verdict stands as FAIL. A successor protocol must predeclare criteria with measurable headroom, and these numbers are then exploratory with respect to that successor.",
+      "not_a_claim_about": [
+        "promotion; the frozen bar was not met and is not being moved",
+        "the holdout partition, untouched",
+        "downstream HRM quality, not measured"
+      ],
+      "receipts": [
+        "evidence/gate_c2/chain_completion/chain_completion.json",
+        "evidence/gate_c2/chain_completion/RESULTS.sha256"
+      ],
+      "report": "configs/gate_c2c_protocol.json",
+      "status": "MEASURED_RECEIPTED",
+      "verdict": "FAIL_CHAIN_COMPLETION under the frozen protocol, on one criterion only",
+      "why_it_fails": "target_recall_given_identity_delta required >= +0.05. Measured: C1 +0.0144, C2 -0.0857, C3 -0.0143, C4 +0.0469. The reference already scored 0.96 on c2_cal_id and 0.80 on c2_cal_surface for that metric, so at most 0.20 of headroom existed and I still required +0.05 of it as a hard gate. C4 misses by 0.0031."
     }
   },
   "testing_policy": "Tests assert structured state, never exact strings against narrative prose. Three separate failures came from matching capitalisation in text written separately from the assertion; the pattern was wrong, not merely careless. Prose is rendered from state, and state is what is tested.",

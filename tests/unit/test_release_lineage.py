@@ -47,6 +47,7 @@ def test_research_status_declares_every_gate():
         "gate_c2_r_retrieval_coverage",
         "gate_c2_i_identity_resolution",
         "gate_c2_s_evidence_selection",
+        "gate_c2c_chain_completion",
         "gate_n1_natural_external_memory",
         "gate_d_conditional_retrieval_opportunity", "gate_e_learned_retrieval_control",
         "gate_f_recurrence_opportunity", "gate_g_adaptive_recurrence",
