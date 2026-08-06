@@ -270,3 +270,37 @@ def test_composer_is_byte_identical_to_the_gate_a_composer():
 
     empty_a = _asyncio.run(constructor.construct(task, StudyCondition.B0_NO_CONTEXT))
     assert compose_evidence_prompt(QUESTION, []) == empty_a.prompt
+
+
+def test_second_hop_survives_packing_when_pass_one_already_found_it():
+    """Regression: the packer silently dropped an already-retrieved second hop.
+
+    The record that resolves a bridge names the bridge, not the question's
+    subject, so anchoring on question entities alone discarded it — costing
+    9 of 500 tasks in the first Sprint 2 run while reporting the failure as
+    "bridge not detected".
+    """
+
+    records = corpus_records()
+    backend = CanonicalRetrievalBackend(CanonicalRetrievalMode.BM25, records)
+    # k large enough that pass one already returns both hops.
+    result = run(TwoPassRetriever(backend, k=10, followup_k=10).retrieve(QUESTION))
+    assert set(result.receipt.selected_ids) >= {"hop-1", "hop-2"}, (
+        "second hop was retrieved but dropped during selection"
+    )
+    assert result.report.verdict == SufficiencyVerdict.SUFFICIENT
+
+
+def test_linked_entities_are_exposed_for_anchoring():
+    state = build_evidence_state(
+        question=QUESTION, records=[view("a", HOP1, 1), view("b", HOP2, 2)],
+    )
+    assert "Adapter-78103" in state.linked_entities
+    assert state.bridge_entities == (), "a resolved link is no longer a bridge"
+    # A resolved link must still anchor selection.
+    selected, receipt = select_evidence(
+        [view("a", HOP1, 1), view("b", HOP2, 2)],
+        anchor_entities=tuple(set(state.required_entities) | set(state.linked_entities)),
+    )
+    assert {row.evidence_id for row in selected} == {"a", "b"}
+    assert receipt.dropped_unanchored_ids == ()

@@ -63,6 +63,7 @@ class EvidenceState:
     observed_entities: tuple[str, ...]
     missing_entities: tuple[str, ...]
     bridge_entities: tuple[str, ...]
+    linked_entities: tuple[str, ...]
     required_operands: tuple[str, ...]
     observed_operands: tuple[str, ...]
     answer_bearing_ids: tuple[str, ...]
@@ -146,6 +147,10 @@ def build_evidence_state(
         entity for entity in observed
         if entity in linked and support.get(entity, 0) < 2
     )
+    # Linked entities stay relevant even once they are resolved: the record
+    # that resolves a link mentions the link, not the question's subject, so
+    # anchoring on question entities alone would discard the second hop.
+    linked_entities = tuple(entity for entity in observed if entity in linked)
     operands = tuple(number for view in views for number in view.numbers)
     unique_ids = list(dict.fromkeys(view.evidence_id for view in views))
     # A record that mentions something the question asked about *and* states a
@@ -163,6 +168,7 @@ def build_evidence_state(
         observed_entities=observed,
         missing_entities=missing,
         bridge_entities=bridges,
+        linked_entities=linked_entities,
         required_operands=tuple(str(index) for index in range(required_operand_count)),
         observed_operands=operands,
         answer_bearing_ids=answer_bearing,

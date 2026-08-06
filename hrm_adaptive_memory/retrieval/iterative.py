@@ -151,8 +151,12 @@ class TwoPassRetriever:
         selection_receipt: SelectionReceipt | None = None
         selected = merged
         if select:
-            anchors = set(final_state.required_entities)
-            # An entity the follow-up resolved is now a legitimate anchor.
+            # Anchor on the question's entities *and* on entities the evidence
+            # links to them. The record that resolves a link names the link,
+            # not the question's subject, so anchoring on question entities
+            # alone silently discards the second hop even when pass one
+            # already retrieved it.
+            anchors = set(final_state.required_entities) | set(final_state.linked_entities)
             if followup is not None:
                 anchors |= set(followup.terms)
             selected, selection_receipt = select_evidence(
