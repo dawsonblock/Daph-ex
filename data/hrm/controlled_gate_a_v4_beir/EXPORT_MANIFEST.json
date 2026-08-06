@@ -1,0 +1,26 @@
+{
+  "beir_package_required": false,
+  "evaluator_only_file": "proof_ground_truth.jsonl",
+  "format": "beir-compatible",
+  "source": "data/hrm/controlled_gate_a_v4",
+  "splits": {
+    "development": {
+      "corpus_sha256": "62207b577dcd52e9a685a3676b1078ae10c3a6adb66e0694caba1a20bba5cd06",
+      "documents": 534,
+      "qrel_rows": 246,
+      "queries": 120
+    },
+    "ood": {
+      "corpus_sha256": "887b2307e2479281bfafe0b74480fda8ab2a2d7e09d5fee3d7c6682cfaebe86b",
+      "documents": 1233,
+      "qrel_rows": 639,
+      "queries": 250
+    },
+    "qualification": {
+      "corpus_sha256": "03fbb7497e2358028aa4e7f49822f024742b0584775769f0c73c00168f2f7627",
+      "documents": 2216,
+      "qrel_rows": 1028,
+      "queries": 500
+    }
+  }
+}

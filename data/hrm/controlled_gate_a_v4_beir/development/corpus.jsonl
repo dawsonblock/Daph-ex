@@ -1,0 +1,534 @@
+{"_id": "entity_attribute-0000/fact", "text": "During setup, Nimbus sensor array was paired with 1424 for assigned category.", "title": ""}
+{"_id": "entity_attribute-0001/fact", "text": "The assigned category registry records that Quail control module is assigned THETA-OLIVE.", "title": ""}
+{"_id": "entity_attribute-0001/identity", "text": "QCM-4 is the short code for Quail control module.", "title": ""}
+{"_id": "entity_attribute-0002/fact", "text": "Changelog: assigned category for Jacana pressure assembly set to suspended.", "title": ""}
+{"_id": "entity_attribute-0003/fact", "text": "Changelog: assigned category for Auk sensor array set to {\"grade\": \"quarantined\"}.", "title": ""}
+{"_id": "entity_attribute-0003/identity", "text": "ASA-2 is the short code for Auk sensor array.", "title": ""}
+{"_id": "entity_attribute-0004/fact", "text": "[assigned category] Curlew intake manifold -> 8563", "title": ""}
+{"_id": "entity_attribute-0005/fact", "text": "Note: the assigned category for Marlin sensor array resolves to ZETA-CORAL.", "title": ""}
+{"_id": "entity_attribute-0005/identity", "text": "Abbreviation table: MSA-5 = Marlin sensor array.", "title": ""}
+{"_id": "entity_attribute-0006/fact", "text": "Note: the assigned category for Pelican intake manifold resolves to accredited.", "title": ""}
+{"_id": "entity_attribute-0007/fact", "text": "- updated Raven control module: assigned category now {\"category\": \"quarantined\"}", "title": ""}
+{"_id": "entity_attribute-0007/identity", "text": "Abbreviation table: RCM-3 = Raven control module.", "title": ""}
+{"_id": "entity_attribute-0008/fact", "text": "Per the assigned category register, 3119 is allocated to Bluebird intake manifold.", "title": ""}
+{"_id": "entity_attribute-0009/fact", "text": "{\"subject\": \"Marlin pressure assembly\", \"assigned category\": \"THETA-OLIVE\"}", "title": ""}
+{"_id": "entity_attribute-0009/identity", "text": "In shorthand, Marlin pressure assembly is written MPA-5.", "title": ""}
+{"_id": "entity_attribute-0010/fact", "text": "Revision applied \u2014 Teal drive cluster assigned category changed to retired.", "title": ""}
+{"_id": "entity_attribute-0011/fact", "text": "Per the assigned category register, {\"state\": \"suspended\"} is allocated to Raven sensor array.", "title": ""}
+{"_id": "entity_attribute-0011/identity", "text": "In shorthand, Raven sensor array is written RSA-8.", "title": ""}
+{"_id": "ownership_chain-0000/link", "text": "The registered asset registry records that Sparrow intake manifold is assigned Finch control module.", "title": ""}
+{"_id": "ownership_chain-0000/value", "text": "- updated Finch control module: ownership tier now 3529", "title": ""}
+{"_id": "ownership_chain-0000/dead-end-0", "text": "{\"subject\": \"Sparrow intake manifold\", \"mounted monitor\": \"Ibis intake manifold\"}", "title": ""}
+{"_id": "ownership_chain-0000/dead-end-1", "text": "{\"subject\": \"Sparrow intake manifold\", \"spare enclosure\": \"Raven sensor array\"}", "title": ""}
+{"_id": "ownership_chain-0001/link", "text": "subject=Osprey relay unit; registered asset=Marlin pressure assembly", "title": ""}
+{"_id": "ownership_chain-0001/value", "text": "Note: the ownership tier for Marlin pressure assembly resolves to DELTA-AMBER.", "title": ""}
+{"_id": "ownership_chain-0001/identity", "text": "ORU-7 is the short code for Osprey relay unit.", "title": ""}
+{"_id": "ownership_chain-0001/dead-end-0", "text": "Revision applied \u2014 Osprey relay unit spare enclosure changed to Pelican control module.", "title": ""}
+{"_id": "ownership_chain-0001/dead-end-1", "text": "Revision applied \u2014 Osprey relay unit spare enclosure changed to Vireo pressure assembly.", "title": ""}
+{"_id": "ownership_chain-0002/link", "text": "subject=Pelican control module; registered asset=Marlin control module", "title": ""}
+{"_id": "ownership_chain-0002/value", "text": "- updated Marlin control module: ownership tier now suspended", "title": ""}
+{"_id": "ownership_chain-0002/dead-end-0", "text": "Engineering notes indicate Pelican control module uses Nimbus relay unit as its spare enclosure.", "title": ""}
+{"_id": "ownership_chain-0002/dead-end-1", "text": "Engineering notes indicate Pelican control module uses Teal control module as its mounted monitor.", "title": ""}
+{"_id": "ownership_chain-0002/rejected-0", "text": "Per the proposed ownership tier register, retired is allocated to Marlin control module. This proposal was rejected.", "title": ""}
+{"_id": "ownership_chain-0002/rejected-1", "text": "Revision applied \u2014 Marlin control module proposed ownership tier changed to quarantined. This proposal was rejected.", "title": ""}
+{"_id": "ownership_chain-0003/link", "text": "subject=Gannet relay unit; registered asset=Teal intake manifold", "title": ""}
+{"_id": "ownership_chain-0003/value", "text": "- updated Teal intake manifold: ownership tier now {\"grade\": \"quarantined\"}", "title": ""}
+{"_id": "ownership_chain-0003/identity", "text": "GRU-2 is the short code for Gannet relay unit.", "title": ""}
+{"_id": "ownership_chain-0003/dead-end-0", "text": "Per the mounted monitor register, Osprey control module is allocated to Gannet relay unit.", "title": ""}
+{"_id": "ownership_chain-0003/dead-end-1", "text": "Per the mounted monitor register, Ibis drive cluster is allocated to Gannet relay unit.", "title": ""}
+{"_id": "ownership_chain-0003/direct", "text": "[change] Gannet relay unit :: ownership tier := {\"grade\": \"quarantined\"}", "title": ""}
+{"_id": "ownership_chain-0004/link", "text": "- updated Dunlin relay unit: registered asset now Wren control module", "title": ""}
+{"_id": "ownership_chain-0004/value", "text": "Per the ownership tier register, 7362 is allocated to Wren control module.", "title": ""}
+{"_id": "ownership_chain-0004/dead-end-0", "text": "It is recorded in the mounted monitor registry that Dunlin relay unit holds Auk drive cluster.", "title": ""}
+{"_id": "ownership_chain-0004/dead-end-1", "text": "mounted monitor:\n  subject: Dunlin relay unit\n  value: Marlin intake manifold", "title": ""}
+{"_id": "ownership_chain-0005/link", "text": "[registered asset] Pelican control module -> Bluebird sensor array", "title": ""}
+{"_id": "ownership_chain-0005/value", "text": "{\"subject\": \"Bluebird sensor array\", \"ownership tier\": \"GAMMA-BLUE\"}", "title": ""}
+{"_id": "ownership_chain-0005/identity", "text": "Abbreviation table: PCM-8 = Pelican control module.", "title": ""}
+{"_id": "ownership_chain-0005/dead-end-0", "text": "It is recorded in the mounted monitor registry that Pelican control module holds Quail pressure assembly.", "title": ""}
+{"_id": "ownership_chain-0005/dead-end-1", "text": "[change] Pelican control module :: mounted monitor := Bittern intake manifold", "title": ""}
+{"_id": "ownership_chain-0006/link", "text": "- updated Ibis control module: registered asset now Teal drive cluster", "title": ""}
+{"_id": "ownership_chain-0006/value", "text": "{\"subject\": \"Teal drive cluster\", \"ownership tier\": \"retired\"}", "title": ""}
+{"_id": "ownership_chain-0006/dead-end-0", "text": "For Ibis control module, mounted monitor requires Bluebird intake manifold.", "title": ""}
+{"_id": "ownership_chain-0006/dead-end-1", "text": "[change] Ibis control module :: mounted monitor := Vireo intake manifold", "title": ""}
+{"_id": "ownership_chain-0006/rejected-0", "text": "For Teal drive cluster, proposed ownership tier requires suspended. This proposal was rejected.", "title": ""}
+{"_id": "ownership_chain-0006/rejected-1", "text": "[change] Teal drive cluster :: proposed ownership tier := provisional This proposal was rejected.", "title": ""}
+{"_id": "ownership_chain-0007/link", "text": "Note: the registered asset for Kestrel relay unit resolves to Osprey control module.", "title": ""}
+{"_id": "ownership_chain-0007/value", "text": "Engineering notes indicate Osprey control module uses {\"state\": \"provisional\"} as its ownership tier.", "title": ""}
+{"_id": "ownership_chain-0007/identity", "text": "Abbreviation table: KRU-7 = Kestrel relay unit.", "title": ""}
+{"_id": "ownership_chain-0007/dead-end-0", "text": "For Kestrel relay unit, mounted monitor requires Finch control module.", "title": ""}
+{"_id": "ownership_chain-0007/dead-end-1", "text": "spare enclosure:\n  subject: Kestrel relay unit\n  value: Teal control module", "title": ""}
+{"_id": "ownership_chain-0007/direct", "text": "The ownership tier registry records that Kestrel relay unit is assigned {\"state\": \"provisional\"}.", "title": ""}
+{"_id": "ownership_chain-0008/link", "text": "Engineering notes indicate Curlew pressure assembly uses Bluebird sensor array as its registered asset.", "title": ""}
+{"_id": "ownership_chain-0008/value", "text": "ownership tier:\n  subject: Bluebird sensor array\n  value: 9167", "title": ""}
+{"_id": "ownership_chain-0008/dead-end-0", "text": "During setup, Curlew pressure assembly was paired with Pelican control module for mounted monitor.", "title": ""}
+{"_id": "ownership_chain-0008/dead-end-1", "text": "subject=Curlew pressure assembly; mounted monitor=Finch sensor array", "title": ""}
+{"_id": "ownership_chain-0009/link", "text": "{\"subject\": \"Jacana drive cluster\", \"registered asset\": \"Heron intake manifold\"}", "title": ""}
+{"_id": "ownership_chain-0009/value", "text": "For Heron intake manifold, ownership tier requires ETA-INDIGO.", "title": ""}
+{"_id": "ownership_chain-0009/identity", "text": "In shorthand, Jacana drive cluster is written JDC-7.", "title": ""}
+{"_id": "ownership_chain-0009/dead-end-0", "text": "Changelog: spare enclosure for Jacana drive cluster set to Vireo control module.", "title": ""}
+{"_id": "ownership_chain-0009/dead-end-1", "text": "The spare enclosure registry records that Jacana drive cluster is assigned Nimbus control module.", "title": ""}
+{"_id": "ownership_chain-0010/link", "text": "{\"subject\": \"Bluebird drive cluster\", \"registered asset\": \"Osprey drive cluster\"}", "title": ""}
+{"_id": "ownership_chain-0010/value", "text": "[change] Osprey drive cluster :: ownership tier := accredited", "title": ""}
+{"_id": "ownership_chain-0010/dead-end-0", "text": "subject=Bluebird drive cluster; mounted monitor=Gannet relay unit", "title": ""}
+{"_id": "ownership_chain-0010/dead-end-1", "text": "Changelog: mounted monitor for Bluebird drive cluster set to Nimbus control module.", "title": ""}
+{"_id": "ownership_chain-0010/rejected-0", "text": "subject=Osprey drive cluster; proposed ownership tier=suspended This proposal was rejected.", "title": ""}
+{"_id": "ownership_chain-0010/rejected-1", "text": "The proposed ownership tier registry records that Osprey drive cluster is assigned quarantined. This proposal was rejected.", "title": ""}
+{"_id": "ownership_chain-0011/link", "text": "Per the registered asset register, Bluebird intake manifold is allocated to Nimbus intake manifold.", "title": ""}
+{"_id": "ownership_chain-0011/value", "text": "[change] Bluebird intake manifold :: ownership tier := {\"tier\": \"suspended\"}", "title": ""}
+{"_id": "ownership_chain-0011/identity", "text": "In shorthand, Nimbus intake manifold is written NIM-4.", "title": ""}
+{"_id": "ownership_chain-0011/dead-end-0", "text": "Changelog: mounted monitor for Nimbus intake manifold set to Teal relay unit.", "title": ""}
+{"_id": "ownership_chain-0011/dead-end-1", "text": "subject=Nimbus intake manifold; mounted monitor=Wren drive cluster", "title": ""}
+{"_id": "ownership_chain-0011/direct", "text": "Registry entry: Nimbus intake manifold \u2014 ownership tier \u2014 {\"tier\": \"suspended\"}.", "title": ""}
+{"_id": "configuration_chain-0000/link", "text": "Changelog: active configuration for Ibis relay unit set to Auk relay unit.", "title": ""}
+{"_id": "configuration_chain-0000/value", "text": "- updated Auk relay unit: parameter grade now 1101", "title": ""}
+{"_id": "configuration_chain-0000/dead-end-0", "text": "Revision applied \u2014 Ibis relay unit spare enclosure changed to Osprey relay unit.", "title": ""}
+{"_id": "configuration_chain-0000/dead-end-1", "text": "{\"subject\": \"Ibis relay unit\", \"mounted monitor\": \"Pelican drive cluster\"}", "title": ""}
+{"_id": "configuration_chain-0001/link", "text": "subject=Osprey drive cluster; active configuration=Dunlin pressure assembly", "title": ""}
+{"_id": "configuration_chain-0001/value", "text": "[parameter grade] Dunlin pressure assembly -> THETA-OLIVE", "title": ""}
+{"_id": "configuration_chain-0001/identity", "text": "ODC-6 is the short code for Osprey drive cluster.", "title": ""}
+{"_id": "configuration_chain-0001/dead-end-0", "text": "Revision applied \u2014 Osprey drive cluster mounted monitor changed to Curlew control module.", "title": ""}
+{"_id": "configuration_chain-0001/dead-end-1", "text": "{\"subject\": \"Osprey drive cluster\", \"mounted monitor\": \"Nimbus relay unit\"}", "title": ""}
+{"_id": "configuration_chain-0002/link", "text": "subject=Curlew sensor array; active configuration=Marlin intake manifold", "title": ""}
+{"_id": "configuration_chain-0002/value", "text": "Registry entry: Marlin intake manifold \u2014 parameter grade \u2014 accredited.", "title": ""}
+{"_id": "configuration_chain-0002/dead-end-0", "text": "Per the spare enclosure register, Finch drive cluster is allocated to Curlew sensor array.", "title": ""}
+{"_id": "configuration_chain-0002/dead-end-1", "text": "Engineering notes indicate Curlew sensor array uses Egret intake manifold as its mounted monitor.", "title": ""}
+{"_id": "configuration_chain-0002/rejected-0", "text": "{\"subject\": \"Marlin intake manifold\", \"proposed parameter grade\": \"suspended\"} This proposal was rejected.", "title": ""}
+{"_id": "configuration_chain-0002/rejected-1", "text": "Per the proposed parameter grade register, retired is allocated to Marlin intake manifold. This proposal was rejected.", "title": ""}
+{"_id": "configuration_chain-0003/link", "text": "subject=Marlin control module; active configuration=Curlew relay unit", "title": ""}
+{"_id": "configuration_chain-0003/value", "text": "Note: the parameter grade for Curlew relay unit resolves to {\"state\": \"suspended\"}.", "title": ""}
+{"_id": "configuration_chain-0003/identity", "text": "MCM-5 is the short code for Marlin control module.", "title": ""}
+{"_id": "configuration_chain-0003/dead-end-0", "text": "Engineering notes indicate Marlin control module uses Kestrel pressure assembly as its mounted monitor.", "title": ""}
+{"_id": "configuration_chain-0003/dead-end-1", "text": "Revision applied \u2014 Marlin control module mounted monitor changed to Raven intake manifold.", "title": ""}
+{"_id": "configuration_chain-0003/direct", "text": "It is recorded in the parameter grade registry that Marlin control module holds {\"state\": \"suspended\"}.", "title": ""}
+{"_id": "configuration_chain-0004/link", "text": "[active configuration] Kestrel drive cluster -> Ibis intake manifold", "title": ""}
+{"_id": "configuration_chain-0004/value", "text": "{\"subject\": \"Ibis intake manifold\", \"parameter grade\": \"7863\"}", "title": ""}
+{"_id": "configuration_chain-0004/dead-end-0", "text": "[change] Kestrel drive cluster :: spare enclosure := Osprey control module", "title": ""}
+{"_id": "configuration_chain-0004/dead-end-1", "text": "spare enclosure:\n  subject: Kestrel drive cluster\n  value: Finch relay unit", "title": ""}
+{"_id": "configuration_chain-0005/link", "text": "- updated Finch relay unit: active configuration now Heron relay unit", "title": ""}
+{"_id": "configuration_chain-0005/value", "text": "Engineering notes indicate Heron relay unit uses ALPHA-RED as its parameter grade.", "title": ""}
+{"_id": "configuration_chain-0005/identity", "text": "Abbreviation table: FRU-4 = Finch relay unit.", "title": ""}
+{"_id": "configuration_chain-0005/dead-end-0", "text": "For Finch relay unit, mounted monitor requires Nimbus relay unit.", "title": ""}
+{"_id": "configuration_chain-0005/dead-end-1", "text": "spare enclosure:\n  subject: Finch relay unit\n  value: Gannet intake manifold", "title": ""}
+{"_id": "configuration_chain-0006/link", "text": "[active configuration] Bluebird sensor array -> Vireo intake manifold", "title": ""}
+{"_id": "configuration_chain-0006/value", "text": "Per the parameter grade register, provisional is allocated to Vireo intake manifold.", "title": ""}
+{"_id": "configuration_chain-0006/dead-end-0", "text": "It is recorded in the spare enclosure registry that Bluebird sensor array holds Kestrel control module.", "title": ""}
+{"_id": "configuration_chain-0006/dead-end-1", "text": "For Bluebird sensor array, spare enclosure requires Quail relay unit.", "title": ""}
+{"_id": "configuration_chain-0006/rejected-0", "text": "proposed parameter grade:\n  subject: Vireo intake manifold\n  value: suspended This proposal was rejected.", "title": ""}
+{"_id": "configuration_chain-0006/rejected-1", "text": "proposed parameter grade:\n  subject: Vireo intake manifold\n  value: retired This proposal was rejected.", "title": ""}
+{"_id": "configuration_chain-0007/link", "text": "Registry entry: Dunlin drive cluster \u2014 active configuration \u2014 Bluebird control module.", "title": ""}
+{"_id": "configuration_chain-0007/value", "text": "{\"subject\": \"Bluebird control module\", \"parameter grade\": \"{\"grade\": \"provisional\"}\"}", "title": ""}
+{"_id": "configuration_chain-0007/identity", "text": "Abbreviation table: DDC-8 = Dunlin drive cluster.", "title": ""}
+{"_id": "configuration_chain-0007/dead-end-0", "text": "mounted monitor:\n  subject: Dunlin drive cluster\n  value: Pelican drive cluster", "title": ""}
+{"_id": "configuration_chain-0007/dead-end-1", "text": "For Dunlin drive cluster, mounted monitor requires Ibis control module.", "title": ""}
+{"_id": "configuration_chain-0007/direct", "text": "Changelog: parameter grade for Dunlin drive cluster set to {\"grade\": \"provisional\"}.", "title": ""}
+{"_id": "configuration_chain-0008/link", "text": "Engineering notes indicate Osprey sensor array uses Sparrow relay unit as its active configuration.", "title": ""}
+{"_id": "configuration_chain-0008/value", "text": "It is recorded in the parameter grade registry that Sparrow relay unit holds 8120.", "title": ""}
+{"_id": "configuration_chain-0008/dead-end-0", "text": "Changelog: mounted monitor for Osprey sensor array set to Egret intake manifold.", "title": ""}
+{"_id": "configuration_chain-0008/dead-end-1", "text": "subject=Osprey sensor array; mounted monitor=Auk control module", "title": ""}
+{"_id": "configuration_chain-0009/link", "text": "Engineering notes indicate Pelican control module uses Sparrow control module as its active configuration.", "title": ""}
+{"_id": "configuration_chain-0009/value", "text": "parameter grade:\n  subject: Sparrow control module\n  value: GAMMA-BLUE", "title": ""}
+{"_id": "configuration_chain-0009/identity", "text": "In shorthand, Pelican control module is written PCM-4.", "title": ""}
+{"_id": "configuration_chain-0009/dead-end-0", "text": "During setup, Pelican control module was paired with Kestrel intake manifold for spare enclosure.", "title": ""}
+{"_id": "configuration_chain-0009/dead-end-1", "text": "Changelog: spare enclosure for Pelican control module set to Jacana intake manifold.", "title": ""}
+{"_id": "configuration_chain-0010/link", "text": "Per the active configuration register, Raven pressure assembly is allocated to Finch pressure assembly.", "title": ""}
+{"_id": "configuration_chain-0010/value", "text": "[change] Raven pressure assembly :: parameter grade := provisional", "title": ""}
+{"_id": "configuration_chain-0010/dead-end-0", "text": "During setup, Finch pressure assembly was paired with Wren intake manifold for spare enclosure.", "title": ""}
+{"_id": "configuration_chain-0010/dead-end-1", "text": "subject=Finch pressure assembly; spare enclosure=Osprey sensor array", "title": ""}
+{"_id": "configuration_chain-0010/rejected-0", "text": "During setup, Raven pressure assembly was paired with accredited for proposed parameter grade. This proposal was rejected.", "title": ""}
+{"_id": "configuration_chain-0010/rejected-1", "text": "Changelog: proposed parameter grade for Raven pressure assembly set to suspended. This proposal was rejected.", "title": ""}
+{"_id": "configuration_chain-0011/link", "text": "Per the active configuration register, Heron sensor array is allocated to Wren intake manifold.", "title": ""}
+{"_id": "configuration_chain-0011/value", "text": "For Heron sensor array, parameter grade requires {\"category\": \"accredited\"}.", "title": ""}
+{"_id": "configuration_chain-0011/identity", "text": "In shorthand, Wren intake manifold is written WIM-5.", "title": ""}
+{"_id": "configuration_chain-0011/dead-end-0", "text": "The mounted monitor registry records that Wren intake manifold is assigned Jacana drive cluster.", "title": ""}
+{"_id": "configuration_chain-0011/dead-end-1", "text": "During setup, Wren intake manifold was paired with Gannet pressure assembly for mounted monitor.", "title": ""}
+{"_id": "configuration_chain-0011/direct", "text": "- updated Wren intake manifold: parameter grade now {\"category\": \"accredited\"}", "title": ""}
+{"_id": "dependency_chain-0000/link", "text": "Changelog: required dependency for Sparrow pressure assembly set to Ibis sensor array.", "title": ""}
+{"_id": "dependency_chain-0000/value", "text": "Registry entry: Ibis sensor array \u2014 release channel \u2014 6392.", "title": ""}
+{"_id": "dependency_chain-0000/dead-end-0", "text": "Revision applied \u2014 Sparrow pressure assembly spare enclosure changed to Marlin control module.", "title": ""}
+{"_id": "dependency_chain-0000/dead-end-1", "text": "Engineering notes indicate Sparrow pressure assembly uses Dunlin drive cluster as its mounted monitor.", "title": ""}
+{"_id": "dependency_chain-0001/link", "text": "During setup, Ibis control module was paired with Auk drive cluster for required dependency.", "title": ""}
+{"_id": "dependency_chain-0001/value", "text": "[release channel] Auk drive cluster -> BETA-GREEN", "title": ""}
+{"_id": "dependency_chain-0001/identity", "text": "ICM-8 is the short code for Ibis control module.", "title": ""}
+{"_id": "dependency_chain-0001/dead-end-0", "text": "Revision applied \u2014 Ibis control module mounted monitor changed to Bittern control module.", "title": ""}
+{"_id": "dependency_chain-0001/dead-end-1", "text": "Engineering notes indicate Ibis control module uses Finch sensor array as its spare enclosure.", "title": ""}
+{"_id": "dependency_chain-0002/link", "text": "Changelog: required dependency for Vireo control module set to Nimbus intake manifold.", "title": ""}
+{"_id": "dependency_chain-0002/value", "text": "Note: the release channel for Nimbus intake manifold resolves to suspended.", "title": ""}
+{"_id": "dependency_chain-0002/dead-end-0", "text": "{\"subject\": \"Vireo control module\", \"spare enclosure\": \"Finch drive cluster\"}", "title": ""}
+{"_id": "dependency_chain-0002/dead-end-1", "text": "{\"subject\": \"Vireo control module\", \"spare enclosure\": \"Bittern sensor array\"}", "title": ""}
+{"_id": "dependency_chain-0002/rejected-0", "text": "Per the proposed release channel register, accredited is allocated to Nimbus intake manifold. This proposal was rejected.", "title": ""}
+{"_id": "dependency_chain-0002/rejected-1", "text": "Revision applied \u2014 Nimbus intake manifold proposed release channel changed to quarantined. This proposal was rejected.", "title": ""}
+{"_id": "dependency_chain-0003/link", "text": "subject=Ibis drive cluster; required dependency=Pelican pressure assembly", "title": ""}
+{"_id": "dependency_chain-0003/value", "text": "- updated Pelican pressure assembly: release channel now {\"grade\": \"quarantined\"}", "title": ""}
+{"_id": "dependency_chain-0003/identity", "text": "IDC-7 is the short code for Ibis drive cluster.", "title": ""}
+{"_id": "dependency_chain-0003/dead-end-0", "text": "{\"subject\": \"Ibis drive cluster\", \"spare enclosure\": \"Gannet drive cluster\"}", "title": ""}
+{"_id": "dependency_chain-0003/dead-end-1", "text": "Revision applied \u2014 Ibis drive cluster spare enclosure changed to Nimbus control module.", "title": ""}
+{"_id": "dependency_chain-0003/direct", "text": "For Ibis drive cluster, release channel requires {\"grade\": \"quarantined\"}.", "title": ""}
+{"_id": "dependency_chain-0004/link", "text": "- updated Osprey intake manifold: required dependency now Jacana pressure assembly", "title": ""}
+{"_id": "dependency_chain-0004/value", "text": "Per the release channel register, 8457 is allocated to Jacana pressure assembly.", "title": ""}
+{"_id": "dependency_chain-0004/dead-end-0", "text": "For Osprey intake manifold, spare enclosure requires Pelican sensor array.", "title": ""}
+{"_id": "dependency_chain-0004/dead-end-1", "text": "spare enclosure:\n  subject: Osprey intake manifold\n  value: Bittern intake manifold", "title": ""}
+{"_id": "dependency_chain-0005/link", "text": "Registry entry: Wren pressure assembly \u2014 required dependency \u2014 Bluebird sensor array.", "title": ""}
+{"_id": "dependency_chain-0005/value", "text": "{\"subject\": \"Bluebird sensor array\", \"release channel\": \"DELTA-AMBER\"}", "title": ""}
+{"_id": "dependency_chain-0005/identity", "text": "Abbreviation table: WPA-6 = Wren pressure assembly.", "title": ""}
+{"_id": "dependency_chain-0005/dead-end-0", "text": "For Wren pressure assembly, spare enclosure requires Bittern drive cluster.", "title": ""}
+{"_id": "dependency_chain-0005/dead-end-1", "text": "[change] Wren pressure assembly :: spare enclosure := Pelican pressure assembly", "title": ""}
+{"_id": "dependency_chain-0006/link", "text": "[required dependency] Nimbus sensor array -> Egret drive cluster", "title": ""}
+{"_id": "dependency_chain-0006/value", "text": "Revision applied \u2014 Egret drive cluster release channel changed to accredited.", "title": ""}
+{"_id": "dependency_chain-0006/dead-end-0", "text": "spare enclosure:\n  subject: Nimbus sensor array\n  value: Pelican control module", "title": ""}
+{"_id": "dependency_chain-0006/dead-end-1", "text": "It is recorded in the spare enclosure registry that Nimbus sensor array holds Auk relay unit.", "title": ""}
+{"_id": "dependency_chain-0006/rejected-0", "text": "[change] Egret drive cluster :: proposed release channel := suspended This proposal was rejected.", "title": ""}
+{"_id": "dependency_chain-0006/rejected-1", "text": "It is recorded in the proposed release channel registry that Egret drive cluster holds quarantined. This proposal was rejected.", "title": ""}
+{"_id": "dependency_chain-0007/link", "text": "Registry entry: Kestrel pressure assembly \u2014 required dependency \u2014 Pelican intake manifold.", "title": ""}
+{"_id": "dependency_chain-0007/value", "text": "{\"subject\": \"Pelican intake manifold\", \"release channel\": \"{\"category\": \"provisional\"}\"}", "title": ""}
+{"_id": "dependency_chain-0007/identity", "text": "Abbreviation table: KPA-1 = Kestrel pressure assembly.", "title": ""}
+{"_id": "dependency_chain-0007/dead-end-0", "text": "spare enclosure:\n  subject: Kestrel pressure assembly\n  value: Osprey relay unit", "title": ""}
+{"_id": "dependency_chain-0007/dead-end-1", "text": "[change] Kestrel pressure assembly :: spare enclosure := Teal sensor array", "title": ""}
+{"_id": "dependency_chain-0007/direct", "text": "During setup, Kestrel pressure assembly was paired with {\"category\": \"provisional\"} for release channel.", "title": ""}
+{"_id": "dependency_chain-0008/link", "text": "Revision applied \u2014 Finch relay unit required dependency changed to Kestrel intake manifold.", "title": ""}
+{"_id": "dependency_chain-0008/value", "text": "For Kestrel intake manifold, release channel requires 7729.", "title": ""}
+{"_id": "dependency_chain-0008/dead-end-0", "text": "Changelog: spare enclosure for Finch relay unit set to Bittern intake manifold.", "title": ""}
+{"_id": "dependency_chain-0008/dead-end-1", "text": "subject=Finch relay unit; mounted monitor=Curlew intake manifold", "title": ""}
+{"_id": "dependency_chain-0009/link", "text": "Per the required dependency register, Curlew intake manifold is allocated to Jacana control module.", "title": ""}
+{"_id": "dependency_chain-0009/value", "text": "It is recorded in the release channel registry that Curlew intake manifold holds GAMMA-BLUE.", "title": ""}
+{"_id": "dependency_chain-0009/identity", "text": "In shorthand, Jacana control module is written JCM-8.", "title": ""}
+{"_id": "dependency_chain-0009/dead-end-0", "text": "Changelog: mounted monitor for Jacana control module set to Auk control module.", "title": ""}
+{"_id": "dependency_chain-0009/dead-end-1", "text": "The mounted monitor registry records that Jacana control module is assigned Nimbus control module.", "title": ""}
+{"_id": "dependency_chain-0010/link", "text": "Per the required dependency register, Bittern drive cluster is allocated to Heron control module.", "title": ""}
+{"_id": "dependency_chain-0010/value", "text": "For Bittern drive cluster, release channel requires quarantined.", "title": ""}
+{"_id": "dependency_chain-0010/dead-end-0", "text": "During setup, Heron control module was paired with Curlew control module for mounted monitor.", "title": ""}
+{"_id": "dependency_chain-0010/dead-end-1", "text": "subject=Heron control module; mounted monitor=Wren control module", "title": ""}
+{"_id": "dependency_chain-0010/rejected-0", "text": "The proposed release channel registry records that Bittern drive cluster is assigned retired. This proposal was rejected.", "title": ""}
+{"_id": "dependency_chain-0010/rejected-1", "text": "During setup, Bittern drive cluster was paired with suspended for proposed release channel. This proposal was rejected.", "title": ""}
+{"_id": "dependency_chain-0011/link", "text": "Engineering notes indicate Osprey control module uses Bittern pressure assembly as its required dependency.", "title": ""}
+{"_id": "dependency_chain-0011/value", "text": "release channel:\n  subject: Bittern pressure assembly\n  value: {\"state\": \"accredited\"}", "title": ""}
+{"_id": "dependency_chain-0011/identity", "text": "In shorthand, Osprey control module is written OCM-3.", "title": ""}
+{"_id": "dependency_chain-0011/dead-end-0", "text": "The spare enclosure registry records that Osprey control module is assigned Gannet relay unit.", "title": ""}
+{"_id": "dependency_chain-0011/dead-end-1", "text": "Changelog: mounted monitor for Osprey control module set to Bluebird pressure assembly.", "title": ""}
+{"_id": "dependency_chain-0011/direct", "text": "[release channel] Osprey control module -> {\"state\": \"accredited\"}", "title": ""}
+{"_id": "location_chain-0000/link", "text": "The hosting venue registry records that Pelican relay unit is assigned Gannet pressure assembly.", "title": ""}
+{"_id": "location_chain-0000/value", "text": "- updated Gannet pressure assembly: service region now 4305", "title": ""}
+{"_id": "location_chain-0000/dead-end-0", "text": "{\"subject\": \"Pelican relay unit\", \"mounted monitor\": \"Sparrow drive cluster\"}", "title": ""}
+{"_id": "location_chain-0000/dead-end-1", "text": "Engineering notes indicate Pelican relay unit uses Teal intake manifold as its spare enclosure.", "title": ""}
+{"_id": "location_chain-0001/link", "text": "subject=Gannet relay unit; hosting venue=Egret sensor array", "title": ""}
+{"_id": "location_chain-0001/value", "text": "Registry entry: Egret sensor array \u2014 service region \u2014 THETA-OLIVE.", "title": ""}
+{"_id": "location_chain-0001/identity", "text": "GRU-6 is the short code for Gannet relay unit.", "title": ""}
+{"_id": "location_chain-0001/dead-end-0", "text": "Engineering notes indicate Gannet relay unit uses Vireo drive cluster as its mounted monitor.", "title": ""}
+{"_id": "location_chain-0001/dead-end-1", "text": "Per the mounted monitor register, Pelican sensor array is allocated to Gannet relay unit.", "title": ""}
+{"_id": "location_chain-0002/link", "text": "subject=Wren relay unit; hosting venue=Bittern drive cluster", "title": ""}
+{"_id": "location_chain-0002/value", "text": "Note: the service region for Bittern drive cluster resolves to provisional.", "title": ""}
+{"_id": "location_chain-0002/dead-end-0", "text": "Revision applied \u2014 Wren relay unit spare enclosure changed to Kestrel relay unit.", "title": ""}
+{"_id": "location_chain-0002/dead-end-1", "text": "Engineering notes indicate Wren relay unit uses Jacana intake manifold as its spare enclosure.", "title": ""}
+{"_id": "location_chain-0002/rejected-0", "text": "Per the proposed service region register, accredited is allocated to Bittern drive cluster. This proposal was rejected.", "title": ""}
+{"_id": "location_chain-0002/rejected-1", "text": "Engineering notes indicate Bittern drive cluster uses retired as its proposed service region. This proposal was rejected.", "title": ""}
+{"_id": "location_chain-0003/link", "text": "The hosting venue registry records that Wren sensor array is assigned Heron pressure assembly.", "title": ""}
+{"_id": "location_chain-0003/value", "text": "Note: the service region for Heron pressure assembly resolves to {\"grade\": \"provisional\"}.", "title": ""}
+{"_id": "location_chain-0003/identity", "text": "WSA-5 is the short code for Wren sensor array.", "title": ""}
+{"_id": "location_chain-0003/dead-end-0", "text": "Revision applied \u2014 Wren sensor array mounted monitor changed to Auk pressure assembly.", "title": ""}
+{"_id": "location_chain-0003/dead-end-1", "text": "{\"subject\": \"Wren sensor array\", \"mounted monitor\": \"Bittern drive cluster\"}", "title": ""}
+{"_id": "location_chain-0003/direct", "text": "[change] Wren sensor array :: service region := {\"grade\": \"provisional\"}", "title": ""}
+{"_id": "location_chain-0004/link", "text": "Note: the hosting venue for Pelican sensor array resolves to Raven drive cluster.", "title": ""}
+{"_id": "location_chain-0004/value", "text": "Engineering notes indicate Raven drive cluster uses 7730 as its service region.", "title": ""}
+{"_id": "location_chain-0004/dead-end-0", "text": "mounted monitor:\n  subject: Pelican sensor array\n  value: Teal relay unit", "title": ""}
+{"_id": "location_chain-0004/dead-end-1", "text": "mounted monitor:\n  subject: Pelican sensor array\n  value: Osprey intake manifold", "title": ""}
+{"_id": "location_chain-0005/link", "text": "Note: the hosting venue for Sparrow control module resolves to Bluebird intake manifold.", "title": ""}
+{"_id": "location_chain-0005/value", "text": "{\"subject\": \"Bluebird intake manifold\", \"service region\": \"EPSILON-SLATE\"}", "title": ""}
+{"_id": "location_chain-0005/identity", "text": "Abbreviation table: SCM-1 = Sparrow control module.", "title": ""}
+{"_id": "location_chain-0005/dead-end-0", "text": "It is recorded in the mounted monitor registry that Sparrow control module holds Wren relay unit.", "title": ""}
+{"_id": "location_chain-0005/dead-end-1", "text": "mounted monitor:\n  subject: Sparrow control module\n  value: Kestrel drive cluster", "title": ""}
+{"_id": "location_chain-0006/link", "text": "[hosting venue] Pelican sensor array -> Quail control module", "title": ""}
+{"_id": "location_chain-0006/value", "text": "{\"subject\": \"Quail control module\", \"service region\": \"provisional\"}", "title": ""}
+{"_id": "location_chain-0006/dead-end-0", "text": "mounted monitor:\n  subject: Pelican sensor array\n  value: Finch sensor array", "title": ""}
+{"_id": "location_chain-0006/dead-end-1", "text": "mounted monitor:\n  subject: Pelican sensor array\n  value: Marlin control module", "title": ""}
+{"_id": "location_chain-0006/rejected-0", "text": "proposed service region:\n  subject: Quail control module\n  value: accredited This proposal was rejected.", "title": ""}
+{"_id": "location_chain-0006/rejected-1", "text": "It is recorded in the proposed service region registry that Quail control module holds suspended. This proposal was rejected.", "title": ""}
+{"_id": "location_chain-0007/link", "text": "Note: the hosting venue for Quail drive cluster resolves to Kestrel sensor array.", "title": ""}
+{"_id": "location_chain-0007/value", "text": "{\"subject\": \"Kestrel sensor array\", \"service region\": \"{\"grade\": \"retired\"}\"}", "title": ""}
+{"_id": "location_chain-0007/identity", "text": "Abbreviation table: QDC-6 = Quail drive cluster.", "title": ""}
+{"_id": "location_chain-0007/dead-end-0", "text": "spare enclosure:\n  subject: Quail drive cluster\n  value: Auk control module", "title": ""}
+{"_id": "location_chain-0007/dead-end-1", "text": "It is recorded in the mounted monitor registry that Quail drive cluster holds Marlin control module.", "title": ""}
+{"_id": "location_chain-0007/direct", "text": "Changelog: service region for Quail drive cluster set to {\"grade\": \"retired\"}.", "title": ""}
+{"_id": "location_chain-0008/link", "text": "Engineering notes indicate Heron relay unit uses Bittern relay unit as its hosting venue.", "title": ""}
+{"_id": "location_chain-0008/value", "text": "For Bittern relay unit, service region requires 1101.", "title": ""}
+{"_id": "location_chain-0008/dead-end-0", "text": "The spare enclosure registry records that Heron relay unit is assigned Raven relay unit.", "title": ""}
+{"_id": "location_chain-0008/dead-end-1", "text": "During setup, Heron relay unit was paired with Teal pressure assembly for spare enclosure.", "title": ""}
+{"_id": "location_chain-0009/link", "text": "Engineering notes indicate Heron relay unit uses Auk relay unit as its hosting venue.", "title": ""}
+{"_id": "location_chain-0009/value", "text": "[change] Auk relay unit :: service region := GAMMA-BLUE", "title": ""}
+{"_id": "location_chain-0009/identity", "text": "In shorthand, Heron relay unit is written HRU-2.", "title": ""}
+{"_id": "location_chain-0009/dead-end-0", "text": "subject=Heron relay unit; spare enclosure=Egret control module", "title": ""}
+{"_id": "location_chain-0009/dead-end-1", "text": "subject=Heron relay unit; mounted monitor=Kestrel drive cluster", "title": ""}
+{"_id": "location_chain-0010/link", "text": "Engineering notes indicate Dunlin drive cluster uses Egret relay unit as its hosting venue.", "title": ""}
+{"_id": "location_chain-0010/value", "text": "For Egret relay unit, service region requires provisional.", "title": ""}
+{"_id": "location_chain-0010/dead-end-0", "text": "During setup, Dunlin drive cluster was paired with Kestrel pressure assembly for spare enclosure.", "title": ""}
+{"_id": "location_chain-0010/dead-end-1", "text": "During setup, Dunlin drive cluster was paired with Teal relay unit for mounted monitor.", "title": ""}
+{"_id": "location_chain-0010/rejected-0", "text": "During setup, Egret relay unit was paired with suspended for proposed service region. This proposal was rejected.", "title": ""}
+{"_id": "location_chain-0010/rejected-1", "text": "subject=Egret relay unit; proposed service region=accredited This proposal was rejected.", "title": ""}
+{"_id": "location_chain-0011/link", "text": "Engineering notes indicate Gannet control module uses Vireo control module as its hosting venue.", "title": ""}
+{"_id": "location_chain-0011/value", "text": "service region:\n  subject: Vireo control module\n  value: {\"grade\": \"retired\"}", "title": ""}
+{"_id": "location_chain-0011/identity", "text": "In shorthand, Gannet control module is written GCM-8.", "title": ""}
+{"_id": "location_chain-0011/dead-end-0", "text": "Changelog: mounted monitor for Gannet control module set to Quail sensor array.", "title": ""}
+{"_id": "location_chain-0011/dead-end-1", "text": "Changelog: spare enclosure for Gannet control module set to Finch drive cluster.", "title": ""}
+{"_id": "location_chain-0011/direct", "text": "[service region] Gannet control module -> {\"grade\": \"retired\"}", "title": ""}
+{"_id": "temporal_chain-0000/link", "text": "The assigned unit registry records that Curlew relay unit is assigned Kestrel relay unit.", "title": ""}
+{"_id": "temporal_chain-0000/current", "text": "Revision 2 (effective 2031-06-01) supersedes revision 1: subject=Kestrel relay unit; operating tier=9088", "title": ""}
+{"_id": "temporal_chain-0000/superseded", "text": "Revision 1 (effective 2030-01-01, since superseded) recorded: The operating tier registry records that Kestrel relay unit is assigned 5267.", "title": ""}
+{"_id": "temporal_chain-0001/link", "text": "subject=Kestrel relay unit; assigned unit=Osprey drive cluster", "title": ""}
+{"_id": "temporal_chain-0001/current", "text": "Revision 2 (effective 2031-06-01) supersedes revision 1: Changelog: operating tier for Osprey drive cluster set to ZETA-CORAL.", "title": ""}
+{"_id": "temporal_chain-0001/superseded", "text": "Revision 1 (effective 2030-01-01, since superseded) recorded: During setup, Osprey drive cluster was paired with EPSILON-SLATE for operating tier.", "title": ""}
+{"_id": "temporal_chain-0001/identity", "text": "KRU-7 is the short code for Kestrel relay unit.", "title": ""}
+{"_id": "temporal_chain-0002/link", "text": "Changelog: assigned unit for Quail relay unit set to Marlin intake manifold.", "title": ""}
+{"_id": "temporal_chain-0002/current", "text": "Revision 2 (effective 2031-06-01) supersedes revision 1: subject=Marlin intake manifold; operating tier=suspended", "title": ""}
+{"_id": "temporal_chain-0002/superseded", "text": "Revision 1 (effective 2030-01-01, since superseded) recorded: Changelog: operating tier for Marlin intake manifold set to retired.", "title": ""}
+{"_id": "temporal_chain-0003/link", "text": "Changelog: assigned unit for Sparrow pressure assembly set to Jacana intake manifold.", "title": ""}
+{"_id": "temporal_chain-0003/current", "text": "Revision 2 (effective 2031-06-01) supersedes revision 1: During setup, Jacana intake manifold was paired with false for operating tier.", "title": ""}
+{"_id": "temporal_chain-0003/superseded", "text": "Revision 1 (effective 2030-01-01, since superseded) recorded: subject=Jacana intake manifold; operating tier=true", "title": ""}
+{"_id": "temporal_chain-0003/identity", "text": "SPA-3 is the short code for Sparrow pressure assembly.", "title": ""}
+{"_id": "temporal_chain-0004/link", "text": "Note: the assigned unit for Pelican relay unit resolves to Finch sensor array.", "title": ""}
+{"_id": "temporal_chain-0004/current", "text": "Revision 2 (effective 2031-06-01) supersedes revision 1: - updated Finch sensor array: operating tier now {\"tier\": \"provisional\"}", "title": ""}
+{"_id": "temporal_chain-0004/superseded", "text": "Revision 1 (effective 2030-01-01, since superseded) recorded: - updated Finch sensor array: operating tier now {\"grade\": \"retired\"}", "title": ""}
+{"_id": "temporal_chain-0005/link", "text": "- updated Teal pressure assembly: assigned unit now Raven drive cluster", "title": ""}
+{"_id": "temporal_chain-0005/current", "text": "Revision 2 (effective 2031-06-01) supersedes revision 1: [operating tier] Raven drive cluster -> 8249", "title": ""}
+{"_id": "temporal_chain-0005/superseded", "text": "Revision 1 (effective 2030-01-01, since superseded) recorded: - updated Raven drive cluster: operating tier now 9976", "title": ""}
+{"_id": "temporal_chain-0005/identity", "text": "Abbreviation table: TPA-2 = Teal pressure assembly.", "title": ""}
+{"_id": "temporal_chain-0006/link", "text": "[assigned unit] Kestrel sensor array -> Auk intake manifold", "title": ""}
+{"_id": "temporal_chain-0006/current", "text": "Revision 2 (effective 2031-06-01) supersedes revision 1: Registry entry: Auk intake manifold \u2014 operating tier \u2014 ZETA-CORAL.", "title": ""}
+{"_id": "temporal_chain-0006/superseded", "text": "Revision 1 (effective 2030-01-01, since superseded) recorded: [operating tier] Auk intake manifold -> GAMMA-BLUE", "title": ""}
+{"_id": "temporal_chain-0007/link", "text": "- updated Jacana sensor array: assigned unit now Egret drive cluster", "title": ""}
+{"_id": "temporal_chain-0007/current", "text": "Revision 2 (effective 2031-06-01) supersedes revision 1: [operating tier] Egret drive cluster -> accredited", "title": ""}
+{"_id": "temporal_chain-0007/superseded", "text": "Revision 1 (effective 2030-01-01, since superseded) recorded: Note: the operating tier for Egret drive cluster resolves to quarantined.", "title": ""}
+{"_id": "temporal_chain-0007/identity", "text": "Abbreviation table: JSA-8 = Jacana sensor array.", "title": ""}
+{"_id": "temporal_chain-0008/link", "text": "Per the assigned unit register, Bluebird pressure assembly is allocated to Quail sensor array.", "title": ""}
+{"_id": "temporal_chain-0008/current", "text": "Revision 2 (effective 2031-06-01) supersedes revision 1: Per the operating tier register, false is allocated to Bluebird pressure assembly.", "title": ""}
+{"_id": "temporal_chain-0008/superseded", "text": "Revision 1 (effective 2030-01-01, since superseded) recorded: {\"subject\": \"Bluebird pressure assembly\", \"operating tier\": \"true\"}", "title": ""}
+{"_id": "temporal_chain-0009/link", "text": "Revision applied \u2014 Vireo sensor array assigned unit changed to Marlin intake manifold.", "title": ""}
+{"_id": "temporal_chain-0009/current", "text": "Revision 2 (effective 2031-06-01) supersedes revision 1: Per the operating tier register, {\"state\": \"provisional\"} is allocated to Marlin intake manifold.", "title": ""}
+{"_id": "temporal_chain-0009/superseded", "text": "Revision 1 (effective 2030-01-01, since superseded) recorded: Revision applied \u2014 Marlin intake manifold operating tier changed to {\"tier\": \"suspended\"}.", "title": ""}
+{"_id": "temporal_chain-0009/identity", "text": "In shorthand, Vireo sensor array is written VSA-6.", "title": ""}
+{"_id": "temporal_chain-0010/link", "text": "{\"subject\": \"Curlew relay unit\", \"assigned unit\": \"Auk sensor array\"}", "title": ""}
+{"_id": "temporal_chain-0010/current", "text": "Revision 2 (effective 2031-06-01) supersedes revision 1: Per the operating tier register, 4792 is allocated to Auk sensor array.", "title": ""}
+{"_id": "temporal_chain-0010/superseded", "text": "Revision 1 (effective 2030-01-01, since superseded) recorded: {\"subject\": \"Auk sensor array\", \"operating tier\": \"5092\"}", "title": ""}
+{"_id": "temporal_chain-0011/link", "text": "Per the assigned unit register, Quail intake manifold is allocated to Gannet sensor array.", "title": ""}
+{"_id": "temporal_chain-0011/current", "text": "Revision 2 (effective 2031-06-01) supersedes revision 1: {\"subject\": \"Quail intake manifold\", \"operating tier\": \"EPSILON-SLATE\"}", "title": ""}
+{"_id": "temporal_chain-0011/superseded", "text": "Revision 1 (effective 2030-01-01, since superseded) recorded: {\"subject\": \"Quail intake manifold\", \"operating tier\": \"ALPHA-RED\"}", "title": ""}
+{"_id": "temporal_chain-0011/identity", "text": "In shorthand, Gannet sensor array is written GSA-3.", "title": ""}
+{"_id": "numeric_chain-0000/link", "text": "Changelog: rate record for Finch intake manifold set to Vireo pressure assembly.", "title": ""}
+{"_id": "numeric_chain-0000/value", "text": "Registry entry: Vireo pressure assembly \u2014 billing multiplier \u2014 9659.", "title": ""}
+{"_id": "numeric_chain-0000/dead-end-0", "text": "{\"subject\": \"Finch intake manifold\", \"spare enclosure\": \"Curlew control module\"}", "title": ""}
+{"_id": "numeric_chain-0000/dead-end-1", "text": "Per the mounted monitor register, Bluebird relay unit is allocated to Finch intake manifold.", "title": ""}
+{"_id": "numeric_chain-0001/link", "text": "During setup, Jacana sensor array was paired with Bittern control module for rate record.", "title": ""}
+{"_id": "numeric_chain-0001/value", "text": "Note: the billing multiplier for Bittern control module resolves to THETA-OLIVE.", "title": ""}
+{"_id": "numeric_chain-0001/identity", "text": "JSA-3 is the short code for Jacana sensor array.", "title": ""}
+{"_id": "numeric_chain-0001/dead-end-0", "text": "Revision applied \u2014 Jacana sensor array mounted monitor changed to Vireo sensor array.", "title": ""}
+{"_id": "numeric_chain-0001/dead-end-1", "text": "Per the spare enclosure register, Dunlin pressure assembly is allocated to Jacana sensor array.", "title": ""}
+{"_id": "numeric_chain-0002/link", "text": "subject=Auk sensor array; rate record=Bluebird intake manifold", "title": ""}
+{"_id": "numeric_chain-0002/value", "text": "- updated Bluebird intake manifold: billing multiplier now suspended", "title": ""}
+{"_id": "numeric_chain-0002/dead-end-0", "text": "Revision applied \u2014 Auk sensor array mounted monitor changed to Ibis pressure assembly.", "title": ""}
+{"_id": "numeric_chain-0002/dead-end-1", "text": "Revision applied \u2014 Auk sensor array spare enclosure changed to Quail drive cluster.", "title": ""}
+{"_id": "numeric_chain-0002/rejected-0", "text": "{\"subject\": \"Bluebird intake manifold\", \"proposed billing multiplier\": \"quarantined\"} This proposal was rejected.", "title": ""}
+{"_id": "numeric_chain-0002/rejected-1", "text": "Revision applied \u2014 Bluebird intake manifold proposed billing multiplier changed to provisional. This proposal was rejected.", "title": ""}
+{"_id": "numeric_chain-0003/link", "text": "During setup, Finch control module was paired with Raven pressure assembly for rate record.", "title": ""}
+{"_id": "numeric_chain-0003/value", "text": "Registry entry: Raven pressure assembly \u2014 billing multiplier \u2014 {\"state\": \"provisional\"}.", "title": ""}
+{"_id": "numeric_chain-0003/identity", "text": "FCM-1 is the short code for Finch control module.", "title": ""}
+{"_id": "numeric_chain-0003/dead-end-0", "text": "Revision applied \u2014 Finch control module spare enclosure changed to Dunlin drive cluster.", "title": ""}
+{"_id": "numeric_chain-0003/dead-end-1", "text": "{\"subject\": \"Finch control module\", \"spare enclosure\": \"Heron control module\"}", "title": ""}
+{"_id": "numeric_chain-0003/direct", "text": "billing multiplier:\n  subject: Finch control module\n  value: {\"state\": \"provisional\"}", "title": ""}
+{"_id": "numeric_chain-0004/link", "text": "- updated Osprey relay unit: rate record now Gannet control module", "title": ""}
+{"_id": "numeric_chain-0004/value", "text": "Revision applied \u2014 Gannet control module billing multiplier changed to 3801.", "title": ""}
+{"_id": "numeric_chain-0004/dead-end-0", "text": "[change] Osprey relay unit :: spare enclosure := Sparrow pressure assembly", "title": ""}
+{"_id": "numeric_chain-0004/dead-end-1", "text": "It is recorded in the mounted monitor registry that Osprey relay unit holds Raven drive cluster.", "title": ""}
+{"_id": "numeric_chain-0005/link", "text": "[rate record] Gannet relay unit -> Wren pressure assembly", "title": ""}
+{"_id": "numeric_chain-0005/value", "text": "Engineering notes indicate Wren pressure assembly uses BETA-GREEN as its billing multiplier.", "title": ""}
+{"_id": "numeric_chain-0005/identity", "text": "Abbreviation table: GRU-2 = Gannet relay unit.", "title": ""}
+{"_id": "numeric_chain-0005/dead-end-0", "text": "It is recorded in the spare enclosure registry that Gannet relay unit holds Quail sensor array.", "title": ""}
+{"_id": "numeric_chain-0005/dead-end-1", "text": "For Gannet relay unit, spare enclosure requires Dunlin intake manifold.", "title": ""}
+{"_id": "numeric_chain-0006/link", "text": "- updated Bluebird control module: rate record now Kestrel pressure assembly", "title": ""}
+{"_id": "numeric_chain-0006/value", "text": "Revision applied \u2014 Kestrel pressure assembly billing multiplier changed to quarantined.", "title": ""}
+{"_id": "numeric_chain-0006/dead-end-0", "text": "It is recorded in the spare enclosure registry that Bluebird control module holds Ibis intake manifold.", "title": ""}
+{"_id": "numeric_chain-0006/dead-end-1", "text": "[change] Bluebird control module :: spare enclosure := Heron relay unit", "title": ""}
+{"_id": "numeric_chain-0006/rejected-0", "text": "proposed billing multiplier:\n  subject: Kestrel pressure assembly\n  value: suspended This proposal was rejected.", "title": ""}
+{"_id": "numeric_chain-0006/rejected-1", "text": "For Kestrel pressure assembly, proposed billing multiplier requires provisional. This proposal was rejected.", "title": ""}
+{"_id": "numeric_chain-0007/link", "text": "Note: the rate record for Heron sensor array resolves to Ibis pressure assembly.", "title": ""}
+{"_id": "numeric_chain-0007/value", "text": "Revision applied \u2014 Ibis pressure assembly billing multiplier changed to {\"tier\": \"retired\"}.", "title": ""}
+{"_id": "numeric_chain-0007/identity", "text": "Abbreviation table: HSA-2 = Heron sensor array.", "title": ""}
+{"_id": "numeric_chain-0007/dead-end-0", "text": "[change] Heron sensor array :: spare enclosure := Wren sensor array", "title": ""}
+{"_id": "numeric_chain-0007/dead-end-1", "text": "spare enclosure:\n  subject: Heron sensor array\n  value: Bluebird drive cluster", "title": ""}
+{"_id": "numeric_chain-0007/direct", "text": "During setup, Heron sensor array was paired with {\"tier\": \"retired\"} for billing multiplier.", "title": ""}
+{"_id": "numeric_chain-0008/link", "text": "Engineering notes indicate Pelican pressure assembly uses Marlin sensor array as its rate record.", "title": ""}
+{"_id": "numeric_chain-0008/value", "text": "For Marlin sensor array, billing multiplier requires 7618.", "title": ""}
+{"_id": "numeric_chain-0008/dead-end-0", "text": "subject=Pelican pressure assembly; spare enclosure=Auk relay unit", "title": ""}
+{"_id": "numeric_chain-0008/dead-end-1", "text": "During setup, Pelican pressure assembly was paired with Finch drive cluster for mounted monitor.", "title": ""}
+{"_id": "numeric_chain-0009/link", "text": "Per the rate record register, Bittern control module is allocated to Pelican control module.", "title": ""}
+{"_id": "numeric_chain-0009/value", "text": "billing multiplier:\n  subject: Bittern control module\n  value: ZETA-CORAL", "title": ""}
+{"_id": "numeric_chain-0009/identity", "text": "In shorthand, Pelican control module is written PCM-8.", "title": ""}
+{"_id": "numeric_chain-0009/dead-end-0", "text": "During setup, Pelican control module was paired with Bluebird pressure assembly for spare enclosure.", "title": ""}
+{"_id": "numeric_chain-0009/dead-end-1", "text": "During setup, Pelican control module was paired with Raven drive cluster for spare enclosure.", "title": ""}
+{"_id": "numeric_chain-0010/link", "text": "Engineering notes indicate Teal control module uses Bluebird pressure assembly as its rate record.", "title": ""}
+{"_id": "numeric_chain-0010/value", "text": "[change] Bluebird pressure assembly :: billing multiplier := quarantined", "title": ""}
+{"_id": "numeric_chain-0010/dead-end-0", "text": "subject=Teal control module; mounted monitor=Raven control module", "title": ""}
+{"_id": "numeric_chain-0010/dead-end-1", "text": "The mounted monitor registry records that Teal control module is assigned Dunlin control module.", "title": ""}
+{"_id": "numeric_chain-0010/rejected-0", "text": "Changelog: proposed billing multiplier for Bluebird pressure assembly set to suspended. This proposal was rejected.", "title": ""}
+{"_id": "numeric_chain-0010/rejected-1", "text": "During setup, Bluebird pressure assembly was paired with retired for proposed billing multiplier. This proposal was rejected.", "title": ""}
+{"_id": "numeric_chain-0011/link", "text": "Per the rate record register, Finch drive cluster is allocated to Wren sensor array.", "title": ""}
+{"_id": "numeric_chain-0011/value", "text": "billing multiplier:\n  subject: Finch drive cluster\n  value: {\"category\": \"provisional\"}", "title": ""}
+{"_id": "numeric_chain-0011/identity", "text": "In shorthand, Wren sensor array is written WSA-7.", "title": ""}
+{"_id": "numeric_chain-0011/dead-end-0", "text": "During setup, Wren sensor array was paired with Egret pressure assembly for spare enclosure.", "title": ""}
+{"_id": "numeric_chain-0011/dead-end-1", "text": "Changelog: spare enclosure for Wren sensor array set to Bittern relay unit.", "title": ""}
+{"_id": "numeric_chain-0011/direct", "text": "Note: the billing multiplier for Wren sensor array resolves to {\"category\": \"provisional\"}.", "title": ""}
+{"_id": "procedural_chain-0000/link", "text": "subject=Curlew sensor array; applicable procedure=Gannet pressure assembly", "title": ""}
+{"_id": "procedural_chain-0000/value", "text": "Registry entry: Gannet pressure assembly \u2014 required action \u2014 7949.", "title": ""}
+{"_id": "procedural_chain-0000/dead-end-0", "text": "Per the spare enclosure register, Quail control module is allocated to Curlew sensor array.", "title": ""}
+{"_id": "procedural_chain-0000/dead-end-1", "text": "Per the spare enclosure register, Egret pressure assembly is allocated to Curlew sensor array.", "title": ""}
+{"_id": "procedural_chain-0001/link", "text": "The applicable procedure registry records that Ibis drive cluster is assigned Finch drive cluster.", "title": ""}
+{"_id": "procedural_chain-0001/value", "text": "[required action] Finch drive cluster -> BETA-GREEN", "title": ""}
+{"_id": "procedural_chain-0001/identity", "text": "IDC-8 is the short code for Ibis drive cluster.", "title": ""}
+{"_id": "procedural_chain-0001/dead-end-0", "text": "Engineering notes indicate Ibis drive cluster uses Auk control module as its mounted monitor.", "title": ""}
+{"_id": "procedural_chain-0001/dead-end-1", "text": "Revision applied \u2014 Ibis drive cluster spare enclosure changed to Pelican pressure assembly.", "title": ""}
+{"_id": "procedural_chain-0002/link", "text": "subject=Finch relay unit; applicable procedure=Heron intake manifold", "title": ""}
+{"_id": "procedural_chain-0002/value", "text": "- updated Heron intake manifold: required action now accredited", "title": ""}
+{"_id": "procedural_chain-0002/dead-end-0", "text": "Engineering notes indicate Finch relay unit uses Egret relay unit as its spare enclosure.", "title": ""}
+{"_id": "procedural_chain-0002/dead-end-1", "text": "Revision applied \u2014 Finch relay unit spare enclosure changed to Vireo intake manifold.", "title": ""}
+{"_id": "procedural_chain-0002/rejected-0", "text": "{\"subject\": \"Heron intake manifold\", \"proposed required action\": \"retired\"} This proposal was rejected.", "title": ""}
+{"_id": "procedural_chain-0002/rejected-1", "text": "{\"subject\": \"Heron intake manifold\", \"proposed required action\": \"quarantined\"} This proposal was rejected.", "title": ""}
+{"_id": "procedural_chain-0003/link", "text": "subject=Jacana sensor array; applicable procedure=Auk pressure assembly", "title": ""}
+{"_id": "procedural_chain-0003/value", "text": "Note: the required action for Auk pressure assembly resolves to {\"tier\": \"accredited\"}.", "title": ""}
+{"_id": "procedural_chain-0003/identity", "text": "JSA-7 is the short code for Jacana sensor array.", "title": ""}
+{"_id": "procedural_chain-0003/dead-end-0", "text": "Per the mounted monitor register, Ibis intake manifold is allocated to Jacana sensor array.", "title": ""}
+{"_id": "procedural_chain-0003/dead-end-1", "text": "Engineering notes indicate Jacana sensor array uses Wren relay unit as its mounted monitor.", "title": ""}
+{"_id": "procedural_chain-0003/direct", "text": "[change] Jacana sensor array :: required action := {\"tier\": \"accredited\"}", "title": ""}
+{"_id": "procedural_chain-0004/link", "text": "[applicable procedure] Bittern relay unit -> Kestrel pressure assembly", "title": ""}
+{"_id": "procedural_chain-0004/value", "text": "Engineering notes indicate Kestrel pressure assembly uses 5191 as its required action.", "title": ""}
+{"_id": "procedural_chain-0004/dead-end-0", "text": "For Bittern relay unit, spare enclosure requires Dunlin intake manifold.", "title": ""}
+{"_id": "procedural_chain-0004/dead-end-1", "text": "For Bittern relay unit, spare enclosure requires Nimbus drive cluster.", "title": ""}
+{"_id": "procedural_chain-0005/link", "text": "- updated Marlin relay unit: applicable procedure now Vireo relay unit", "title": ""}
+{"_id": "procedural_chain-0005/value", "text": "Revision applied \u2014 Vireo relay unit required action changed to ZETA-CORAL.", "title": ""}
+{"_id": "procedural_chain-0005/identity", "text": "Abbreviation table: MRU-7 = Marlin relay unit.", "title": ""}
+{"_id": "procedural_chain-0005/dead-end-0", "text": "It is recorded in the mounted monitor registry that Marlin relay unit holds Heron control module.", "title": ""}
+{"_id": "procedural_chain-0005/dead-end-1", "text": "spare enclosure:\n  subject: Marlin relay unit\n  value: Finch drive cluster", "title": ""}
+{"_id": "procedural_chain-0006/link", "text": "Registry entry: Finch drive cluster \u2014 applicable procedure \u2014 Bluebird pressure assembly.", "title": ""}
+{"_id": "procedural_chain-0006/value", "text": "{\"subject\": \"Bluebird pressure assembly\", \"required action\": \"retired\"}", "title": ""}
+{"_id": "procedural_chain-0006/dead-end-0", "text": "[change] Finch drive cluster :: spare enclosure := Ibis sensor array", "title": ""}
+{"_id": "procedural_chain-0006/dead-end-1", "text": "It is recorded in the mounted monitor registry that Finch drive cluster holds Nimbus pressure assembly.", "title": ""}
+{"_id": "procedural_chain-0006/rejected-0", "text": "It is recorded in the proposed required action registry that Bluebird pressure assembly holds suspended. This proposal was rejected.", "title": ""}
+{"_id": "procedural_chain-0006/rejected-1", "text": "[change] Bluebird pressure assembly :: proposed required action := provisional This proposal was rejected.", "title": ""}
+{"_id": "procedural_chain-0007/link", "text": "Note: the applicable procedure for Raven control module resolves to Auk pressure assembly.", "title": ""}
+{"_id": "procedural_chain-0007/value", "text": "Revision applied \u2014 Auk pressure assembly required action changed to {\"category\": \"accredited\"}.", "title": ""}
+{"_id": "procedural_chain-0007/identity", "text": "Abbreviation table: RCM-5 = Raven control module.", "title": ""}
+{"_id": "procedural_chain-0007/dead-end-0", "text": "[change] Raven control module :: mounted monitor := Marlin relay unit", "title": ""}
+{"_id": "procedural_chain-0007/dead-end-1", "text": "spare enclosure:\n  subject: Raven control module\n  value: Heron sensor array", "title": ""}
+{"_id": "procedural_chain-0007/direct", "text": "The required action registry records that Raven control module is assigned {\"category\": \"accredited\"}.", "title": ""}
+{"_id": "procedural_chain-0008/link", "text": "Engineering notes indicate Osprey control module uses Finch pressure assembly as its applicable procedure.", "title": ""}
+{"_id": "procedural_chain-0008/value", "text": "For Finch pressure assembly, required action requires 9926.", "title": ""}
+{"_id": "procedural_chain-0008/dead-end-0", "text": "During setup, Osprey control module was paired with Raven intake manifold for mounted monitor.", "title": ""}
+{"_id": "procedural_chain-0008/dead-end-1", "text": "The mounted monitor registry records that Osprey control module is assigned Auk relay unit.", "title": ""}
+{"_id": "procedural_chain-0009/link", "text": "Engineering notes indicate Jacana sensor array uses Wren intake manifold as its applicable procedure.", "title": ""}
+{"_id": "procedural_chain-0009/value", "text": "required action:\n  subject: Wren intake manifold\n  value: THETA-OLIVE", "title": ""}
+{"_id": "procedural_chain-0009/identity", "text": "In shorthand, Jacana sensor array is written JSA-4.", "title": ""}
+{"_id": "procedural_chain-0009/dead-end-0", "text": "Changelog: spare enclosure for Jacana sensor array set to Quail sensor array.", "title": ""}
+{"_id": "procedural_chain-0009/dead-end-1", "text": "During setup, Jacana sensor array was paired with Raven pressure assembly for spare enclosure.", "title": ""}
+{"_id": "procedural_chain-0010/link", "text": "Engineering notes indicate Ibis control module uses Bluebird relay unit as its applicable procedure.", "title": ""}
+{"_id": "procedural_chain-0010/value", "text": "required action:\n  subject: Bluebird relay unit\n  value: suspended", "title": ""}
+{"_id": "procedural_chain-0010/dead-end-0", "text": "subject=Ibis control module; mounted monitor=Curlew drive cluster", "title": ""}
+{"_id": "procedural_chain-0010/dead-end-1", "text": "The mounted monitor registry records that Ibis control module is assigned Heron pressure assembly.", "title": ""}
+{"_id": "procedural_chain-0010/rejected-0", "text": "During setup, Bluebird relay unit was paired with accredited for proposed required action. This proposal was rejected.", "title": ""}
+{"_id": "procedural_chain-0010/rejected-1", "text": "During setup, Bluebird relay unit was paired with retired for proposed required action. This proposal was rejected.", "title": ""}
+{"_id": "procedural_chain-0011/link", "text": "Per the applicable procedure register, Finch drive cluster is allocated to Kestrel sensor array.", "title": ""}
+{"_id": "procedural_chain-0011/value", "text": "It is recorded in the required action registry that Finch drive cluster holds {\"state\": \"provisional\"}.", "title": ""}
+{"_id": "procedural_chain-0011/identity", "text": "In shorthand, Kestrel sensor array is written KSA-6.", "title": ""}
+{"_id": "procedural_chain-0011/dead-end-0", "text": "During setup, Kestrel sensor array was paired with Pelican control module for mounted monitor.", "title": ""}
+{"_id": "procedural_chain-0011/dead-end-1", "text": "Changelog: spare enclosure for Kestrel sensor array set to Marlin intake manifold.", "title": ""}
+{"_id": "procedural_chain-0011/direct", "text": "[required action] Kestrel sensor array -> {\"state\": \"provisional\"}", "title": ""}
+{"_id": "temporal_update-0000/current", "text": "Revision 2 (effective 2031-06-01) supersedes revision 1: The operating tier registry records that Egret drive cluster is assigned 6543.", "title": ""}
+{"_id": "temporal_update-0000/superseded", "text": "Revision 1 (effective 2030-01-01, since superseded) recorded: Changelog: operating tier for Egret drive cluster set to 9498.", "title": ""}
+{"_id": "temporal_update-0001/current", "text": "Revision 2 (effective 2031-06-01) supersedes revision 1: subject=Pelican drive cluster; operating tier=THETA-OLIVE", "title": ""}
+{"_id": "temporal_update-0001/superseded", "text": "Revision 1 (effective 2030-01-01, since superseded) recorded: subject=Pelican drive cluster; operating tier=GAMMA-BLUE", "title": ""}
+{"_id": "temporal_update-0001/identity", "text": "PDC-7 is the short code for Pelican drive cluster.", "title": ""}
+{"_id": "temporal_update-0002/current", "text": "Revision 2 (effective 2031-06-01) supersedes revision 1: The operating tier registry records that Raven drive cluster is assigned suspended.", "title": ""}
+{"_id": "temporal_update-0002/superseded", "text": "Revision 1 (effective 2030-01-01, since superseded) recorded: Changelog: operating tier for Raven drive cluster set to provisional.", "title": ""}
+{"_id": "temporal_update-0003/current", "text": "Revision 2 (effective 2031-06-01) supersedes revision 1: subject=Raven pressure assembly; operating tier=true", "title": ""}
+{"_id": "temporal_update-0003/superseded", "text": "Revision 1 (effective 2030-01-01, since superseded) recorded: subject=Raven pressure assembly; operating tier=false", "title": ""}
+{"_id": "temporal_update-0003/identity", "text": "RPA-4 is the short code for Raven pressure assembly.", "title": ""}
+{"_id": "temporal_update-0004/current", "text": "Revision 2 (effective 2031-06-01) supersedes revision 1: [operating tier] Auk drive cluster -> {\"state\": \"suspended\"}", "title": ""}
+{"_id": "temporal_update-0004/superseded", "text": "Revision 1 (effective 2030-01-01, since superseded) recorded: Note: the operating tier for Auk drive cluster resolves to {\"state\": \"accredited\"}.", "title": ""}
+{"_id": "temporal_update-0005/current", "text": "Revision 2 (effective 2031-06-01) supersedes revision 1: Note: the operating tier for Gannet intake manifold resolves to 1391.", "title": ""}
+{"_id": "temporal_update-0005/superseded", "text": "Revision 1 (effective 2030-01-01, since superseded) recorded: [operating tier] Gannet intake manifold -> 9638", "title": ""}
+{"_id": "temporal_update-0005/identity", "text": "Abbreviation table: GIM-8 = Gannet intake manifold.", "title": ""}
+{"_id": "temporal_update-0006/current", "text": "Revision 2 (effective 2031-06-01) supersedes revision 1: [operating tier] Raven control module -> EPSILON-SLATE", "title": ""}
+{"_id": "temporal_update-0006/superseded", "text": "Revision 1 (effective 2030-01-01, since superseded) recorded: Registry entry: Raven control module \u2014 operating tier \u2014 ZETA-CORAL.", "title": ""}
+{"_id": "temporal_update-0007/current", "text": "Revision 2 (effective 2031-06-01) supersedes revision 1: - updated Osprey intake manifold: operating tier now retired", "title": ""}
+{"_id": "temporal_update-0007/superseded", "text": "Revision 1 (effective 2030-01-01, since superseded) recorded: - updated Osprey intake manifold: operating tier now accredited", "title": ""}
+{"_id": "temporal_update-0007/identity", "text": "Abbreviation table: OIM-1 = Osprey intake manifold.", "title": ""}
+{"_id": "temporal_update-0008/current", "text": "Revision 2 (effective 2031-06-01) supersedes revision 1: Revision applied \u2014 Dunlin relay unit operating tier changed to true.", "title": ""}
+{"_id": "temporal_update-0008/superseded", "text": "Revision 1 (effective 2030-01-01, since superseded) recorded: Engineering notes indicate Dunlin relay unit uses false as its operating tier.", "title": ""}
+{"_id": "temporal_update-0009/current", "text": "Revision 2 (effective 2031-06-01) supersedes revision 1: Per the operating tier register, {\"category\": \"retired\"} is allocated to Gannet drive cluster.", "title": ""}
+{"_id": "temporal_update-0009/superseded", "text": "Revision 1 (effective 2030-01-01, since superseded) recorded: Engineering notes indicate Gannet drive cluster uses {\"state\": \"quarantined\"} as its operating tier.", "title": ""}
+{"_id": "temporal_update-0009/identity", "text": "In shorthand, Gannet drive cluster is written GDC-1.", "title": ""}
+{"_id": "temporal_update-0010/current", "text": "Revision 2 (effective 2031-06-01) supersedes revision 1: Engineering notes indicate Gannet sensor array uses 5038 as its operating tier.", "title": ""}
+{"_id": "temporal_update-0010/superseded", "text": "Revision 1 (effective 2030-01-01, since superseded) recorded: {\"subject\": \"Gannet sensor array\", \"operating tier\": \"6243\"}", "title": ""}
+{"_id": "temporal_update-0011/current", "text": "Revision 2 (effective 2031-06-01) supersedes revision 1: Per the operating tier register, ALPHA-RED is allocated to Bluebird intake manifold.", "title": ""}
+{"_id": "temporal_update-0011/superseded", "text": "Revision 1 (effective 2030-01-01, since superseded) recorded: {\"subject\": \"Bluebird intake manifold\", \"operating tier\": \"GAMMA-BLUE\"}", "title": ""}
+{"_id": "temporal_update-0011/identity", "text": "In shorthand, Bluebird intake manifold is written BIM-5.", "title": ""}
+{"_id": "distractor_heavy-0000/accepted", "text": "During setup, Heron relay unit was paired with 7330 for routing class.", "title": ""}
+{"_id": "distractor_heavy-0000/near-near_entity", "text": "The routing class registry records that Dunlin control module is assigned 9907.", "title": ""}
+{"_id": "distractor_heavy-0000/near-near_relation", "text": "subject=Heron relay unit; calibration routing class=7299", "title": ""}
+{"_id": "distractor_heavy-0000/near-near_status", "text": "The proposed routing class registry records that Heron relay unit is assigned 9561. Status: rejected.", "title": ""}
+{"_id": "distractor_heavy-0000/near-near_temporal", "text": "The former routing class registry records that Heron relay unit is assigned 3281. This record is historical.", "title": ""}
+{"_id": "distractor_heavy-0001/accepted", "text": "During setup, Raven control module was paired with THETA-OLIVE for routing class.", "title": ""}
+{"_id": "distractor_heavy-0001/near-near_entity", "text": "Changelog: routing class for Bittern control module set to ETA-INDIGO.", "title": ""}
+{"_id": "distractor_heavy-0001/near-near_relation", "text": "During setup, Raven control module was paired with DELTA-AMBER for calibration routing class.", "title": ""}
+{"_id": "distractor_heavy-0001/near-near_status", "text": "Changelog: proposed routing class for Raven control module set to EPSILON-SLATE. Status: rejected.", "title": ""}
+{"_id": "distractor_heavy-0001/near-near_temporal", "text": "subject=Raven control module; former routing class=GAMMA-BLUE This record is historical.", "title": ""}
+{"_id": "distractor_heavy-0001/identity", "text": "RCM-8 is the short code for Raven control module.", "title": ""}
+{"_id": "distractor_heavy-0002/accepted", "text": "The routing class registry records that Vireo intake manifold is assigned retired.", "title": ""}
+{"_id": "distractor_heavy-0002/near-near_entity", "text": "During setup, Nimbus relay unit was paired with quarantined for routing class.", "title": ""}
+{"_id": "distractor_heavy-0002/near-near_relation", "text": "Changelog: calibration routing class for Vireo intake manifold set to suspended.", "title": ""}
+{"_id": "distractor_heavy-0002/near-near_status", "text": "subject=Vireo intake manifold; proposed routing class=provisional Status: rejected.", "title": ""}
+{"_id": "distractor_heavy-0002/near-near_temporal", "text": "During setup, Vireo intake manifold was paired with accredited for former routing class. This record is historical.", "title": ""}
+{"_id": "distractor_heavy-0003/accepted", "text": "During setup, Dunlin sensor array was paired with {\"grade\": \"accredited\"} for routing class.", "title": ""}
+{"_id": "distractor_heavy-0003/near-near_entity", "text": "Changelog: routing class for Teal sensor array set to {\"grade\": \"provisional\"}.", "title": ""}
+{"_id": "distractor_heavy-0003/near-near_relation", "text": "The calibration routing class registry records that Dunlin sensor array is assigned {\"state\": \"quarantined\"}.", "title": ""}
+{"_id": "distractor_heavy-0003/near-near_status", "text": "subject=Dunlin sensor array; proposed routing class={\"category\": \"suspended\"} Status: rejected.", "title": ""}
+{"_id": "distractor_heavy-0003/near-near_temporal", "text": "subject=Dunlin sensor array; former routing class={\"category\": \"retired\"} This record is historical.", "title": ""}
+{"_id": "distractor_heavy-0003/identity", "text": "DSA-7 is the short code for Dunlin sensor array.", "title": ""}
+{"_id": "distractor_heavy-0004/accepted", "text": "- updated Quail pressure assembly: routing class now 2851", "title": ""}
+{"_id": "distractor_heavy-0004/near-near_entity", "text": "[routing class] Finch relay unit -> 2392", "title": ""}
+{"_id": "distractor_heavy-0004/near-near_relation", "text": "Registry entry: Quail pressure assembly \u2014 calibration routing class \u2014 8206.", "title": ""}
+{"_id": "distractor_heavy-0004/near-near_status", "text": "[proposed routing class] Quail pressure assembly -> 1670 Status: rejected.", "title": ""}
+{"_id": "distractor_heavy-0004/near-near_temporal", "text": "Registry entry: Quail pressure assembly \u2014 former routing class \u2014 9201. This record is historical.", "title": ""}
+{"_id": "distractor_heavy-0005/accepted", "text": "[routing class] Osprey sensor array -> ZETA-CORAL", "title": ""}
+{"_id": "distractor_heavy-0005/near-near_entity", "text": "Registry entry: Gannet intake manifold \u2014 routing class \u2014 BETA-GREEN.", "title": ""}
+{"_id": "distractor_heavy-0005/near-near_relation", "text": "[calibration routing class] Osprey sensor array -> DELTA-AMBER", "title": ""}
+{"_id": "distractor_heavy-0005/near-near_status", "text": "- updated Osprey sensor array: proposed routing class now GAMMA-BLUE Status: rejected.", "title": ""}
+{"_id": "distractor_heavy-0005/near-near_temporal", "text": "- updated Osprey sensor array: former routing class now THETA-OLIVE This record is historical.", "title": ""}
+{"_id": "distractor_heavy-0005/identity", "text": "Abbreviation table: OSA-3 = Osprey sensor array.", "title": ""}
+{"_id": "distractor_heavy-0006/accepted", "text": "Note: the routing class for Raven drive cluster resolves to retired.", "title": ""}
+{"_id": "distractor_heavy-0006/near-near_entity", "text": "Registry entry: Marlin relay unit \u2014 routing class \u2014 suspended.", "title": ""}
+{"_id": "distractor_heavy-0006/near-near_relation", "text": "Note: the calibration routing class for Raven drive cluster resolves to accredited.", "title": ""}
+{"_id": "distractor_heavy-0006/near-near_status", "text": "[proposed routing class] Raven drive cluster -> quarantined Status: rejected.", "title": ""}
+{"_id": "distractor_heavy-0006/near-near_temporal", "text": "- updated Raven drive cluster: former routing class now provisional This record is historical.", "title": ""}
+{"_id": "distractor_heavy-0007/accepted", "text": "- updated Pelican control module: routing class now {\"category\": \"retired\"}", "title": ""}
+{"_id": "distractor_heavy-0007/near-near_entity", "text": "Registry entry: Heron pressure assembly \u2014 routing class \u2014 {\"grade\": \"quarantined\"}.", "title": ""}
+{"_id": "distractor_heavy-0007/near-near_relation", "text": "[calibration routing class] Pelican control module -> {\"category\": \"accredited\"}", "title": ""}
+{"_id": "distractor_heavy-0007/near-near_status", "text": "Registry entry: Pelican control module \u2014 proposed routing class \u2014 {\"grade\": \"suspended\"}. Status: rejected.", "title": ""}
+{"_id": "distractor_heavy-0007/near-near_temporal", "text": "[former routing class] Pelican control module -> {\"tier\": \"provisional\"} This record is historical.", "title": ""}
+{"_id": "distractor_heavy-0007/identity", "text": "Abbreviation table: PCM-5 = Pelican control module.", "title": ""}
+{"_id": "distractor_heavy-0008/accepted", "text": "Per the routing class register, 7050 is allocated to Wren intake manifold.", "title": ""}
+{"_id": "distractor_heavy-0008/near-near_entity", "text": "{\"subject\": \"Osprey drive cluster\", \"routing class\": \"4470\"}", "title": ""}
+{"_id": "distractor_heavy-0008/near-near_relation", "text": "Per the calibration routing class register, 9170 is allocated to Wren intake manifold.", "title": ""}
+{"_id": "distractor_heavy-0008/near-near_status", "text": "Revision applied \u2014 Wren intake manifold proposed routing class changed to 4220. Status: rejected.", "title": ""}
+{"_id": "distractor_heavy-0008/near-near_temporal", "text": "Engineering notes indicate Wren intake manifold uses 8458 as its former routing class. This record is historical.", "title": ""}
+{"_id": "distractor_heavy-0009/accepted", "text": "Revision applied \u2014 Egret relay unit routing class changed to ZETA-CORAL.", "title": ""}
+{"_id": "distractor_heavy-0009/near-near_entity", "text": "Engineering notes indicate Heron drive cluster uses THETA-OLIVE as its routing class.", "title": ""}
+{"_id": "distractor_heavy-0009/near-near_relation", "text": "Revision applied \u2014 Egret relay unit calibration routing class changed to GAMMA-BLUE.", "title": ""}
+{"_id": "distractor_heavy-0009/near-near_status", "text": "Engineering notes indicate Egret relay unit uses BETA-GREEN as its proposed routing class. Status: rejected.", "title": ""}
+{"_id": "distractor_heavy-0009/near-near_temporal", "text": "Revision applied \u2014 Egret relay unit former routing class changed to EPSILON-SLATE. This record is historical.", "title": ""}
+{"_id": "distractor_heavy-0009/identity", "text": "In shorthand, Egret relay unit is written ERU-7.", "title": ""}
+{"_id": "distractor_heavy-0010/accepted", "text": "Per the routing class register, quarantined is allocated to Jacana sensor array.", "title": ""}
+{"_id": "distractor_heavy-0010/near-near_entity", "text": "{\"subject\": \"Bittern control module\", \"routing class\": \"retired\"}", "title": ""}
+{"_id": "distractor_heavy-0010/near-near_relation", "text": "Per the calibration routing class register, accredited is allocated to Jacana sensor array.", "title": ""}
+{"_id": "distractor_heavy-0010/near-near_status", "text": "Revision applied \u2014 Jacana sensor array proposed routing class changed to provisional. Status: rejected.", "title": ""}
+{"_id": "distractor_heavy-0010/near-near_temporal", "text": "Engineering notes indicate Jacana sensor array uses suspended as its former routing class. This record is historical.", "title": ""}
+{"_id": "distractor_heavy-0011/accepted", "text": "Engineering notes indicate Dunlin sensor array uses {\"tier\": \"provisional\"} as its routing class.", "title": ""}
+{"_id": "distractor_heavy-0011/near-near_entity", "text": "Revision applied \u2014 Heron drive cluster routing class changed to {\"state\": \"suspended\"}.", "title": ""}
+{"_id": "distractor_heavy-0011/near-near_relation", "text": "Engineering notes indicate Dunlin sensor array uses {\"tier\": \"quarantined\"} as its calibration routing class.", "title": ""}
+{"_id": "distractor_heavy-0011/near-near_status", "text": "Engineering notes indicate Dunlin sensor array uses {\"tier\": \"accredited\"} as its proposed routing class. Status: rejected.", "title": ""}
+{"_id": "distractor_heavy-0011/near-near_temporal", "text": "Engineering notes indicate Dunlin sensor array uses {\"state\": \"retired\"} as its former routing class. This record is historical.", "title": ""}
+{"_id": "distractor_heavy-0011/identity", "text": "In shorthand, Dunlin sensor array is written DSA-1.", "title": ""}

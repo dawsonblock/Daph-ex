@@ -1,0 +1,20 @@
+{
+  "backend": "bm25",
+  "candidate_budget": 50,
+  "corpus_sha256": "887b2307e2479281bfafe0b74480fda8ab2a2d7e09d5fee3d7c6682cfaebe86b",
+  "gate": "C2",
+  "k_values": [
+    1,
+    5,
+    10,
+    20,
+    50
+  ],
+  "measured_complete_set@50": 0.048,
+  "query_policy": "Q0_original",
+  "reference_complete_set@50": 0.048,
+  "reproduces_reference": true,
+  "split": "ood",
+  "stage": "retrieval",
+  "wall_seconds": 0.6
+}

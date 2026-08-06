@@ -1,0 +1,120 @@
+{"_id": "entity_attribute-0000", "text": "Which assigned category applies to Nimbus sensor array?"}
+{"_id": "entity_attribute-0001", "text": "Which assigned category applies to QCM-4?"}
+{"_id": "entity_attribute-0002", "text": "Which assigned category applies to Jacana pressure assembly?"}
+{"_id": "entity_attribute-0003", "text": "Which assigned category applies to ASA-2?"}
+{"_id": "entity_attribute-0004", "text": "What is the assigned category for Curlew intake manifold?"}
+{"_id": "entity_attribute-0005", "text": "What is the assigned category for MSA-5?"}
+{"_id": "entity_attribute-0006", "text": "What is the assigned category for Pelican intake manifold?"}
+{"_id": "entity_attribute-0007", "text": "What is the assigned category for RCM-3?"}
+{"_id": "entity_attribute-0008", "text": "For Bluebird intake manifold, which assigned category is recorded?"}
+{"_id": "entity_attribute-0009", "text": "For MPA-5, which assigned category is recorded?"}
+{"_id": "entity_attribute-0010", "text": "For Teal drive cluster, which assigned category is recorded?"}
+{"_id": "entity_attribute-0011", "text": "For RSA-8, which assigned category is recorded?"}
+{"_id": "ownership_chain-0000", "text": "Which ownership tier applies to Sparrow intake manifold?"}
+{"_id": "ownership_chain-0001", "text": "Which ownership tier applies to ORU-7?"}
+{"_id": "ownership_chain-0002", "text": "Which ownership tier applies to Pelican control module?"}
+{"_id": "ownership_chain-0003", "text": "Which ownership tier applies to GRU-2?"}
+{"_id": "ownership_chain-0004", "text": "What is the ownership tier for Dunlin relay unit?"}
+{"_id": "ownership_chain-0005", "text": "What is the ownership tier for PCM-8?"}
+{"_id": "ownership_chain-0006", "text": "What is the ownership tier for Ibis control module?"}
+{"_id": "ownership_chain-0007", "text": "What is the ownership tier for KRU-7?"}
+{"_id": "ownership_chain-0008", "text": "For Curlew pressure assembly, which ownership tier is recorded?"}
+{"_id": "ownership_chain-0009", "text": "For JDC-7, which ownership tier is recorded?"}
+{"_id": "ownership_chain-0010", "text": "For Bluebird drive cluster, which ownership tier is recorded?"}
+{"_id": "ownership_chain-0011", "text": "For NIM-4, which ownership tier is recorded?"}
+{"_id": "configuration_chain-0000", "text": "Which parameter grade applies to Ibis relay unit?"}
+{"_id": "configuration_chain-0001", "text": "Which parameter grade applies to ODC-6?"}
+{"_id": "configuration_chain-0002", "text": "Which parameter grade applies to Curlew sensor array?"}
+{"_id": "configuration_chain-0003", "text": "Which parameter grade applies to MCM-5?"}
+{"_id": "configuration_chain-0004", "text": "What is the parameter grade for Kestrel drive cluster?"}
+{"_id": "configuration_chain-0005", "text": "What is the parameter grade for FRU-4?"}
+{"_id": "configuration_chain-0006", "text": "What is the parameter grade for Bluebird sensor array?"}
+{"_id": "configuration_chain-0007", "text": "What is the parameter grade for DDC-8?"}
+{"_id": "configuration_chain-0008", "text": "For Osprey sensor array, which parameter grade is recorded?"}
+{"_id": "configuration_chain-0009", "text": "For PCM-4, which parameter grade is recorded?"}
+{"_id": "configuration_chain-0010", "text": "For Finch pressure assembly, which parameter grade is recorded?"}
+{"_id": "configuration_chain-0011", "text": "For WIM-5, which parameter grade is recorded?"}
+{"_id": "dependency_chain-0000", "text": "Which release channel applies to Sparrow pressure assembly?"}
+{"_id": "dependency_chain-0001", "text": "Which release channel applies to ICM-8?"}
+{"_id": "dependency_chain-0002", "text": "Which release channel applies to Vireo control module?"}
+{"_id": "dependency_chain-0003", "text": "Which release channel applies to IDC-7?"}
+{"_id": "dependency_chain-0004", "text": "What is the release channel for Osprey intake manifold?"}
+{"_id": "dependency_chain-0005", "text": "What is the release channel for WPA-6?"}
+{"_id": "dependency_chain-0006", "text": "What is the release channel for Nimbus sensor array?"}
+{"_id": "dependency_chain-0007", "text": "What is the release channel for KPA-1?"}
+{"_id": "dependency_chain-0008", "text": "For Finch relay unit, which release channel is recorded?"}
+{"_id": "dependency_chain-0009", "text": "For JCM-8, which release channel is recorded?"}
+{"_id": "dependency_chain-0010", "text": "For Heron control module, which release channel is recorded?"}
+{"_id": "dependency_chain-0011", "text": "For OCM-3, which release channel is recorded?"}
+{"_id": "location_chain-0000", "text": "Which service region applies to Pelican relay unit?"}
+{"_id": "location_chain-0001", "text": "Which service region applies to GRU-6?"}
+{"_id": "location_chain-0002", "text": "Which service region applies to Wren relay unit?"}
+{"_id": "location_chain-0003", "text": "Which service region applies to WSA-5?"}
+{"_id": "location_chain-0004", "text": "What is the service region for Pelican sensor array?"}
+{"_id": "location_chain-0005", "text": "What is the service region for SCM-1?"}
+{"_id": "location_chain-0006", "text": "What is the service region for Pelican sensor array?"}
+{"_id": "location_chain-0007", "text": "What is the service region for QDC-6?"}
+{"_id": "location_chain-0008", "text": "For Heron relay unit, which service region is recorded?"}
+{"_id": "location_chain-0009", "text": "For HRU-2, which service region is recorded?"}
+{"_id": "location_chain-0010", "text": "For Dunlin drive cluster, which service region is recorded?"}
+{"_id": "location_chain-0011", "text": "For GCM-8, which service region is recorded?"}
+{"_id": "temporal_chain-0000", "text": "As of the current revision, which operating tier applies to Curlew relay unit?"}
+{"_id": "temporal_chain-0001", "text": "As of the current revision, which operating tier applies to KRU-7?"}
+{"_id": "temporal_chain-0002", "text": "As of the current revision, which operating tier applies to Quail relay unit?"}
+{"_id": "temporal_chain-0003", "text": "As of the current revision, which operating tier applies to SPA-3?"}
+{"_id": "temporal_chain-0004", "text": "As of the current revision, which operating tier applies to Pelican relay unit?"}
+{"_id": "temporal_chain-0005", "text": "As of the current revision, which operating tier applies to TPA-2?"}
+{"_id": "temporal_chain-0006", "text": "As of the current revision, which operating tier applies to Kestrel sensor array?"}
+{"_id": "temporal_chain-0007", "text": "As of the current revision, which operating tier applies to JSA-8?"}
+{"_id": "temporal_chain-0008", "text": "As of the current revision, which operating tier applies to Quail sensor array?"}
+{"_id": "temporal_chain-0009", "text": "As of the current revision, which operating tier applies to VSA-6?"}
+{"_id": "temporal_chain-0010", "text": "As of the current revision, which operating tier applies to Curlew relay unit?"}
+{"_id": "temporal_chain-0011", "text": "As of the current revision, which operating tier applies to GSA-3?"}
+{"_id": "numeric_chain-0000", "text": "Which billing multiplier applies to Finch intake manifold?"}
+{"_id": "numeric_chain-0001", "text": "Which billing multiplier applies to JSA-3?"}
+{"_id": "numeric_chain-0002", "text": "Which billing multiplier applies to Auk sensor array?"}
+{"_id": "numeric_chain-0003", "text": "Which billing multiplier applies to FCM-1?"}
+{"_id": "numeric_chain-0004", "text": "What is the billing multiplier for Osprey relay unit?"}
+{"_id": "numeric_chain-0005", "text": "What is the billing multiplier for GRU-2?"}
+{"_id": "numeric_chain-0006", "text": "What is the billing multiplier for Bluebird control module?"}
+{"_id": "numeric_chain-0007", "text": "What is the billing multiplier for HSA-2?"}
+{"_id": "numeric_chain-0008", "text": "For Pelican pressure assembly, which billing multiplier is recorded?"}
+{"_id": "numeric_chain-0009", "text": "For PCM-8, which billing multiplier is recorded?"}
+{"_id": "numeric_chain-0010", "text": "For Teal control module, which billing multiplier is recorded?"}
+{"_id": "numeric_chain-0011", "text": "For WSA-7, which billing multiplier is recorded?"}
+{"_id": "procedural_chain-0000", "text": "Which required action applies to Curlew sensor array?"}
+{"_id": "procedural_chain-0001", "text": "Which required action applies to IDC-8?"}
+{"_id": "procedural_chain-0002", "text": "Which required action applies to Finch relay unit?"}
+{"_id": "procedural_chain-0003", "text": "Which required action applies to JSA-7?"}
+{"_id": "procedural_chain-0004", "text": "What is the required action for Bittern relay unit?"}
+{"_id": "procedural_chain-0005", "text": "What is the required action for MRU-7?"}
+{"_id": "procedural_chain-0006", "text": "What is the required action for Finch drive cluster?"}
+{"_id": "procedural_chain-0007", "text": "What is the required action for RCM-5?"}
+{"_id": "procedural_chain-0008", "text": "For Osprey control module, which required action is recorded?"}
+{"_id": "procedural_chain-0009", "text": "For JSA-4, which required action is recorded?"}
+{"_id": "procedural_chain-0010", "text": "For Ibis control module, which required action is recorded?"}
+{"_id": "procedural_chain-0011", "text": "For KSA-6, which required action is recorded?"}
+{"_id": "temporal_update-0000", "text": "As of the current revision, which operating tier applies to Egret drive cluster?"}
+{"_id": "temporal_update-0001", "text": "As of the current revision, which operating tier applies to PDC-7?"}
+{"_id": "temporal_update-0002", "text": "As of the current revision, which operating tier applies to Raven drive cluster?"}
+{"_id": "temporal_update-0003", "text": "As of the current revision, which operating tier applies to RPA-4?"}
+{"_id": "temporal_update-0004", "text": "As of the current revision, which operating tier applies to Auk drive cluster?"}
+{"_id": "temporal_update-0005", "text": "As of the current revision, which operating tier applies to GIM-8?"}
+{"_id": "temporal_update-0006", "text": "As of the current revision, which operating tier applies to Raven control module?"}
+{"_id": "temporal_update-0007", "text": "As of the current revision, which operating tier applies to OIM-1?"}
+{"_id": "temporal_update-0008", "text": "As of the current revision, which operating tier applies to Dunlin relay unit?"}
+{"_id": "temporal_update-0009", "text": "As of the current revision, which operating tier applies to GDC-1?"}
+{"_id": "temporal_update-0010", "text": "As of the current revision, which operating tier applies to Gannet sensor array?"}
+{"_id": "temporal_update-0011", "text": "As of the current revision, which operating tier applies to BIM-5?"}
+{"_id": "distractor_heavy-0000", "text": "Which routing class applies to Heron relay unit?"}
+{"_id": "distractor_heavy-0001", "text": "Which routing class applies to RCM-8?"}
+{"_id": "distractor_heavy-0002", "text": "Which routing class applies to Vireo intake manifold?"}
+{"_id": "distractor_heavy-0003", "text": "Which routing class applies to DSA-7?"}
+{"_id": "distractor_heavy-0004", "text": "What is the routing class for Quail pressure assembly?"}
+{"_id": "distractor_heavy-0005", "text": "What is the routing class for OSA-3?"}
+{"_id": "distractor_heavy-0006", "text": "What is the routing class for Raven drive cluster?"}
+{"_id": "distractor_heavy-0007", "text": "What is the routing class for PCM-5?"}
+{"_id": "distractor_heavy-0008", "text": "For Wren intake manifold, which routing class is recorded?"}
+{"_id": "distractor_heavy-0009", "text": "For ERU-7, which routing class is recorded?"}
+{"_id": "distractor_heavy-0010", "text": "For Jacana sensor array, which routing class is recorded?"}
+{"_id": "distractor_heavy-0011", "text": "For DSA-1, which routing class is recorded?"}
