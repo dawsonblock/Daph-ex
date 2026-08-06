@@ -38,6 +38,7 @@ class RetrievalGroundTruth:
     proof_path_ids: tuple[str, ...]
     bridge_ids: tuple[str, ...]
     answer_record_ids: tuple[str, ...]
+    identity_record_ids: tuple[str, ...] = ()
 
     def weights(self, *, answer_weight: float = 3.0, bridge_weight: float = 2.0,
                 base_weight: float = 1.0) -> dict[str, float]:
@@ -71,7 +72,13 @@ class RetrievalGroundTruth:
             if meta.get("latent_bridge") and edge["target"] == meta["latent_bridge"]))
         answers = tuple(dict.fromkeys(
             edge["record_id"] for edge in edges if edge["target"] == meta["answer_node"]))
+        # Identity records are what an alias/description question must traverse
+        # before the target relation is even addressable.
+        identity = tuple(dict.fromkeys(
+            edge["record_id"] for edge in edges
+            if str(edge.get("source", "")).startswith("surface:")))
         return cls(
+            identity_record_ids=identity,
             task_id=task["task_id"], family=task["family"],
             entity_regime=task["metadata"]["entity_regime"],
             answer_kind=task["metadata"]["answer_kind"],
@@ -94,6 +101,11 @@ class CoverageResult:
     # None for tasks that have no bridge at all. Reporting False there would
     # let single-hop tasks dilute a bridge-recall statistic.
     bridge_found: float | None
+    # Alias decomposition. An alias score of 0.08 vs 0.12 is uninformative;
+    # "identity found 72% / canonicalized 61% / target recovered 19%" names the
+    # failing mechanism.
+    identity_record_found: float | None
+    target_relation_record_found: float | None
     answer_record_found: float
     mrr: float
     ndcg: float
@@ -140,6 +152,12 @@ def score_coverage(
         partial_proof_coverage_at=partial_at,
         bridge_found=(None if not truth.bridge_ids
                       else float(set(truth.bridge_ids) <= set(ranked))),
+        identity_record_found=(None if not truth.identity_record_ids
+                               else float(set(truth.identity_record_ids) <= set(ranked))),
+        # The answer-bearing record is the target-relation record; it is only
+        # reachable once identity is resolved, so both are reported.
+        target_relation_record_found=(None if not truth.answer_record_ids
+                                      else float(bool(set(truth.answer_record_ids) & set(ranked)))),
         answer_record_found=float(
             bool(truth.answer_record_ids) and bool(set(truth.answer_record_ids) & set(ranked))),
         mrr=0.0 if first is None else 1.0 / first,
@@ -177,6 +195,22 @@ def summarize_coverage(
                 round(mean(r.bridge_found for r in rows if r.bridge_found is not None), 4)
                 if any(r.bridge_found is not None for r in rows) else None),
             "bridge_task_count": sum(1 for r in rows if r.bridge_found is not None),
+            "identity_record_recall_among_identity_tasks": (
+                round(mean(r.identity_record_found for r in rows
+                           if r.identity_record_found is not None), 4)
+                if any(r.identity_record_found is not None for r in rows) else None),
+            "identity_task_count": sum(1 for r in rows if r.identity_record_found is not None),
+            "target_relation_record_recall": (
+                round(mean(r.target_relation_record_found for r in rows
+                           if r.target_relation_record_found is not None), 4)
+                if any(r.target_relation_record_found is not None for r in rows) else None),
+            # Conditional: the target relation is only addressable after identity
+            # resolves, so mixing the two would hide which mechanism failed.
+            "target_recall_given_identity_found": (
+                round(mean(r.target_relation_record_found for r in rows
+                           if r.identity_record_found == 1.0
+                           and r.target_relation_record_found is not None), 4)
+                if any(r.identity_record_found == 1.0 for r in rows) else None),
             "answer_record_found": round(mean(r.answer_record_found for r in rows), 4),
             "mean_pool_size": round(mean(r.candidate_pool_size for r in rows), 2),
             "mean_latency_ms": round(mean(r.latency_ms for r in rows), 3),

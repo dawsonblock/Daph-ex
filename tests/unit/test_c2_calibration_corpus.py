@@ -70,10 +70,13 @@ def test_holdout_covers_all_four_regimes_and_is_marked_reserved():
     tasks, _ = load("c2_cal_holdout")
     assert {t["metadata"]["entity_regime"] for t in tasks} == {
         "canonical", "abbreviation", "alias", "description"}
-    manifest = json.loads((CAL / "c2_cal_holdout" / "dataset_manifest.json").read_text())
-    assert "RESERVED" in manifest["purpose"]
-    audit = json.loads((CAL / "AUDIT.json").read_text())
-    assert "burn" in audit["holdout_policy"]
+    # Structured state, not prose. Three prior failures came from asserting
+    # exact strings against narrative text I had written separately; tests
+    # should validate state and let prose be rendered from it.
+    state = json.loads((CAL / "AUDIT.json").read_text())["state"]
+    assert state["holdout_partition"] == "c2_cal_holdout"
+    assert state["holdout_status"] == "RESERVED"
+    assert state["holdout_runs_permitted"] == 1
 
 
 @pytest.mark.parametrize("part", PARTS)
@@ -92,6 +95,57 @@ def test_every_task_is_inferable_and_leak_free(part):
 def test_valid_gate_recorded():
     audit = json.loads((CAL / "AUDIT.json").read_text())
     assert audit["VALID_C2_CAL"] is True
-    assert audit["frozen_before_evaluation"] is True
     assert not audit["problems"]
-    assert "does not replace v4" in audit["purpose"].lower()
+    state = audit["state"]
+    assert state["replaces_v4"] is False
+    assert state["purpose"] == "gate_c2_component_selection"
+    assert state["frozen_before_evaluation"] is True
+    assert state["valid"] is True
+
+
+def test_promotion_protocol_is_frozen_before_any_run():
+    """The reference arm and every threshold must be fixed in advance."""
+
+    protocol = json.loads((ROOT / "configs" / "gate_c2_protocol.json").read_text())
+    assert protocol["frozen_before_any_calibration_run"] is True
+    assert protocol["reference_arm"]["immutable"] is True
+    assert protocol["reference_arm"]["name"] == "P0_bm25"
+    assert protocol["primary_metric"] == "complete_set@50"
+    rules = protocol["per_regime_rules"]
+    assert rules["canonical"]["threshold"] == -0.02
+    assert rules["abbreviation"]["threshold"] == -0.02
+    assert rules["description"]["threshold"] == 0.10
+    # Alias must never be collapsed into an aggregate.
+    assert rules["alias"]["direction"] == "report_only"
+    assert protocol["aggregate_verdict_forbidden"] is True
+
+
+def test_selection_gate_threshold_is_predeclared():
+    protocol = json.loads((ROOT / "configs" / "gate_c2_protocol.json").read_text())
+    gate = protocol["selection_gate"]
+    assert isinstance(gate["tau_selection"], (int, float))
+    assert gate["tau_selection"] > 0
+    assert gate["conditional_ceiling_required"]
+
+
+def test_holdout_may_not_inform_any_choice():
+    protocol = json.loads((ROOT / "configs" / "gate_c2_protocol.json").read_text())
+    forbidden = set(protocol["holdout_policy"]["may_never_inform"])
+    for kind in ("model choice", "hyperparameter choice", "query-template choice",
+                 "fusion-weight choice", "packet-budget choice", "selector choice",
+                 "threshold calibration", "debugging"):
+        assert kind in forbidden
+    assert protocol["holdout_policy"]["runs_permitted"] == 1
+
+
+def test_regime_aware_policy_is_blocked_until_alias_mechanism_exists():
+    protocol = json.loads((ROOT / "configs" / "gate_c2_protocol.json").read_text())
+    assert "BLOCKED" in protocol["policy_arms"]["P3_regime_aware_deterministic"]
+    assert "never a production arm" in protocol["policy_arms"]["P4_oracle_regime_policy"]
+
+
+def test_alias_decomposition_metrics_are_required():
+    protocol = json.loads((ROOT / "configs" / "gate_c2_protocol.json").read_text())
+    required = set(protocol["alias_decomposition_required"])
+    assert {"identity_record_recall_at_k", "canonical_entity_recovered",
+            "target_relation_record_recall_at_k"} <= required

@@ -68,7 +68,7 @@
     "slot_label_echo": "99 -> 0 under precision packing; was an evidence-confusability artefact, not a prompt-interface or reasoning limit",
     "slot_label_echoes": "Track evidence quality, not packet format: 85 -> 28 under precision packing, -> 3 under oracle evidence. F-arms would measure a symptom; implemented but unrun."
   },
-  "next_work": "Predeclare per-regime promotion rules, then evaluate BM25 / BGE / deterministic fusion on c2_cal_id and c2_cal_surface. Freeze a candidate-GENERATION POLICY rather than one retriever. Then pools, ceilings, S0/S5. c2_cal_holdout stays untouched; V4 stays immutable.",
+  "next_work": "Run P0_bm25 / P1_bge / P2_rrf_bm25_bge on c2_cal_id and c2_cal_surface with the frozen per-regime rules and the alias decomposition. Freeze a candidate-GENERATION POLICY, then pools, ceilings, and the S0/S5 gate at tau=0.05. c2_cal_holdout stays untouched (1 run permitted); V4 stays immutable.",
   "ood_taxonomy": {
     "REFERENTIAL_OOD": {
       "mechanism": "identity resolution + multi-hop retrieval",
@@ -356,6 +356,18 @@
         "minilm": 2
       }
     },
+    "gate_c2_protocol": {
+      "claim": "Gate C2 promotion rules, reference arm, and selection threshold are predeclared in configs/gate_c2_protocol.json before any calibration measurement. Reference arm is P0_bm25 and marked immutable; primary metric is complete_set@50; per-regime rules are canonical >= -0.02, abbreviation >= -0.02, description >= +0.10, alias report-only; tau_selection = 0.05 for the S0/S5 gate.",
+      "not_a_claim_about": [
+        "any result, since nothing has been run against calibration",
+        "P3 regime-aware policy, which is blocked until an alias mechanism exists"
+      ],
+      "receipts": [
+        "configs/gate_c2_protocol.json"
+      ],
+      "report": "configs/gate_c2_protocol.json",
+      "status": "FROZEN_BEFORE_ANY_CALIBRATION_RUN"
+    },
     "gate_c2_query_ladder": {
       "claim": "Q0-Q3 retrieval-only query ablation on frozen V4. Querying the bridge entity ALONE (Q1) is worse than the original question on both splits and collapses to 0.000 complete-set@50 on OOD, which explains why the V4 ladder's R2 did not beat R1. A fully rendered request (Q3) nearly doubles dense complete-set@10 on qualification (0.214 -> 0.416) and lifts fusion complete-set@50 from 0.426 to 0.614. On OOD even a perfect query reaches only 0.200, so retrieval representation, not query formulation, is the binding constraint there.",
       "complete_set_at_50_fusion": {
@@ -395,5 +407,6 @@
       "report": "GATE_C1_V4_REPORT.md"
     }
   },
+  "testing_policy": "Tests assert structured state, never exact strings against narrative prose. Three separate failures came from matching capitalisation in text written separately from the assertion; the pattern was wrong, not merely careless. Prose is rendered from state, and state is what is tested.",
   "version": "3.7.1"
 }

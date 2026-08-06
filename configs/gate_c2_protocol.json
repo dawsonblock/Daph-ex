@@ -1,0 +1,72 @@
+{
+  "aggregate_verdict_forbidden": true,
+  "alias_decomposition_required": [
+    "identity_record_recall_at_k",
+    "canonical_entity_recovered",
+    "target_relation_record_recall_at_k",
+    "complete_set_at_k"
+  ],
+  "alias_rationale": "An alias score of 0.08 vs 0.12 is uninformative. identity found 72% / canonicalized 61% / target relation recovered 19% names the failing mechanism.",
+  "candidate_budget": 50,
+  "delta_definition": "delta_r = CES@50(candidate_policy, regime r) - CES@50(P0_bm25, regime r)",
+  "frozen_before_any_calibration_run": true,
+  "holdout_policy": {
+    "may_never_inform": [
+      "model choice",
+      "hyperparameter choice",
+      "query-template choice",
+      "fusion-weight choice",
+      "packet-budget choice",
+      "selector choice",
+      "threshold calibration",
+      "debugging"
+    ],
+    "note": "Repeatedly inspecting per-regime holdout errors spends it even without explicit tuning. The final run returns the predeclared metrics plus immutable receipts, nothing more.",
+    "partition": "c2_cal_holdout",
+    "runs_permitted": 1,
+    "status": "RESERVED"
+  },
+  "per_regime_rules": {
+    "abbreviation": {
+      "direction": "no_regression",
+      "rule": "delta >= -0.02",
+      "threshold": -0.02
+    },
+    "alias": {
+      "direction": "report_only",
+      "rule": "reported independently; may never be averaged into an aggregate verdict, and no aggregate gain may substitute for it",
+      "threshold": null
+    },
+    "canonical": {
+      "direction": "no_regression",
+      "rule": "delta >= -0.02",
+      "threshold": -0.02
+    },
+    "description": {
+      "direction": "material_gain",
+      "rule": "delta >= +0.10",
+      "threshold": 0.1
+    }
+  },
+  "policy_arms": {
+    "P0_bm25": "reference",
+    "P1_bge": "dense only",
+    "P2_rrf_bm25_bge": "deterministic fusion, no regime awareness",
+    "P3_regime_aware_deterministic": "BLOCKED until the alias identity mechanism exists",
+    "P4_oracle_regime_policy": "ceiling only, never a production arm"
+  },
+  "primary_metric": "complete_set@50",
+  "protocol": "gate_c2_promotion_v1",
+  "reference_arm": {
+    "immutable": true,
+    "name": "P0_bm25",
+    "rationale": "BM25 is the incumbent candidate generator and the strongest single arm measured so far. Frozen as the reference NOW so it cannot be swapped for a weaker baseline after calibration results are seen."
+  },
+  "selection_gate": {
+    "conditional_ceiling_required": "P(gold retained by S5 | gold available in pool)",
+    "rationale": "Low candidate coverage and poor selector performance must not be mixed. The conditional ceiling separates them.",
+    "rule": "if delta < tau_selection -> FAIL_SELECTION_OPPORTUNITY and S1-S4 are NOT built",
+    "statistic": "mean HRM verified_quality, S5 minus S0, on identical frozen candidate pools",
+    "tau_selection": 0.05
+  }
+}

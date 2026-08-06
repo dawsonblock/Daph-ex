@@ -109,3 +109,49 @@ def test_summary_reports_every_axis():
     assert summary["overall"]["complete_set@50"] == 1.0
     for axis in ("family", "entity_regime", "answer_kind", "source_style", "opportunity_group"):
         assert summary["by_axis"][axis]
+
+
+def cal_truths(part="c2_cal_surface"):
+    root = ROOT / "data" / "hrm" / "controlled_gate_c2_calibration_v1" / part
+    return [RetrievalGroundTruth.from_task(json.loads(l))
+            for l in (root / "oracle_tasks.jsonl").read_text().splitlines() if l.strip()]
+
+
+def test_identity_records_are_identified_for_alias_and_description_tasks():
+    """Alias questions must traverse an identity record before the target."""
+
+    truths = cal_truths()
+    assert truths
+    with_identity = [t for t in truths if t.identity_record_ids]
+    assert with_identity, "surface partition must have identity records"
+    for truth in with_identity[:20]:
+        assert all(v.endswith("/identity") for v in truth.identity_record_ids)
+
+
+def test_alias_decomposition_separates_identity_from_target():
+    truth = next(t for t in cal_truths() if t.identity_record_ids and t.answer_record_ids)
+    identity_only = score_coverage(truth, list(truth.identity_record_ids), retriever="t")
+    assert identity_only.identity_record_found == 1.0
+    assert identity_only.target_relation_record_found == 0.0
+    target_only = score_coverage(truth, list(truth.answer_record_ids), retriever="t")
+    assert target_only.identity_record_found == 0.0
+    assert target_only.target_relation_record_found == 1.0
+
+
+def test_identity_metrics_are_none_for_canonical_tasks():
+    """Canonical tasks have no identity hop and must not dilute the statistic."""
+
+    canonical = [t for t in cal_truths("c2_cal_id") if not t.identity_record_ids]
+    assert canonical
+    row = score_coverage(canonical[0], list(canonical[0].required_ids), retriever="t")
+    assert row.identity_record_found is None
+
+
+def test_summary_reports_conditional_target_recall():
+    truths = cal_truths()
+    rows = [score_coverage(t, list(t.required_ids), retriever="oracle") for t in truths]
+    summary = summarize_coverage(rows, {t.task_id: t for t in truths}, retriever="oracle")
+    o = summary["overall"]
+    assert o["identity_record_recall_among_identity_tasks"] == 1.0
+    assert o["target_recall_given_identity_found"] == 1.0
+    assert o["identity_task_count"] == len([t for t in truths if t.identity_record_ids])

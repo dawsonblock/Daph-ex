@@ -172,6 +172,15 @@
   },
   "problems": [],
   "purpose": "Gate C2 component selection. Does NOT replace V4, which stays immutable.",
+  "state": {
+    "frozen_before_evaluation": true,
+    "holdout_partition": "c2_cal_holdout",
+    "holdout_runs_permitted": 1,
+    "holdout_status": "RESERVED",
+    "purpose": "gate_c2_component_selection",
+    "replaces_v4": false,
+    "valid": true
+  },
   "v4_separation": {
     "entity_head_overlap": [],
     "evidence_id_collisions": 0,
