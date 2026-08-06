@@ -4,7 +4,8 @@
     "controlled_gate_a_v1": "SUPERSEDED_answer_leaked_into_one_question",
     "controlled_gate_a_v2": "CANONICAL_for_gate_a0_and_gate_b",
     "controlled_gate_a_v3": "HISTORICAL_qualitative_only_four_defects_documented",
-    "controlled_gate_a_v4": "CANONICAL_VALID_V4_true_frozen_before_evaluation"
+    "controlled_gate_a_v4": "CANONICAL_VALID_V4_true_frozen_before_evaluation",
+    "controlled_gate_c2_calibration_v1": "CANONICAL_for_gate_c2_component_selection_does_not_replace_v4"
   },
   "canonical_package": "hrm_adaptive_memory",
   "capabilities": {
@@ -67,7 +68,7 @@
     "slot_label_echo": "99 -> 0 under precision packing; was an evidence-confusability artefact, not a prompt-interface or reasoning limit",
     "slot_label_echoes": "Track evidence quality, not packet format: 85 -> 28 under precision packing, -> 3 under oracle evidence. F-arms would measure a symptom; implemented but unrun."
   },
-  "next_work": "Build and freeze controlled_gate_c2_calibration_v1 (400 tasks, all four entity regimes, partitioned C2-CAL-ID and C2-CAL-SURFACE, hard-separated from V4 by seed/entities/templates/clusters/task-ids) with the same inferability audit. Predeclare per-regime promotion rules before running: no canonical/abbreviation regression beyond -0.02, description improvement >= +0.10, alias reported separately and never hidden by aggregate. Freeze a candidate-GENERATION POLICY (BM25 + BGE deterministic fusion) rather than one winning retriever. Then pools, ceilings, and S0/S5. V4 stays immutable.",
+  "next_work": "Predeclare per-regime promotion rules, then evaluate BM25 / BGE / deterministic fusion on c2_cal_id and c2_cal_surface. Freeze a candidate-GENERATION POLICY rather than one retriever. Then pools, ceilings, S0/S5. c2_cal_holdout stays untouched; V4 stays immutable.",
   "ood_taxonomy": {
     "REFERENTIAL_OOD": {
       "mechanism": "identity resolution + multi-hop retrieval",
@@ -259,6 +260,22 @@
       ],
       "report": "GATE_C2_BGE_REPORT.md",
       "status": "MEASURED_EXPLORATORY_USED_FOR_ARCHITECTURE_SELECTION"
+    },
+    "gate_c2_calibration_corpus": {
+      "claim": "controlled_gate_c2_calibration_v1 exists solely for Gate C2 component selection. Three partitions: c2_cal_id (canonical+abbreviation, 100), c2_cal_surface (alias+description, 100), c2_cal_holdout (all four regimes, 100, RESERVED). All regimes balanced, all tasks inferable, zero leaks, zero latent-id exposure.",
+      "holdout_policy": "c2_cal_holdout is reserved. Selecting on calibration burns calibration exactly as using V4 OOD for architecture selection burned that split, so a pristine set is reserved up front rather than discovered missing later.",
+      "not_a_claim_about": [
+        "any retriever or selector result, none of which has been run on it",
+        "V4, which stays immutable",
+        "the holdout partition, which must never inform selection"
+      ],
+      "receipts": [
+        "data/hrm/controlled_gate_c2_calibration_v1/AUDIT.json",
+        "data/hrm/controlled_gate_c2_calibration_v1/RECEIPTS.sha256"
+      ],
+      "report": "GATE_C2_DEV_SWEEP_REPORT.md",
+      "status": "FROZEN_BEFORE_EVALUATION",
+      "v4_separation": "Disjoint entity heads (minerals vs V4's birds), disjoint roles, disjoint source styles, c2cal- task-id namespace, zero evidence-id collisions. Enforced by test, not just by construction."
     },
     "gate_c2_coverage": {
       "claim": "Retrieval coverage measured without the reader on frozen V4. Dense beats BM25 on BOTH splits, reversing the Gate B ordering, and rank fusion beats either alone. Coverage remains the dominant constraint.",

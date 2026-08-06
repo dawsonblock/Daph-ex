@@ -1,0 +1,42 @@
+{
+  "answer_kinds": [
+    "boolean",
+    "enum",
+    "json_field",
+    "numeric",
+    "symbolic"
+  ],
+  "dataset_id": "controlled-gate-c2-calibration-v1-c2_cal_id",
+  "evidence_count": 380,
+  "evidence_sha256": "11928151f6f74b65f038afc239598d8ea3d0d210cf57ebeb0c2372809feb7ef6",
+  "families": [
+    "configuration_chain",
+    "dependency_chain",
+    "distractor_heavy",
+    "entity_attribute",
+    "location_chain",
+    "numeric_chain",
+    "ownership_chain",
+    "procedural_chain",
+    "temporal_chain",
+    "temporal_update"
+  ],
+  "generation_seed": 51001,
+  "partition": "c2_cal_id",
+  "per_regime": 50,
+  "purpose": "component selection only; does not replace V4",
+  "regimes": [
+    "canonical",
+    "abbreviation"
+  ],
+  "source_styles": [
+    "audit_trail",
+    "dispatch_sheet",
+    "field_memo",
+    "retrofit_note",
+    "survey_report",
+    "transfer_ledger"
+  ],
+  "task_count": 100,
+  "task_sha256": "16ba3fd7bbed7df6365af4a6e49976f76ca02207ea6305c5d214a720240dacbc"
+}

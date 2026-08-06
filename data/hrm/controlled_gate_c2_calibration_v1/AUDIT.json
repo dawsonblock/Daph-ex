@@ -1,0 +1,180 @@
+{
+  "VALID_C2_CAL": true,
+  "audit": {
+    "c2_cal_holdout": {
+      "distractor_leaks": 0,
+      "latent_id_leaks": 0,
+      "not_inferable": 0,
+      "proof_graphs": true,
+      "question_leaks": 0,
+      "regime_counts": {
+        "abbreviation": 25,
+        "alias": 25,
+        "canonical": 25,
+        "description": 25
+      }
+    },
+    "c2_cal_id": {
+      "distractor_leaks": 0,
+      "latent_id_leaks": 0,
+      "not_inferable": 0,
+      "proof_graphs": true,
+      "question_leaks": 0,
+      "regime_counts": {
+        "abbreviation": 50,
+        "canonical": 50
+      }
+    },
+    "c2_cal_surface": {
+      "distractor_leaks": 0,
+      "latent_id_leaks": 0,
+      "not_inferable": 0,
+      "proof_graphs": true,
+      "question_leaks": 0,
+      "regime_counts": {
+        "alias": 50,
+        "description": 50
+      }
+    }
+  },
+  "frozen_before_evaluation": true,
+  "generator": "controlled-gate-c2-calibration-v1",
+  "holdout_policy": "c2_cal_holdout is RESERVED. Selecting on it would burn it exactly as using V4 OOD for architecture selection burned that split.",
+  "partitions": {
+    "c2_cal_holdout": {
+      "answer_kinds": [
+        "boolean",
+        "enum",
+        "json_field",
+        "numeric",
+        "symbolic"
+      ],
+      "dataset_id": "controlled-gate-c2-calibration-v1-c2_cal_holdout",
+      "evidence_count": 407,
+      "evidence_sha256": "e7b0db5549aedd339b7f70ef93b3d194057febac809e177d6b875dc54fa4cb7c",
+      "families": [
+        "configuration_chain",
+        "dependency_chain",
+        "distractor_heavy",
+        "entity_attribute",
+        "location_chain",
+        "numeric_chain",
+        "ownership_chain",
+        "procedural_chain",
+        "temporal_chain",
+        "temporal_update"
+      ],
+      "generation_seed": 51003,
+      "partition": "c2_cal_holdout",
+      "per_regime": 25,
+      "purpose": "RESERVED: never use for selection",
+      "regimes": [
+        "canonical",
+        "abbreviation",
+        "alias",
+        "description"
+      ],
+      "source_styles": [
+        "audit_trail",
+        "dispatch_sheet",
+        "field_memo",
+        "retrofit_note",
+        "survey_report",
+        "transfer_ledger"
+      ],
+      "task_count": 100,
+      "task_sha256": "30acc0047b77a1a6bea3f136f71f574ef31127d6d12a33935b075aef3ea91852"
+    },
+    "c2_cal_id": {
+      "answer_kinds": [
+        "boolean",
+        "enum",
+        "json_field",
+        "numeric",
+        "symbolic"
+      ],
+      "dataset_id": "controlled-gate-c2-calibration-v1-c2_cal_id",
+      "evidence_count": 380,
+      "evidence_sha256": "11928151f6f74b65f038afc239598d8ea3d0d210cf57ebeb0c2372809feb7ef6",
+      "families": [
+        "configuration_chain",
+        "dependency_chain",
+        "distractor_heavy",
+        "entity_attribute",
+        "location_chain",
+        "numeric_chain",
+        "ownership_chain",
+        "procedural_chain",
+        "temporal_chain",
+        "temporal_update"
+      ],
+      "generation_seed": 51001,
+      "partition": "c2_cal_id",
+      "per_regime": 50,
+      "purpose": "component selection only; does not replace V4",
+      "regimes": [
+        "canonical",
+        "abbreviation"
+      ],
+      "source_styles": [
+        "audit_trail",
+        "dispatch_sheet",
+        "field_memo",
+        "retrofit_note",
+        "survey_report",
+        "transfer_ledger"
+      ],
+      "task_count": 100,
+      "task_sha256": "16ba3fd7bbed7df6365af4a6e49976f76ca02207ea6305c5d214a720240dacbc"
+    },
+    "c2_cal_surface": {
+      "answer_kinds": [
+        "boolean",
+        "enum",
+        "json_field",
+        "numeric",
+        "symbolic"
+      ],
+      "dataset_id": "controlled-gate-c2-calibration-v1-c2_cal_surface",
+      "evidence_count": 430,
+      "evidence_sha256": "0755cba3f689e3086a57c19ff750ed4f52d745b11a7a09b869d2621d0e0877e7",
+      "families": [
+        "configuration_chain",
+        "dependency_chain",
+        "distractor_heavy",
+        "entity_attribute",
+        "location_chain",
+        "numeric_chain",
+        "ownership_chain",
+        "procedural_chain",
+        "temporal_chain",
+        "temporal_update"
+      ],
+      "generation_seed": 51002,
+      "partition": "c2_cal_surface",
+      "per_regime": 50,
+      "purpose": "component selection only; does not replace V4",
+      "regimes": [
+        "alias",
+        "description"
+      ],
+      "source_styles": [
+        "audit_trail",
+        "dispatch_sheet",
+        "field_memo",
+        "retrofit_note",
+        "survey_report",
+        "transfer_ledger"
+      ],
+      "task_count": 100,
+      "task_sha256": "c9b09880f866947f60bac9f9e8110b4b65617a51a22f9f87a3ccd1e87e08468a"
+    }
+  },
+  "problems": [],
+  "purpose": "Gate C2 component selection. Does NOT replace V4, which stays immutable.",
+  "v4_separation": {
+    "entity_head_overlap": [],
+    "evidence_id_collisions": 0,
+    "task_id_prefix": "c2cal-"
+  }
+}
