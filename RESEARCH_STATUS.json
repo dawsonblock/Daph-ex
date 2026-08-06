@@ -1,4 +1,5 @@
 {
+  "architecture_principle": "Retrieval iteration must ACCUMULATE information state, never replace earlier context with the latest bridge. Pinned by tests/unit/test_information_state.py.",
   "benchmark_lineage": {
     "controlled_gate_a_v1": "SUPERSEDED_answer_leaked_into_one_question",
     "controlled_gate_a_v2": "CANONICAL_for_gate_a0_and_gate_b",
@@ -60,11 +61,13 @@
     "adaptive_retrieval_trigger": "91 of 91 follow-ups positive, 0 negative; a fixed two-pass policy suffices and Gate D is expected to FAIL on this corpus",
     "calculate_action": "100 answers produced, +0.000 marginal quality; NOT promoted",
     "calculate_action_v3": "-0.008 on v3 qualification; harmful, remains unqualified",
+    "followup_dropped_the_subject": "MEASURED: the old follow-up discarded the subject after finding a bridge. Complete-set@50 by formulation: bridge alone 0.500, bridge+relation 0.625, subject+bridge+relation 0.900. Retention is worth +0.275, larger than any encoder change measured. Fixed by InformationState, which accumulates rather than replaces; bridge_only is retained as a named negative control.",
     "gate_d_v3": "oracle trigger equals best fixed policy on both splits (opportunity +0.000); 50 positive / 450 neutral / 0 negative. No controller is justified.",
+    "rrf_k_sensitivity": "NEGATIVE_RESULT: complete_set@50 is 0.767 at every k in {10,30,60,100} on development. k was never worth tuning on this corpus. k=10 is used as the simplest deterministic value on a CES@10 tiebreak and is NOT claimed to be scientifically superior.",
     "slot_label_echo": "99 -> 0 under precision packing; was an evidence-confusability artefact, not a prompt-interface or reasoning limit",
     "slot_label_echoes": "Track evidence quality, not packet format: 85 -> 28 under precision packing, -> 3 under oracle evidence. F-arms would measure a symptom; implemented but unrun."
   },
-  "next_work": "Freeze candidate pools from the winning retriever, then run S0-S5 selection on identical pools. Alias remains a retrieval/multi-hop problem, not an embedding one. Executive, adaptive recurrence, Graphiti, and learned routing stay blocked.",
+  "next_work": "Build and freeze controlled_gate_c2_calibration_v1 (400 tasks, all four entity regimes, partitioned C2-CAL-ID and C2-CAL-SURFACE, hard-separated from V4 by seed/entities/templates/clusters/task-ids) with the same inferability audit. Predeclare per-regime promotion rules before running: no canonical/abbreviation regression beyond -0.02, description improvement >= +0.10, alias reported separately and never hidden by aggregate. Freeze a candidate-GENERATION POLICY (BM25 + BGE deterministic fusion) rather than one winning retriever. Then pools, ceilings, and S0/S5. V4 stays immutable.",
   "ood_taxonomy": {
     "REFERENTIAL_OOD": {
       "mechanism": "identity resolution + multi-hop retrieval",
@@ -220,6 +223,7 @@
     },
     "gate_c2_bge_dense": {
       "claim": "A stronger pinned dense encoder (BAAI/bge-small-en-v1.5, CLS pooling, query-prefix only) earns promotion on OOD but not on qualification. Complete-set@50 rises 0.072 -> 0.152 OOD (more than doubling) while qualification moves only 0.364 -> 0.370.",
+      "claim_class_note": "The numbers stand (BGE OOD CES@50 0.152 vs MiniLM 0.072; description 0.083 -> 0.242). But this OOD set has now been used to decide whether BGE belongs in the architecture, so it is no longer a pristine final confirmation set for THIS C2 architecture-selection question. Class changed from 'final untouched confirmation' to 'measured exploratory evidence used for architecture selection'. A clean confirmation requires controlled_gate_c2_calibration_v1.",
       "interpretation": "The entire OOD gain comes from the DESCRIPTION regime (+0.158, roughly 3x). That is mechanistically coherent: a description is a natural-language phrase, which is what a semantic encoder is for. An alias is an arbitrary name substitution that no encoder can resolve without retrieving the identity record, so alias remains a multi-hop retrieval problem rather than an embedding problem. Promoting BGE on aggregate recall alone would have obscured that split.",
       "not_a_claim_about": [
         "qualification, where the gain is +0.006 and within noise",
@@ -254,7 +258,7 @@
         "evidence/gate_c2/retrieval/dense_bge_ood/"
       ],
       "report": "GATE_C2_BGE_REPORT.md",
-      "status": "MEASURED_RECEIPTED"
+      "status": "MEASURED_EXPLORATORY_USED_FOR_ARCHITECTURE_SELECTION"
     },
     "gate_c2_coverage": {
       "claim": "Retrieval coverage measured without the reader on frozen V4. Dense beats BM25 on BOTH splits, reversing the Gate B ordering, and rank fusion beats either alone. Coverage remains the dominant constraint.",
