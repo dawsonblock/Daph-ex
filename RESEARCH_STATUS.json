@@ -3,7 +3,7 @@
     "controlled_gate_a_v1": "SUPERSEDED_answer_leaked_into_one_question",
     "controlled_gate_a_v2": "CANONICAL_for_gate_a0_and_gate_b",
     "controlled_gate_a_v3": "HISTORICAL_qualitative_only_four_defects_documented",
-    "controlled_gate_a_v4": "REQUIRED_supersedes_v3"
+    "controlled_gate_a_v4": "CANONICAL_VALID_V4_true_frozen_before_evaluation"
   },
   "canonical_package": "hrm_adaptive_memory",
   "capabilities": {
@@ -50,7 +50,7 @@
     "slot_label_echo": "99 -> 0 under precision packing; was an evidence-confusability artefact, not a prompt-interface or reasoning limit",
     "slot_label_echoes": "Track evidence quality, not packet format: 85 -> 28 under precision packing, -> 3 under oracle evidence. F-arms would measure a symptom; implemented but unrun."
   },
-  "next_work": "Build controlled_gate_a_v4: split-local style selection enforced at the evidence-record level, genuine aliases with explicit alias evidence, inferable description identities, evaluator-only proof graphs with a formal inferability audit, and an R0-R5 oracle ladder built from generator metadata. Then re-run the 3260ce0 mechanism unchanged for a clean baseline before building the semantic information-gap layer (Gate C2).",
+  "next_work": "Run the 3260ce0 mechanism UNCHANGED against frozen controlled_gate_a_v4 (qualification + OOD) through the independent R0-R5 oracle ladder to establish the real bottleneck decomposition. Mechanism improvement is prohibited until that baseline exists.",
   "qualified_claims": {
     "gate_a0": {
       "claim": "HRM-Text-1B can use correctly supplied external evidence on the controlled synthetic Gate A benchmark.",
@@ -97,12 +97,17 @@
       "amended": "OOD measurements voided after four corpus defects were found; see data/hrm/controlled_gate_a_v3/V3_KNOWN_LIMITATIONS.md",
       "claim": "Bounded two-pass retrieval with entity-anchored packing is identifier-dependent: ENTITY_PATTERN matches 0/250 v3 OOD questions and 0/160 natural_name qualification questions, so zero follow-ups fire. On v3 qualification it scores 0.394 against a 0.828 oracle-evidence ceiling.",
       "decomposition_qualification": {
-        "bridge": 0.146,
-        "iteration": 0.1,
+        "_warning": "Raw arm differences, NOT validated causal attributions. The bridge and retrieval terms depend on an oracle_bridge instrument now known not to be independent (it re-runs the extractor under test), so the causal labels are weaker than the numbers. Only V4's R0-R5 ladder can establish the real decomposition.",
+        "bridge_arm_difference_UNVALIDATED": 0.146,
+        "iteration_arm_difference": 0.1,
         "reader_error": 0.172,
-        "retrieval": 0.288,
-        "selection": 0.048
+        "retrieval_arm_difference_UNVALIDATED": 0.288,
+        "selection_arm_difference": 0.048
       },
+      "no_longer_usable": [
+        "the OOD magnitude",
+        "the bridge/retrieval causal split"
+      ],
       "not_a_claim_about": [
         "any quantitative OOD figure, which is voided: 48% of the v3 OOD split is unanswerable from evidence",
         "source-style generalization, since the v3 holdout is violated at the evidence level",
@@ -111,7 +116,13 @@
       ],
       "report": "GATE_C1_REPORT.md",
       "root_cause": "The mechanism performed lexical identifier chaining, not bridge inference. ENTITY_PATTERN requires a hyphen-digit suffix; it matches 0/250 OOD questions and 0/160 natural_name questions inside qualification, so zero follow-ups fire.",
-      "verdict": "FAIL_STRUCTURAL_GENERALIZATION"
+      "verdict": "FAIL_STRUCTURAL_GENERALIZATION",
+      "what_remains_strong": [
+        "the current mechanism materially improves some qualification tasks",
+        "natural_name tasks expose its syntactic brittleness (0/160 entities extracted)",
+        "ENTITY_PATTERN is lexical identifier chaining, not semantic bridge inference",
+        "HRM performs substantially better when supplied correct evidence"
+      ]
     }
   },
   "version": "3.7.1"

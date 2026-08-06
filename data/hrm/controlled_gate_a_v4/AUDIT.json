@@ -1,0 +1,159 @@
+{
+  "audit": {
+    "VALID_V4": true,
+    "inferability": {
+      "development": {
+        "not_inferable": 0,
+        "tasks": 120
+      },
+      "ood": {
+        "not_inferable": 0,
+        "tasks": 250
+      },
+      "qualification": {
+        "not_inferable": 0,
+        "tasks": 500
+      }
+    },
+    "leakage": {
+      "development": {
+        "distractor_leaks": 0,
+        "question_leaks": 0
+      },
+      "ood": {
+        "distractor_leaks": 0,
+        "question_leaks": 0
+      },
+      "qualification": {
+        "distractor_leaks": 0,
+        "question_leaks": 0
+      }
+    },
+    "oracle_isolation": {
+      "development": {
+        "every_task_has_proof_graph": true,
+        "latent_ids_in_answers": 0,
+        "latent_ids_in_evidence": 0,
+        "latent_ids_in_questions": 0
+      },
+      "ood": {
+        "every_task_has_proof_graph": true,
+        "latent_ids_in_answers": 0,
+        "latent_ids_in_evidence": 0,
+        "latent_ids_in_questions": 0
+      },
+      "qualification": {
+        "every_task_has_proof_graph": true,
+        "latent_ids_in_answers": 0,
+        "latent_ids_in_evidence": 0,
+        "latent_ids_in_questions": 0
+      }
+    },
+    "problems": [],
+    "retrievability": {
+      "development": {
+        "missing_required_records": 0,
+        "subject_not_findable_in_required": 0,
+        "unrealised_identity_transitions": 0
+      },
+      "ood": {
+        "missing_required_records": 0,
+        "subject_not_findable_in_required": 0,
+        "unrealised_identity_transitions": 0
+      },
+      "qualification": {
+        "missing_required_records": 0,
+        "subject_not_findable_in_required": 0,
+        "unrealised_identity_transitions": 0
+      }
+    },
+    "split_isolation": {
+      "ood_evidence_styles": [
+        "message",
+        "table_text"
+      ],
+      "qualification_evidence_styles": [
+        "change_log",
+        "formal_registry",
+        "key_value_log",
+        "technical_note"
+      ],
+      "regime_overlap": [],
+      "style_overlap": []
+    },
+    "structural_diversity": {
+      "answer_kinds": 5,
+      "families": 10,
+      "iterative_families": 7,
+      "opportunity_groups": 4,
+      "source_clusters": 24,
+      "templates": 160
+    }
+  },
+  "frozen_before_evaluation": true,
+  "generator": "controlled-gate-a-v4",
+  "splits": {
+    "development": {
+      "allowed_source_styles": [
+        "formal_registry",
+        "technical_note",
+        "key_value_log",
+        "change_log"
+      ],
+      "entity_regimes": [
+        "canonical",
+        "abbreviation"
+      ],
+      "evidence_count": 534,
+      "evidence_record_styles": [
+        "change_log",
+        "formal_registry",
+        "key_value_log",
+        "technical_note"
+      ],
+      "source_cluster_count": 12,
+      "task_count": 120,
+      "template_count": 120
+    },
+    "ood": {
+      "allowed_source_styles": [
+        "table_text",
+        "message"
+      ],
+      "entity_regimes": [
+        "alias",
+        "description"
+      ],
+      "evidence_count": 1233,
+      "evidence_record_styles": [
+        "message",
+        "table_text"
+      ],
+      "source_cluster_count": 24,
+      "task_count": 250,
+      "template_count": 80
+    },
+    "qualification": {
+      "allowed_source_styles": [
+        "formal_registry",
+        "technical_note",
+        "key_value_log",
+        "change_log"
+      ],
+      "entity_regimes": [
+        "canonical",
+        "abbreviation"
+      ],
+      "evidence_count": 2216,
+      "evidence_record_styles": [
+        "change_log",
+        "formal_registry",
+        "key_value_log",
+        "technical_note"
+      ],
+      "source_cluster_count": 24,
+      "task_count": 500,
+      "template_count": 160
+    }
+  }
+}

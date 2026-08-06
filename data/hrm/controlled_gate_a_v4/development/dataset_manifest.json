@@ -1,0 +1,65 @@
+{
+  "allowed_source_styles": [
+    "formal_registry",
+    "technical_note",
+    "key_value_log",
+    "change_log"
+  ],
+  "answer_kinds": [
+    "numeric",
+    "symbolic",
+    "enum",
+    "boolean",
+    "json_field"
+  ],
+  "claim_strength": "CONTROLLED_SYNTHETIC_BENCHMARK_ONLY",
+  "dataset_id": "controlled-gate-a-v4-development",
+  "entity_regimes": [
+    "canonical",
+    "abbreviation"
+  ],
+  "evidence_count": 534,
+  "evidence_record_styles": [
+    "change_log",
+    "formal_registry",
+    "key_value_log",
+    "technical_note"
+  ],
+  "evidence_sha256": "451fc9d73cd3a862180f620590f96ae6c2ef4883ec773b342c4a2c3cf0f204c7",
+  "families": [
+    "entity_attribute",
+    "ownership_chain",
+    "configuration_chain",
+    "dependency_chain",
+    "location_chain",
+    "temporal_chain",
+    "numeric_chain",
+    "procedural_chain",
+    "temporal_update",
+    "distractor_heavy"
+  ],
+  "generation_seed": 9101,
+  "inferability_verified": true,
+  "iterative_families": [
+    "configuration_chain",
+    "dependency_chain",
+    "location_chain",
+    "numeric_chain",
+    "ownership_chain",
+    "procedural_chain",
+    "temporal_chain"
+  ],
+  "natural_memory_claim_allowed": false,
+  "opportunity_groups": [
+    "A_ONE_PASS_SUFFICIENT",
+    "B_SECOND_PASS_REQUIRED",
+    "C_SECOND_PASS_CONFUSING",
+    "D_SECOND_PASS_SUPPRESS"
+  ],
+  "source_cluster_count": 12,
+  "split": "development",
+  "task_count": 120,
+  "task_sha256": "d617b6c02631d160a102e7969456ba159e09a098d3da89c3e5d8a0b5ab17f7dd",
+  "tasks_per_family": 12,
+  "template_count": 120
+}

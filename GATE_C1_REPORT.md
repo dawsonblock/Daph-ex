@@ -13,6 +13,17 @@
 > corpus text alone: the entity extractor matches 0 of 250 OOD questions and 0
 > of 160 `natural_name` qualification questions, so zero follow-ups fired.
 >
+> **Also amended:** the `bridge` (+0.146) and `retrieval` (+0.288) terms below
+> are *raw arm differences, not validated causal attributions*. Both depend on
+> an `oracle_bridge` arm now known not to be independent of the extractor under
+> test. The arm scores stand as historical measurements; the causal labels do
+> not. Only V4's independent R0–R5 ladder can establish the real decomposition.
+>
+> What remains strong from this experiment is simpler: the mechanism materially
+> improves some qualification tasks, `natural_name` tasks expose its syntactic
+> brittleness, `ENTITY_PATTERN` is not semantic bridge inference, and HRM
+> performs substantially better given correct evidence.
+>
 > Details: `data/hrm/controlled_gate_a_v3/V3_KNOWN_LIMITATIONS.md`.
 > Superseded by `controlled_gate_a_v4`.
 
