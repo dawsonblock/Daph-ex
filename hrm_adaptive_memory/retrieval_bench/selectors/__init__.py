@@ -88,14 +88,42 @@ def s2_connectivity(candidates, *, budget: int, question: str, texts,
     return chosen[:budget]
 
 
+class DegenerateRerankerError(RuntimeError):
+    """A reranker returned scores that cannot express an ordering.
+
+    This exists because of a real measurement failure. An earlier S3 arm used
+    cross-encoder/ms-marco-MiniLM-L6-v2, whose forward pass returns NaN for
+    every pair under torch 2.10 / transformers 5.14.1 (finite fp32 weights,
+    absmax 4.7, NaN from the first attention layer onward). `sorted` compares
+    NaN keys as all-False, so the pool came back in its original order and the
+    arm silently reported figures identical to S0 to four decimals. A broken
+    scorer must fail, never impersonate the baseline.
+    """
+
+
 def make_cross_encoder_selector(model_id: str, revision: str | None = None,
                                 max_length: int = 512):
     """S3/S4: rerank the frozen pool with a pinned cross-encoder."""
+    import math
+
     import torch
     from transformers import AutoModelForSequenceClassification, AutoTokenizer
     kw = {"revision": revision} if revision else {}
     tok = AutoTokenizer.from_pretrained(model_id, **kw)
     mdl = AutoModelForSequenceClassification.from_pretrained(model_id, **kw).eval()
+
+    def _audit(scores: list[float], count: int) -> None:
+        bad = sum(1 for s in scores if not math.isfinite(s))
+        if bad:
+            raise DegenerateRerankerError(
+                f"{model_id} returned {bad}/{len(scores)} non-finite scores; "
+                "refusing to emit an order that would duplicate the raw pool"
+            )
+        if count > 1 and len(set(scores)) == 1:
+            raise DegenerateRerankerError(
+                f"{model_id} scored all {count} candidates identically "
+                f"({scores[0]}); this cannot rerank and would duplicate S0"
+            )
 
     def selector(candidates, *, budget: int, question: str, texts, **_) -> list[str]:
         ids = [c["document_id"] for c in candidates]
@@ -108,10 +136,12 @@ def make_cross_encoder_selector(model_id: str, revision: str | None = None,
                           truncation=True, max_length=max_length, return_tensors="pt")
                 logits = mdl(**enc).logits
                 scores.extend((logits[:, -1] if logits.shape[-1] > 1 else logits[:, 0]).tolist())
+        _audit(scores, len(ids))
         order = sorted(range(len(ids)), key=lambda i: (-scores[i], i))
         return [ids[i] for i in order[:budget]]
 
     selector.model_id = model_id
+    selector.revision = revision
     return selector
 
 
