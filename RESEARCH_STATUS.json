@@ -39,6 +39,7 @@
     "gate_c2c_chain_completion_qualified": "PASS_all_four_regimes_on_identifiable_corpus",
     "gate_c2c_v2_chain_validation": "FAIL_ON_A_TRANSPLANTED_DESCRIPTION_THRESHOLD",
     "gate_c2c_v3_chain_validation": "FAIL_description_regime_only",
+    "gate_c3_surface_identity_resolution": "PENDING_PROTOCOL_FROZEN_IMPLEMENTATION_NOT_STARTED",
     "gate_d_conditional_retrieval_opportunity": "PENDING_ACTION_TOO_WEAK_TO_MEASURE",
     "gate_e_learned_retrieval_control": "BLOCKED",
     "gate_f_recurrence_opportunity": "BLOCKED",
@@ -75,7 +76,7 @@
     "slot_label_echo": "99 -> 0 under precision packing; was an evidence-confusability artefact, not a prompt-interface or reasoning limit",
     "slot_label_echoes": "Track evidence quality, not packet format: 85 -> 28 under precision packing, -> 3 under oracle evidence. F-arms would measure a symptom; implemented but unrun."
   },
-  "next_work": "Structural selection qualified on descv4_id only (S2c +0.1200, SGC 30.8%, CI excludes zero under all groupings). Two follow-ups, in order: (1) S2b/S2c are inert on surface forms because entity extraction fails on truncated subjects (100/100 tasks) -- that is an identity-resolution problem upstream of selection, so the next sprint is alias/description identity resolution, not more selector tuning; (2) only then a packet-budget sweep for S0/S2c/S5. Holdout untouched.",
+  "next_work": "Gate C3 (Surface Identity Resolution) protocol is frozen at configs/gate_c3_protocol.json before any measurement: ladder I0-I6, primary metric S2cLiveRate (currently 0.0 on descv4_surface), no HRM initially, deterministic normalization before any learned resolver, no hardcoded entity vocabulary, and a fresh disjoint-vocabulary calibration corpus so the resolver is not tuned into a second surface-specific shortcut. Implementation NOT started, awaiting authorization. The anchor-found/anchor-missing routing policy is explicitly out of scope until resolution is itself qualified. S2c is promoted for the ID-partition mechanism only, not globally. Holdout untouched.",
   "ood_taxonomy": {
     "REFERENTIAL_OOD": {
       "mechanism": "identity resolution + multi-hop retrieval",
@@ -694,9 +695,11 @@
       "what_this_isolates": "Chain completion is real and large for abbreviation and alias -- where a retrieved identity record names a canonical entity that runtime parsing can extract. Description references resolve through prose ('the ancillary unit charted during survey season'), and the canonicalization parser recovers them far less reliably, so the follow-up query is built from a subject it never resolved. C5 reaching 1.000 proves the evidence is retrievable given the right query, so this is a canonicalization-coverage failure, not a retrieval-ceiling failure."
     },
     "gate_c2s_relation_keyword_control": {
+      "canonical_name": "S_rel_only",
       "claim": "The arm labelled S2_connectivity computes exactly as implemented but does not instantiate the chain-selection hypothesis it was built for. Its dominant term rewards records containing the target relation string. In this corpus 0/56 bridge records contain the target relation while 99/99 answer records do, so the arm cannot retain a bridge record: BridgeRetention=0.000 is arithmetically forced, not incidental. It fills 91.3% of each packet with relation-string matches, of which 79.3% of the packet are relation-matching records that are not required.",
       "distinguished_from": "the ms-marco-MiniLM-L6-v2 arm, which was COMPUTATIONALLY invalid (NaN scores). This arm computes correctly; only its scientific interpretation was wrong. Its receipts are valid and retained.",
       "experiment_verdict": "VALID_RECEIPTS_INVALID_HYPOTHESIS_IMPLEMENTATION",
+      "historical_arm_id": "S2_connectivity (unchanged in frozen receipts; renaming a measured arm id would break reproducibility)",
       "kept_as": "negative control: target-relation keyword matching is insufficient for multi-hop packing and causes systematic distractor selection",
       "not_a_claim_about": [
         "whether relational chain selection works, which it does not test",
@@ -709,7 +712,8 @@
         "evidence/gate_c2/selector_ladder/cells.jsonl"
       ],
       "report": "configs/gate_c2_protocol.json",
-      "status": "RESCOPED_NOT_VOIDED_negative_control"
+      "retained_because": "On descv4_surface it is the only arm with a significant gain (+0.170, CI excluding zero under all three groupings, SGC 30.9%). Relation scoring needs no entity anchor, so it still works where identity resolution fails. It is a useful fallback baseline for weak-identity conditions, not a bad implementation to forget.",
+      "status": "VALID_DIAGNOSTIC_CONTROL_relation_only_not_a_chain_selector"
     },
     "gate_c2s_selection_opportunity": {
       "claim": "On frozen candidate pools with an identical 6-record packet budget, oracle selection beats raw top-N by +0.39 (descv4_id) and +0.55 (descv4_surface) HRM verified quality, against a predeclared tau of 0.05. Selection has a large real opportunity; S1-S4 are authorized.",
@@ -794,6 +798,8 @@
       },
       "claim": "At packet budget 6 over the frozen pools, oracle selection is worth +0.390 quality on descv4_id (0.360 -> 0.750) and +0.550 on descv4_surface (0.130 -> 0.680), so evidence selection is a real and large lever. Of the runtime arms, only S2c_chain_plus_relation separates from S0 on descv4_id: dQ=+0.1200 with a paired grouped-bootstrap CI excluding zero under ALL THREE groupings (family [0.04,0.21], source_cluster [0.030,0.214], template [0.010,0.228]), capturing 30.8% of the oracle opportunity. S1/S2/S3/S4 and S2a/S2b do not separate from S0 on that partition.",
       "connected_proof_retention": "VALID_METRIC_BUT_NONDISCRIMINATIVE_ON_V4_PATH_TOPOLOGY",
+      "dual_mechanism_note": "S2c appears to help through two distinct routes -- structural role recovery and packet cleanliness / distractor reduction -- which the current single score conflates. A future structural selector should make those terms explicit rather than fusing them.",
+      "earned_claim": "S2c improves evidence selection when the question entity can be resolved.",
       "experiment_verdict": "STRUCTURAL_SELECTION_QUALIFIED_ON_ID_PARTITION_ONLY",
       "mechanism_evidence": "Correct->wrong flips attribute pointwise failures to role loss: S1 loses the identity record on 10 of 13, S3 the answer record on 10 of 16, S4 answer on 8 and identity on 4 of 13. S2c's 22 fixes break down as 14 answer newly retained, 8 bridge newly retained, 7 both jointly, 15 with distractors reduced, and 7 with no new role retained -- so the gain is partly the intended structural recovery and partly a cleaner packet, NOT purely the claimed mechanism.",
       "not_a_claim_about": [
@@ -803,6 +809,8 @@
         "the candidate-pool ceiling, which sits upstream and is unmeasured here",
         "the reserved c2_cal_holdout, untouched"
       ],
+      "not_earned_claim": "S2c is the production selector for all V4 regimes.",
+      "promotion_status": "PROMOTED_FOR_ID_PARTITION_MECHANISM__NOT_GLOBAL_PIPELINE_PROMOTION",
       "receipts": [
         "evidence/gate_c2/selector_ladder/selector_ladder.json",
         "evidence/gate_c2/selector_ladder/paired_analysis.json",

@@ -88,6 +88,20 @@ def s2_connectivity(candidates, *, budget: int, question: str, texts,
     return chosen[:budget]
 
 
+# Honest name for what this arm actually is. It scores target-relation presence,
+# not connectivity, so `s2_connectivity` was a misnomer. It is retained as a
+# valid diagnostic control rather than discarded: on descv4_surface, where
+# entity anchoring fails and the structural arms go inert, it is the only arm
+# with a significant gain (+0.170), because relation scoring needs no entity
+# anchor. It remains disqualified as a chain selector -- BridgeRetention 0.000
+# on descv4_id, which is forced, since 0/56 bridge records state the target
+# relation there.
+#
+# The historical arm id `S2_connectivity` is left untouched in frozen receipts;
+# renaming a measured arm id would break reproducibility of existing evidence.
+s_rel_only = s2_connectivity
+
+
 class DegenerateRerankerError(RuntimeError):
     """A reranker returned scores that cannot express an ordering.
 

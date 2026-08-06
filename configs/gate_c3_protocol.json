@@ -1,0 +1,88 @@
+{
+  "gate": "C3_SURFACE_IDENTITY_RESOLUTION",
+  "status": "PROTOCOL_FROZEN_BEFORE_MEASUREMENT",
+  "frozen_before_any_c3_measurement": true,
+  "goal": "Resolve truncated, alias, and description mentions into runtime canonical entities well enough that the qualified structural selector can operate on surface tasks.",
+  "motivation": {
+    "observed_defect": "S2b and S2c are inert on descv4_surface: differs_from_s0=0.00 on every task, because entity extraction yields no question entity on 100/100 tasks. Subjects are truncated ('Ojos tension' vs canonical 'Ojos tension block').",
+    "why_this_gate_and_not_more_selector_work": "The surface partition has MORE selector headroom than the ID partition (+0.550 vs +0.390), but the structural selector cannot access it because chains cannot be anchored to the question entity. The missing operation is identity resolution, not model scale or reranking capacity.",
+    "dependency_chain": [
+      "surface mention",
+      "canonical entity",
+      "chain enumeration",
+      "structure + relation selection",
+      "clean evidence packet",
+      "HRM"
+    ]
+  },
+  "ladder": {
+    "I0_current_surface_anchor_extraction": "baseline; the mechanism that is currently inert",
+    "I1_normalized_lexical_mention_matching": "case/punctuation/whitespace normalization only",
+    "I2_prefix_suffix_tolerant_resolution": "allow a mention to match a longer canonical form when the extension is a plausible entity-type continuation",
+    "I3_alias_identity_record_retrieval": "retrieve identity records that state the mapping",
+    "I4_bounded_canonicalization_through_retrieved_identity_edges": "follow refers_to edges found at runtime, bounded depth",
+    "I5_oracle_identity_resolution_plus_real_selector": "perfect anchoring, real selection: isolates resolution from selection",
+    "I6_oracle_evidence": "ceiling"
+  },
+  "metrics": [
+    "QuestionAnchorResolutionRate",
+    "IdentityRecordRecallAtK",
+    "CanonicalEntityRecovery",
+    "ChainEnumerationRate",
+    "CandidateCompleteSet",
+    "S2cLiveRate"
+  ],
+  "primary_metric": {
+    "name": "S2cLiveRate",
+    "definition": "fraction of tasks on which S2c can construct at least one nontrivial chain",
+    "current_value_on_descv4_surface": 0.0
+  },
+  "reader_policy": {
+    "hrm_in_initial_ladder": false,
+    "rationale": "Resolution is measurable without the reader; adding generation first would confound resolution failure with reader error and cost hours per iteration."
+  },
+  "mechanism_constraints": {
+    "deterministic_before_learned": "Deterministic runtime normalization must be tried and measured before any learned resolver.",
+    "no_hardcoded_entity_vocabulary": "The V4 entity-type vocabulary must NOT be hardcoded. Only generic mention-compatibility features are permitted.",
+    "permitted_features": [
+      "exact normalized prefix",
+      "token containment",
+      "edit distance",
+      "head-token preservation",
+      "suffix-extension compatibility",
+      "candidate recurrence across evidence",
+      "alias / refers_to links already present in evidence"
+    ],
+    "no_oracle_metadata_at_runtime": "_oracle_metadata remains evaluator-only; resolution must use question text and candidate text only."
+  },
+  "generalization_requirement": {
+    "fresh_calibration_corpus_required": true,
+    "rationale": "Tuning a resolver on descv4_surface would build a second surface-specific shortcut, which is the failure already recorded for the relation-keyword arm.",
+    "vocabulary_must_be_disjoint_from": [
+      "birds (controlled_gate_a_v4)",
+      "minerals (c2 calibration v1)",
+      "constellations (chain_v2)",
+      "rivers (chain_v3)",
+      "summits (descv4)"
+    ]
+  },
+  "success_criteria": {
+    "surface_question_anchor_resolution": "materially above the current 0%",
+    "s2c_differs_from_s0": "> 0 on most surface tasks",
+    "structural_selector_gain_once_live": "remains positive",
+    "id_partition_regression": "no material regression",
+    "runtime_purity": "no oracle metadata available at runtime",
+    "stretch_result": "surface S2c captures 20-30% of the surface S5 gap (+0.550)"
+  },
+  "holdout_policy": {
+    "c2_cal_holdout_participates": false,
+    "note": "The reserved holdout must not participate in resolver choice, threshold calibration, feature selection, or debugging."
+  },
+  "explicitly_out_of_scope": [
+    "the anchor-found / anchor-missing routing policy, which must not be implemented until identity resolution is itself qualified",
+    "learned routers",
+    "larger rerankers or additional model capacity",
+    "global promotion of any selector",
+    "packet-budget sweeps"
+  ]
+}

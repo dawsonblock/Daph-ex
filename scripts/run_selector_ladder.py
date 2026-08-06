@@ -64,7 +64,7 @@ from hrm_adaptive_memory.retrieval_bench.selectors.chain import (
 ARM_CLASSIFICATION = {
     "S0_raw": "baseline_pool_order",
     "S1_relevance": "negative_control_pointwise_lexical_relevance",
-    "S2_connectivity": "relation_keyword_control_INVALID_HYPOTHESIS_IMPLEMENTATION",
+    "S2_connectivity": "S_rel_only__relation_only_diagnostic_control_VALID_NOT_A_CHAIN_SELECTOR",
     "S3_cross_encoder": "negative_control_pointwise_cross_encoder",
     "S4_cross_encoder_strong": "negative_control_pointwise_cross_encoder_strong",
     "S2a_entity_connectivity": "structural_entity_connectivity",
