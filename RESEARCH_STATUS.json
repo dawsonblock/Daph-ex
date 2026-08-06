@@ -39,7 +39,7 @@
     "gate_n1_natural_external_memory": "PENDING"
   },
   "known_instrument_limitations": {
-    "oracle_bridge_arm": "Derives the bridge by re-running extract_entities, so it fails identically to the deterministic arm wherever extraction fails. The OOD bridge/retrieval split is therefore unresolved. Fix: read latent bridge identity from generator metadata.",
+    "oracle_bridge_arm": "RESOLVED for v4: hrm_adaptive_memory/experiments/oracle_ladder.py reads latent identity from the task proof graph and raises OracleMetadataMissing rather than falling back to surface derivation. R2 (bridge identity, current query style) and R3 (bridge + target relation) are separate arms, so bridge identification and query formulation no longer conflate. The v3 oracle_bridge arm remains invalid and its numbers stay voided.",
     "v3_corpus": "Evidence-level style contamination both directions; alias regime is prefix truncation; 0/120 description tasks answerable from evidence; oracle_bridge reuses the extractor under test."
   },
   "negative_results": {
@@ -114,9 +114,32 @@
         "alias resolution, since the v3 alias regime is prefix truncation",
         "the reader, which scores 0.828 given perfect evidence"
       ],
+      "opportunity_groups_are_design_labels_not_utility_truth": "C_SECOND_PASS_CONFUSING produced 0 measured negative outcomes. A/B/C/D are generator design labels; controller labels must come from measured delta-U only.",
       "report": "GATE_C1_REPORT.md",
       "root_cause": "The mechanism performed lexical identifier chaining, not bridge inference. ENTITY_PATTERN requires a hyphen-digit suffix; it matches 0/250 OOD questions and 0/160 natural_name questions inside qualification, so zero follow-ups fire.",
       "verdict": "FAIL_STRUCTURAL_GENERALIZATION",
+      "verified_diagnostic_qualification_split": {
+        "_note": "Independently recomputed from the frozen receipts. Qualification-split only, so unaffected by the v3 OOD defects. This is the cleanest available proof that the failure is retrieval infrastructure and not the reader.",
+        "interpretation": "HRM reads natural-name evidence as well as exact-id evidence (0.838 vs 0.847). Retrieval collapses to 0.206 on natural names. The ~0.63 gap is the deterministic entity/bridge infrastructure, not reader capability.",
+        "oracle_evidence_by_answer_kind": {
+          "boolean": 0.65,
+          "enum": 0.698,
+          "json_field": 0.716,
+          "numeric": 0.984,
+          "symbolic": 0.927
+        },
+        "oracle_evidence_by_entity_regime": {
+          "abbreviation": 0.8,
+          "exact_id": 0.847,
+          "natural_name": 0.838
+        },
+        "reader_error_is_not_uniform": "The 0.172 reader error concentrates in boolean (0.650) and enum (0.698) judgments, not numeric/symbolic extraction. Inspect those before any evidence-use training.",
+        "two_pass_by_entity_regime": {
+          "abbreviation": 0.488,
+          "exact_id": 0.476,
+          "natural_name": 0.206
+        }
+      },
       "what_remains_strong": [
         "the current mechanism materially improves some qualification tasks",
         "natural_name tasks expose its syntactic brittleness (0/160 entities extracted)",
