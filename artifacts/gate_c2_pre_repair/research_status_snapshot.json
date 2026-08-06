@@ -26,9 +26,6 @@
     "gate_b_single_pass_retrieval": "PASS",
     "gate_c0_controlled_iterative_retrieval": "MECHANISM_SUCCESS_PROMOTION_BLOCKED_BY_BENCHMARK_STRUCTURE",
     "gate_c1_structural_generalization_iterative_retrieval": "FAIL_MEASURED_ON_V4",
-    "gate_c2_i_identity_resolution": "PENDING",
-    "gate_c2_r_retrieval_coverage": "IN_PROGRESS",
-    "gate_c2_s_evidence_selection": "PENDING",
     "gate_c2_semantic_information_gap_retrieval": "IN_PROGRESS_COVERAGE_MEASURED",
     "gate_d_conditional_retrieval_opportunity": "PENDING_ACTION_TOO_WEAK_TO_MEASURE",
     "gate_e_learned_retrieval_control": "BLOCKED",
@@ -65,18 +62,6 @@
     "slot_label_echoes": "Track evidence quality, not packet format: 85 -> 28 under precision packing, -> 3 under oracle evidence. F-arms would measure a symptom; implemented but unrun."
   },
   "next_work": "Freeze candidate pools from the winning retriever, then run S0-S5 selection on identical pools. Alias remains a retrieval/multi-hop problem, not an embedding one. Executive, adaptive recurrence, Graphiti, and learned routing stay blocked.",
-  "ood_taxonomy": {
-    "REFERENTIAL_OOD": {
-      "mechanism": "identity resolution + multi-hop retrieval",
-      "regime": "alias",
-      "status": "unsolved; needs Gate C2-I, not a better encoder"
-    },
-    "SEMANTIC_OOD": {
-      "mechanism": "semantic representation",
-      "regime": "description",
-      "status": "BGE improves 0.083 -> 0.242"
-    }
-  },
   "qualified_claims": {
     "gate_a0": {
       "claim": "HRM-Text-1B can use correctly supplied external evidence on the controlled synthetic Gate A benchmark.",
@@ -248,13 +233,7 @@
           }
         }
       },
-      "promotion_wording": "bge-small-en-v1.5 is promoted as the preferred dense representation for semantic-description OOD retrieval in V4 and as a candidate dense arm for Gate C2 fusion. NOT 'the best retriever'.",
-      "receipts": [
-        "evidence/gate_c2/retrieval/dense_bge_qualification/",
-        "evidence/gate_c2/retrieval/dense_bge_ood/"
-      ],
-      "report": "GATE_C2_BGE_REPORT.md",
-      "status": "MEASURED_RECEIPTED"
+      "report": "GATE_C1_V4_REPORT.md"
     },
     "gate_c2_coverage": {
       "claim": "Retrieval coverage measured without the reader on frozen V4. Dense beats BM25 on BOTH splits, reversing the Gate B ordering, and rank fusion beats either alone. Coverage remains the dominant constraint.",

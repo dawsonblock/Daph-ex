@@ -91,7 +91,9 @@ class CoverageResult:
     complete_set_at: Mapping[int, float]
     proof_path_coverage_at: Mapping[int, float]
     partial_proof_coverage_at: Mapping[int, float]
-    bridge_found: float
+    # None for tasks that have no bridge at all. Reporting False there would
+    # let single-hop tasks dilute a bridge-recall statistic.
+    bridge_found: float | None
     answer_record_found: float
     mrr: float
     ndcg: float
@@ -136,7 +138,8 @@ def score_coverage(
         task_id=truth.task_id, retriever=retriever, retrieved=tuple(ranked),
         recall_at=recall_at, complete_set_at=complete_at, proof_path_coverage_at=proof_at,
         partial_proof_coverage_at=partial_at,
-        bridge_found=float(bool(truth.bridge_ids) and set(truth.bridge_ids) <= set(ranked)),
+        bridge_found=(None if not truth.bridge_ids
+                      else float(set(truth.bridge_ids) <= set(ranked))),
         answer_record_found=float(
             bool(truth.answer_record_ids) and bool(set(truth.answer_record_ids) & set(ranked))),
         mrr=0.0 if first is None else 1.0 / first,
@@ -169,7 +172,11 @@ def summarize_coverage(
             "mrr": round(mean(r.mrr for r in rows), 4),
             "ndcg": round(mean(r.ndcg for r in rows), 4),
             "precision_at_k": round(mean(r.precision_at_k for r in rows), 4),
-            "bridge_found": round(mean(r.bridge_found for r in rows), 4),
+            # Conditioned on tasks that actually have a bridge.
+            "bridge_recall_among_bridge_tasks": (
+                round(mean(r.bridge_found for r in rows if r.bridge_found is not None), 4)
+                if any(r.bridge_found is not None for r in rows) else None),
+            "bridge_task_count": sum(1 for r in rows if r.bridge_found is not None),
             "answer_record_found": round(mean(r.answer_record_found for r in rows), 4),
             "mean_pool_size": round(mean(r.candidate_pool_size for r in rows), 2),
             "mean_latency_ms": round(mean(r.latency_ms for r in rows), 3),

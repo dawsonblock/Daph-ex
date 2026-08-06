@@ -1,0 +1,6 @@
+{
+  "tests_passed": 376,
+  "tests_skipped": 1,
+  "created_utc": "2026-08-06T19:26:38Z",
+  "note": "Pre-repair baseline. BGE numbers existed as claims without canonical receipts; that gap is what this repair cycle closes."
+}
