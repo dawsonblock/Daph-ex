@@ -1,0 +1,36 @@
+{
+  "VALID_CHAIN_V3": true,
+  "audit": {
+    "chain_v3_id": {
+      "distractor_leaks": 0,
+      "id_collisions_with_prior_corpora": 0,
+      "latent_leaks": 0,
+      "not_inferable": 0,
+      "question_leaks": 0
+    },
+    "chain_v3_surface": {
+      "distractor_leaks": 0,
+      "id_collisions_with_prior_corpora": 0,
+      "latent_leaks": 0,
+      "not_inferable": 0,
+      "question_leaks": 0
+    }
+  },
+  "generator": "controlled_gate_c2_chain_validation_v3",
+  "problems": [],
+  "separation": {
+    "evidence_id_collisions": 0,
+    "overlap_with_cal_v1_heads": 0,
+    "overlap_with_v4_heads": 0,
+    "task_id_prefix": "chainv3-"
+  },
+  "state": {
+    "arm_reselection_forbidden": true,
+    "frozen_before_evaluation": true,
+    "holdout_touched": false,
+    "purpose": "independent_replication_of_fixed_C4_mechanism",
+    "replaces_prior_corpora": false,
+    "valid": true,
+    "vocabulary_domain": "rivers"
+  }
+}

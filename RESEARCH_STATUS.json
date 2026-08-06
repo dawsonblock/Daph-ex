@@ -34,6 +34,7 @@
     "gate_c2_semantic_information_gap_retrieval": "IN_PROGRESS_COVERAGE_MEASURED",
     "gate_c2c_chain_completion": "FAIL_ON_ONE_BADLY_SPECIFIED_CRITERION",
     "gate_c2c_v2_chain_validation": "FAIL_ON_A_TRANSPLANTED_DESCRIPTION_THRESHOLD",
+    "gate_c2c_v3_chain_validation": "FAIL_description_regime_only",
     "gate_d_conditional_retrieval_opportunity": "PENDING_ACTION_TOO_WEAK_TO_MEASURE",
     "gate_e_learned_retrieval_control": "BLOCKED",
     "gate_f_recurrence_opportunity": "BLOCKED",
@@ -70,7 +71,7 @@
     "slot_label_echo": "99 -> 0 under precision packing; was an evidence-confusability artefact, not a prompt-interface or reasoning limit",
     "slot_label_echoes": "Track evidence quality, not packet format: 85 -> 28 under precision packing, -> 3 under oracle evidence. F-arms would measure a symptom; implemented but unrun."
   },
-  "next_work": "Researcher decision. Chain completion has now replicated across three disjoint corpora with near-identical magnitudes (surface 0.26->0.56/0.57, ID 0.71->0.97/0.98) and the reformulated conditional endpoint passed on unfitted data. Both v1 and v2 fail on single endpoints I specified badly in different ways. I am not moving either bar. The pattern suggests my per-regime thresholds are being transplanted between interventions that have different mechanisms of action; a v3 protocol should derive each regime's bar from that regime's residual chain length rather than reuse encoder-calibrated numbers. Holdout untouched; pools unfrozen; selector and executive blocked.",
+  "next_work": "Chain completion now has a precise, replicated boundary: it recovers 0.82-0.96 of oracle-recoverable gap for abbreviation and alias, and 0.03 for description. The isolated defect is description canonicalization -- prose references that the runtime parser resolves unreliably -- and C5=1.000 shows the evidence is retrievable once the subject is resolved. Next is to measure description canonicalization coverage directly, before any further protocol. Holdout untouched; pools unfrozen; selector and executive blocked.",
   "ood_taxonomy": {
     "REFERENTIAL_OOD": {
       "mechanism": "identity resolution + multi-hop retrieval",
@@ -481,6 +482,9 @@
         "mean_followup_depth": 2.0,
         "target_given_identity": 0.0469
       },
+      "experiment_verdict": "FAIL_CHAIN_COMPLETION",
+      "failure_reason": "PROMOTION_CRITERION_NOT_MET",
+      "mechanism_effect_observed": true,
       "mechanism_finding": "Chain completion is highly effective. On c2_cal_id complete-set rises 0.710 -> 0.980, essentially reaching the 1.000 oracle-evidence ceiling. On c2_cal_surface it rises 0.260 -> 0.560. Alias improves +0.42 and abbreviation +0.52 against a required +0.10, with zero canonical regression and depth within the bound of 2. Canonicalization is purely runtime: identity statements are parsed out of retrieved candidate text, never read from _oracle_metadata.",
       "my_specification_error": "Choosing a near-saturated conditional metric as a REQUIRED promotion criterion was a protocol-design mistake, made by me before the run. The correct response is not to move the bar after seeing results -- that would destroy the value of predeclaring. The verdict stands as FAIL. A successor protocol must predeclare criteria with measurable headroom, and these numbers are then exploratory with respect to that successor.",
       "not_a_claim_about": [
@@ -493,12 +497,16 @@
         "evidence/gate_c2/chain_completion/RESULTS.sha256"
       ],
       "report": "configs/gate_c2c_protocol.json",
+      "semantics_note": "experiment_verdict FAIL means the predeclared promotion criterion was not met. It does NOT mean the mechanism had no effect; mechanism_effect_observed is true and large. Historical verdicts are unchanged; the status model is now expressive enough to hold both facts at once.",
       "status": "MEASURED_RECEIPTED",
       "verdict": "FAIL_CHAIN_COMPLETION under the frozen protocol, on one criterion only",
       "why_it_fails": "target_recall_given_identity_delta required >= +0.05. Measured: C1 +0.0144, C2 -0.0857, C3 -0.0143, C4 +0.0469. The reference already scored 0.96 on c2_cal_id and 0.80 on c2_cal_surface for that metric, so at most 0.20 of headroom existed and I still required +0.05 of it as a hard gate. C4 misses by 0.0031."
     },
     "gate_c2c_v2_chain_validation": {
       "claim": "Independent replication of the FIXED C4 mechanism on a third disjoint corpus (constellation vocabulary, zero id collisions with V4 or calibration v1). The mechanism replicates strongly: complete_set@50 0.720 -> 0.980 on ID and 0.260 -> 0.570 on surface. Alias +0.54 and abbreviation +0.52 against required +0.25/+0.20. The headroom-normalized conditional endpoint PASSES (HCR 0.192 vs 0.15). It fails description at +0.08 against a required +0.10.",
+      "experiment_verdict": "FAIL_CHAIN_COMPLETION",
+      "failure_reason": "PROMOTION_CRITERION_NOT_MET",
+      "mechanism_effect_observed": true,
       "not_a_claim_about": [
         "promotion; the frozen bar was not met and is not moving",
         "the reserved holdout, still untouched",
@@ -510,12 +518,72 @@
       ],
       "replication_evidence": "The chain-completion effect is now measured on THREE independent corpora with disjoint vocabularies. v1 surface 0.260 -> 0.560, v2 surface 0.260 -> 0.570; v1 ID 0.710 -> 0.970, v2 ID 0.720 -> 0.980. Near-identical magnitudes across corpora that share no surface forms. This is a real mechanism, not benchmark exploitation.",
       "report": "configs/gate_c2c_v2_protocol.json",
+      "semantics_note": "experiment_verdict FAIL means the predeclared promotion criterion was not met. It does NOT mean the mechanism had no effect; mechanism_effect_observed is true and large. Historical verdicts are unchanged; the status model is now expressive enough to hold both facts at once.",
       "status": "MEASURED_RECEIPTED",
       "the_reformulated_criterion_worked": "v1's ill-posed absolute +0.05 on a near-saturated diagnostic is replaced by headroom closure, and it PASSED at 0.192. The reformulation was correct and is now validated on data it was not fitted to.",
       "verdict": "FAIL_CHAIN_COMPLETION on one endpoint; five of six pass",
       "what_failed_and_why_it_is_not_the_mechanism": "description +0.08 vs required +0.10. Chain completion helps description least because a description question already resolves through one identity record; it has the shortest residual chain, so there is least for a follow-up to recover. The +0.10 bar was carried over from the policy-arm protocol where it measured a DIFFERENT intervention (a stronger encoder). Reusing an encoder-calibrated threshold for a chain-completion endpoint is a second protocol-specification error, distinct from v1's."
+    },
+    "gate_c2c_v3_chain_validation": {
+      "claim": "Fourth disjoint corpus (river vocabulary), fixed C4, oracle-gap-closure protocol with uniform tau=0.25. Three of four regimes pass decisively: abbreviation OGC=0.960, alias OGC=0.815, canonical saturated-and-held. Description fails at OGC=0.025 against an oracle gap of 0.800 -- the largest headroom of any regime and almost none of it recovered.",
+      "experiment_verdict": "FAIL_CHAIN_COMPLETION",
+      "failure_reason": "PROMOTION_CRITERION_NOT_MET_description_regime",
+      "mechanism_effect_observed": true,
+      "not_a_claim_about": [
+        "promotion; the bar was not met and is not moving",
+        "the reserved holdout, still untouched",
+        "downstream HRM quality"
+      ],
+      "per_regime_oracle_gap_closure": {
+        "abbreviation": {
+          "C0": 0.5,
+          "C4": 0.98,
+          "C5": 1.0,
+          "OGC": 0.96,
+          "gap": 0.5,
+          "pass": true
+        },
+        "alias": {
+          "C0": 0.44,
+          "C4": 0.88,
+          "C5": 0.98,
+          "OGC": 0.815,
+          "gap": 0.54,
+          "pass": true
+        },
+        "canonical": {
+          "C0": 0.98,
+          "C4": 0.98,
+          "C5": 1.0,
+          "gap": 0.02,
+          "pass": true,
+          "rule": "saturation"
+        },
+        "description": {
+          "C0": 0.2,
+          "C4": 0.22,
+          "C5": 1.0,
+          "OGC": 0.025,
+          "gap": 0.8,
+          "pass": false
+        }
+      },
+      "receipts": [
+        "evidence/gate_c2/chain_validation_v3/chain_validation_v3.json",
+        "evidence/gate_c2/chain_validation_v3/RESULTS.sha256"
+      ],
+      "report": "configs/gate_c2c_v3_protocol.json",
+      "status": "MEASURED_RECEIPTED",
+      "the_normalizer_worked": "Oracle-gap closure was the right endpoint and it changed the diagnosis rather than merely the arithmetic. Under v2's absolute deltas, description looked like a near-miss (+0.08 vs +0.10). Normalized, it is a near-total failure: 0.025 of an available 0.800. The two prior protocols were hiding the single regime where the mechanism genuinely does not work.",
+      "what_this_isolates": "Chain completion is real and large for abbreviation and alias -- where a retrieved identity record names a canonical entity that runtime parsing can extract. Description references resolve through prose ('the ancillary unit charted during survey season'), and the canonicalization parser recovers them far less reliably, so the follow-up query is built from a subject it never resolved. C5 reaching 1.000 proves the evidence is retrievable given the right query, so this is a canonicalization-coverage failure, not a retrieval-ceiling failure."
     }
   },
   "testing_policy": "Tests assert structured state, never exact strings against narrative prose. Three separate failures came from matching capitalisation in text written separately from the assertion; the pattern was wrong, not merely careless. Prose is rendered from state, and state is what is tested.",
+  "verdict_semantics": {
+    "experiment_verdict": "whether the predeclared promotion criterion was met",
+    "failure_reason": "why, when it was not",
+    "mechanism_effect_observed": "whether a real effect was measured, independent of promotion",
+    "rule": "A FAIL verdict never implies absence of effect. Both are recorded separately."
+  },
   "version": "3.7.1"
 }

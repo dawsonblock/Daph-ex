@@ -449,3 +449,22 @@ def restore_vocabulary(previous: Mapping[str, Any]) -> None:
     DESCRIPTORS = previous["DESCRIPTORS"]; SYMBOLIC = previous["SYMBOLIC"]
     ENUM = previous["ENUM"]; BOOLEAN = previous["BOOLEAN"]
     JSON_KEYS = previous["JSON_KEYS"]; CAPACITY = previous["CAPACITY"]
+
+
+VOCAB_V3 = {
+    # Fourth unrelated domain: V4 birds, cal_v1 minerals, chain_v2 constellations.
+    "HEADS": ("Amazon", "Brahmaputra", "Congo", "Danube", "Ebro", "Fraser", "Ganges",
+              "Hudson", "Irrawaddy", "Jordan", "Kolyma", "Loire", "Mekong", "Niger",
+              "Orinoco", "Parana", "Rhone", "Severn", "Tagus", "Ural", "Volga", "Yukon"),
+    "ROLES": ("sluice head", "weir deck", "levee mount", "culvert ring",
+              "spillway arm", "penstock yoke"),
+    "DESCRIPTORS": ("ancillary unit charted during survey season",
+                    "held unit entered on the lockkeeper roll",
+                    "reserve unit named in the dredging order",
+                    "alternate unit filed with the catchment review"),
+    "SYMBOLIC": ("IOTA-BRONZE", "KAPPA-LINEN", "LAMBDA2-SLATE", "MU2-CLAY",
+                 "NU2-MOSS", "XI2-ASH", "PI2-CHALK", "RHO2-PEAT"),
+    "ENUM": ("chartered", "dredged", "impeded", "reserved", "surveyed"),
+    "BOOLEAN": ("confirmed", "declined"),
+    "JSON_KEYS": ("grade3", "tier3", "state3", "band3"),
+}

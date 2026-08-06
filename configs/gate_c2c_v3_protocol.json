@@ -1,0 +1,49 @@
+{
+  "arms": {
+    "C0_p2_fusion": "frozen reference",
+    "C4_bounded_two_step": "fixed treatment",
+    "C5_oracle_next_query": "ceiling, defines the denominator"
+  },
+  "corpus": {
+    "must_be_disjoint_from": [
+      "controlled_gate_a_v4",
+      "controlled_gate_c2_calibration_v1",
+      "controlled_gate_c2_chain_validation_v2"
+    ],
+    "name": "controlled_gate_c2_chain_validation_v3",
+    "vocabulary_domain": "rivers (V4 birds, v1 minerals, v2 constellations)"
+  },
+  "forbidden": [
+    "arm re-selection",
+    "threshold tuning",
+    "mechanism changes",
+    "query changes",
+    "rerunning v1/v2 corpora and calling it validation"
+  ],
+  "frozen_before_any_run": true,
+  "holdout_policy": "c2_cal_holdout remains UNTOUCHED, reserved for the finished lower pipeline.",
+  "on_pass": "promote BOUNDED_CHAIN_COMPLETION and freeze candidate generation, then pools -> ceilings -> S0/S5. Nothing else.",
+  "operational_constraints": {
+    "max_followup_depth": 2,
+    "no_oracle_metadata_at_runtime": true,
+    "runtime_canonicalization_only": true
+  },
+  "primary_metric": {
+    "definition": "OGC_r = (C4_r - C0_r) / (C5_r - C0_r)",
+    "name": "OracleGapClosure",
+    "question": "Of the performance a better next retrieval operation could theoretically recover, how much does the real mechanism recover?",
+    "tau_ogc": 0.25,
+    "uniform_across_regimes": true,
+    "why_uniform": "Per-regime absolute deltas caused both prior failures: v1 demanded absolute gain from a saturated diagnostic, v2 transplanted an encoder-calibrated bar onto a chain-completion endpoint. The intervention is chain completion, so it is judged by how much chain-completion opportunity it captures. tau is a minimum meaningful effect size chosen before any v3 number exists, NOT selected from whichever regime barely passes."
+  },
+  "protocol": "gate_c2c_chain_validation_v3",
+  "purpose": "Validate the FIXED C4 mechanism under a correctly normalized protocol on a fourth disjoint corpus. v1 and v2 were used to discover the appropriate endpoint; that is legitimate exploratory science and is why validation needs fresh data.",
+  "replication_requirement": "must hold on both predeclared partitions",
+  "residual_chain_length": "measured as an EXPLANATORY variable only; never a pass threshold",
+  "runs_permitted": 1,
+  "saturation_rule": {
+    "requirement": "C4_r >= C0_r - 0.02",
+    "trigger": "oracle_gap = C5_r - C0_r <= 0.05",
+    "why": "A regime already at the ceiling cannot show gap closure; demanding it is ill-posed."
+  }
+}
