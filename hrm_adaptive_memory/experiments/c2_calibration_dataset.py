@@ -396,3 +396,56 @@ def build_calibration(*, seed: int, partition: str, per_regime: int) -> dict:
                     if partition != "c2_cal_holdout"
                     else "RESERVED: never use for selection"),
     }}
+
+
+# ---------------------------------------------------------------------------
+# Vocabulary override, for building an independent replication corpus.
+# ---------------------------------------------------------------------------
+
+VOCAB_V2 = {
+    # V4 used birds, calibration v1 minerals; this is a third unrelated domain.
+    "HEADS": ("Andromeda", "Bootes", "Cassiopeia", "Draco", "Eridanus", "Fornax",
+              "Grus", "Hydrus", "Indus", "Lacerta", "Monoceros", "Norma",
+              "Octans", "Perseus", "Reticulum", "Sculptor", "Tucana", "Vela",
+              "Volans", "Aquila", "Carina", "Lyra"),
+    "ROLES": ("beacon array", "drift collar", "phase gate", "shroud panel",
+              "vector spar", "yaw damper"),
+    "DESCRIPTORS": ("quaternary unit logged during shakedown",
+                    "standby unit indexed in the berth manifest",
+                    "relief unit cited in the commissioning brief",
+                    "substitute unit filed under the trials docket"),
+    "SYMBOLIC": ("TAU-GARNET", "UPSILON-FLAX", "PHI-COBALT", "CHI-SORREL",
+                 "PSI-JADE", "OMEGA-RUST", "ALPHA2-BONE", "BETA2-PLUM"),
+    "ENUM": ("provisioned", "quiesced", "restaged", "sequestered", "validated"),
+    "BOOLEAN": ("affirmative", "negative"),
+    "JSON_KEYS": ("grade2", "tier2", "state2", "band2"),
+}
+
+
+def apply_vocabulary(vocab: Mapping[str, Any]) -> dict[str, Any]:
+    """Rebind surface vocabulary; returns the previous values for restoration.
+
+    Structure and audit logic are shared with calibration v1 deliberately; only
+    the surface forms differ, so a replication cannot succeed by reusing learned
+    vocabulary.
+    """
+
+    global HEADS, ROLES, DESCRIPTORS, SYMBOLIC, ENUM, BOOLEAN, JSON_KEYS, CAPACITY
+    previous = {"HEADS": HEADS, "ROLES": ROLES, "DESCRIPTORS": DESCRIPTORS,
+                "SYMBOLIC": SYMBOLIC, "ENUM": ENUM, "BOOLEAN": BOOLEAN,
+                "JSON_KEYS": JSON_KEYS, "CAPACITY": CAPACITY}
+    HEADS = tuple(vocab["HEADS"]); ROLES = tuple(vocab["ROLES"])
+    DESCRIPTORS = tuple(vocab["DESCRIPTORS"]); SYMBOLIC = tuple(vocab["SYMBOLIC"])
+    ENUM = tuple(vocab["ENUM"]); BOOLEAN = tuple(vocab["BOOLEAN"])
+    JSON_KEYS = tuple(vocab["JSON_KEYS"])
+    CAPACITY = {"numeric": 8000, "symbolic": len(SYMBOLIC), "enum": len(ENUM),
+                "boolean": len(BOOLEAN), "json_field": len(ENUM)}
+    return previous
+
+
+def restore_vocabulary(previous: Mapping[str, Any]) -> None:
+    global HEADS, ROLES, DESCRIPTORS, SYMBOLIC, ENUM, BOOLEAN, JSON_KEYS, CAPACITY
+    HEADS = previous["HEADS"]; ROLES = previous["ROLES"]
+    DESCRIPTORS = previous["DESCRIPTORS"]; SYMBOLIC = previous["SYMBOLIC"]
+    ENUM = previous["ENUM"]; BOOLEAN = previous["BOOLEAN"]
+    JSON_KEYS = previous["JSON_KEYS"]; CAPACITY = previous["CAPACITY"]

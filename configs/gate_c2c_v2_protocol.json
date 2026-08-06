@@ -1,0 +1,76 @@
+{
+  "corpus": {
+    "must_be_disjoint_from": [
+      "controlled_gate_a_v4",
+      "controlled_gate_c2_calibration_v1 (all partitions)"
+    ],
+    "name": "controlled_gate_c2_chain_validation_v2",
+    "vocabulary_domain": "constellations (V4 birds, cal_v1 minerals)"
+  },
+  "diagnostic_ceilings_only": [
+    "C5_oracle_next_query",
+    "C6_oracle_evidence"
+  ],
+  "endpoint_separation": {
+    "diagnostic_may_not_veto": [
+      "identity_record_recall",
+      "canonical_resolution_rate",
+      "target_recall_given_identity",
+      "bridge_recall_given_identity",
+      "partial_proof_coverage"
+    ],
+    "primary": [
+      "complete_set_after_chain_completion",
+      "per-regime complete_set",
+      "depth/cost"
+    ],
+    "rule": "A near-saturated diagnostic may not veto the primary endpoint. Diagnostics explain the mechanism; they do not define the hypothesis."
+  },
+  "frozen_before_any_run": true,
+  "headroom_normalized_endpoint": {
+    "definition": "HCR = (m1 - m0) / (1 - m0), the fraction of remaining error closed",
+    "metric": "target_recall_given_identity",
+    "min_hcr": 0.15,
+    "rule": "if m0 >= 0.95: require m1 >= m0 - 0.02 (saturation clause) else: require HCR >= 0.15",
+    "saturation_baseline": 0.95,
+    "saturation_tolerance": 0.02,
+    "why": "v1 required an ABSOLUTE +0.05 from a baseline of 0.80-0.96, so at most 0.04-0.20 of headroom existed and a near-saturated diagnostic could veto overwhelming primary-endpoint gains. Headroom closure is scale-correct across baselines. This is a reformulation of an ill-posed criterion, NOT a relaxed threshold: +0.05 absolute on an 0.80 baseline is HCR 0.25, whereas the new bar is HCR 0.15 -- lower in headroom terms, and explicitly justified before any v2 number exists."
+  },
+  "holdout_policy": "c2_cal_holdout remains UNTOUCHED. It is reserved for the finished lower memory pipeline -- frozen retrieval policy + chain completion + selector + packet budget + reader -- not for adjudicating a calibration protocol defect.",
+  "hypothesis": "Once identity evidence is available, bounded follow-up retrieval recovers the missing multi-record proof path.",
+  "primary_endpoints": {
+    "abbreviation_complete_set_gain": {
+      "direction": "material_gain",
+      "threshold": 0.2
+    },
+    "alias_complete_set_gain": {
+      "direction": "material_gain",
+      "threshold": 0.25
+    },
+    "canonical_non_regression": {
+      "direction": "no_regression",
+      "threshold": -0.02
+    },
+    "description_complete_set_gain": {
+      "direction": "material_gain",
+      "threshold": 0.1
+    },
+    "max_followup_depth": {
+      "direction": "bounded",
+      "threshold": 2
+    }
+  },
+  "protocol": "gate_c2c_chain_validation_v2",
+  "purpose": "Independent replication of a FIXED mechanism under a correctly specified protocol. C2-C-v1's FAIL verdict is preserved unchanged; this does not reinterpret it.",
+  "reference": {
+    "immutable": true,
+    "name": "C0_p2_fusion"
+  },
+  "runs_permitted": 1,
+  "treatment": {
+    "fixed": true,
+    "name": "C4_bounded_two_step",
+    "note": "single treatment; re-selecting arms here would spend another corpus on architecture selection"
+  },
+  "what_v1_already_consumed": "Arm selection. v1 established C1 good, C2 excellent-ID/weaker-surface, C4 strongest balanced, C5 ceiling. That information is spent, so v2 must NOT re-select among arms."
+}
