@@ -27,7 +27,7 @@
     "gate_c0_controlled_iterative_retrieval": "MECHANISM_SUCCESS_PROMOTION_BLOCKED_BY_BENCHMARK_STRUCTURE",
     "gate_c1_structural_generalization_iterative_retrieval": "FAIL_MEASURED_ON_V4",
     "gate_c2_i_identity_resolution": "PENDING",
-    "gate_c2_r_retrieval_coverage": "IN_PROGRESS",
+    "gate_c2_r_retrieval_coverage": "IN_PROGRESS_RETRIEVER_FREEZE_BLOCKED_BY_SPLIT_CONFOUND",
     "gate_c2_s_evidence_selection": "PENDING",
     "gate_c2_semantic_information_gap_retrieval": "IN_PROGRESS_COVERAGE_MEASURED",
     "gate_d_conditional_retrieval_opportunity": "PENDING_ACTION_TOO_WEAK_TO_MEASURE",
@@ -294,6 +294,45 @@
       "receipts": "evidence/gate_c2/{qualification,ood}_coverage/",
       "report": "GATE_C1_V4_REPORT.md",
       "supersedes": "Gate B's finding that BM25 dominates the tested dense stack. That held on the identifier-heavy v2 corpus and does not survive v4."
+    },
+    "gate_c2_dev_sweep": {
+      "CRITICAL_CONFOUND": "The development split contains ONLY the canonical and abbreviation regimes -- it has no description regime at all, because description and alias are held out for OOD. BGE's entire measured value was the description regime (0.083 -> 0.242 OOD). Development therefore CANNOT select for the capability BGE provides, and freezing the retriever on development alone would discard it for the wrong reason. The retriever freeze must not be decided on development complete-set alone.",
+      "claim": "Development-only sweep. Q3 formulation matters enormously: keeping the SUBJECT in the query alongside bridge and relation lifts complete-set@50 from 0.625 (bridge+relation) to 0.900 (subject+bridge+relation). RRF k is flat across {10,30,60,100} at 0.767. On development BM25 dominates both dense arms and contributes 25 unique gold records against 2 each for MiniLM and BGE.",
+      "frozen_rrf_k": 10,
+      "jaccard_overlap": {
+        "bm25_vs_bge": 0.3492,
+        "bm25_vs_minilm": 0.3299,
+        "minilm_vs_bge": 0.3873
+      },
+      "not_a_claim_about": [
+        "qualification or OOD, which were not touched",
+        "Q3 as a production mechanism -- it is oracle-informed",
+        "downstream HRM quality"
+      ],
+      "phase3_q3_complete_set_at_50": {
+        "Q3a_bridge": 0.5,
+        "Q3b_bridge_relation": 0.625,
+        "Q3c_subject_bridge_relation": 0.9,
+        "Q3d_relation_bridge": 0.617,
+        "Q3e_two_query_union": 0.617
+      },
+      "phase4_arms_complete_set_at_50": {
+        "P0_bm25": 0.758,
+        "P1_minilm": 0.533,
+        "P2_bge": 0.592,
+        "P3_rrf_bm25_minilm": 0.783,
+        "P4_rrf_bm25_bge": 0.767,
+        "P5_rrf_three_way": 0.758
+      },
+      "receipts": [
+        "evidence/gate_c2/dev_sweep/dev_sweep.json"
+      ],
+      "status": "MEASURED_RECEIPTED_DEVELOPMENT_ONLY",
+      "unique_gold_contribution": {
+        "bge": 2,
+        "bm25": 25,
+        "minilm": 2
+      }
     },
     "gate_c2_query_ladder": {
       "claim": "Q0-Q3 retrieval-only query ablation on frozen V4. Querying the bridge entity ALONE (Q1) is worse than the original question on both splits and collapses to 0.000 complete-set@50 on OOD, which explains why the V4 ladder's R2 did not beat R1. A fully rendered request (Q3) nearly doubles dense complete-set@10 on qualification (0.214 -> 0.416) and lifts fusion complete-set@50 from 0.426 to 0.614. On OOD even a perfect query reaches only 0.200, so retrieval representation, not query formulation, is the binding constraint there.",
