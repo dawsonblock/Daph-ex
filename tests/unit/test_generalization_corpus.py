@@ -143,6 +143,6 @@ def test_style_holdout_is_checked_on_evidence_records_not_task_labels():
 
 def test_v3_limitations_are_recorded_rather_than_silently_fixed():
     text = (V3 / "V3_KNOWN_LIMITATIONS.md").read_text()
-    for required in ("source-style holdout is violated", "does not produce aliases",
+    for required in ("Source-style holdout is violated", "does not produce aliases",
                      "not answerable from evidence", "is not an oracle"):
         assert required in text, f"erratum omits: {required}"
