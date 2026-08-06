@@ -29,7 +29,7 @@
     "gate_c0_controlled_iterative_retrieval": "MECHANISM_SUCCESS_PROMOTION_BLOCKED_BY_BENCHMARK_STRUCTURE",
     "gate_c1_structural_generalization_iterative_retrieval": "FAIL_MEASURED_ON_V4",
     "gate_c2_i_identity_resolution": "PENDING",
-    "gate_c2_r_retrieval_coverage": "IN_PROGRESS_RETRIEVER_FREEZE_BLOCKED_BY_SPLIT_CONFOUND",
+    "gate_c2_r_retrieval_coverage": "FAIL_CANDIDATE_COVERAGE_NO_ARM_PROMOTABLE",
     "gate_c2_s_evidence_selection": "PENDING",
     "gate_c2_semantic_information_gap_retrieval": "IN_PROGRESS_COVERAGE_MEASURED",
     "gate_d_conditional_retrieval_opportunity": "PENDING_ACTION_TOO_WEAK_TO_MEASURE",
@@ -68,7 +68,7 @@
     "slot_label_echo": "99 -> 0 under precision packing; was an evidence-confusability artefact, not a prompt-interface or reasoning limit",
     "slot_label_echoes": "Track evidence quality, not packet format: 85 -> 28 under precision packing, -> 3 under oracle evidence. F-arms would measure a symptom; implemented but unrun."
   },
-  "next_work": "Run P0_bm25 / P1_bge / P2_rrf_bm25_bge on c2_cal_id and c2_cal_surface with the frozen per-regime rules and the alias decomposition. Freeze a candidate-GENERATION POLICY, then pools, ceilings, and the S0/S5 gate at tau=0.05. c2_cal_holdout stays untouched (1 run permitted); V4 stays immutable.",
+  "next_work": "Neither arm cleared the frozen bar, so no candidate-generation policy is promoted and pools are not frozen. The alias decomposition redirects the next mechanism: identity records are already retrieved (recall 0.96-1.00), so build chain completion -- given identity in hand, recover the remaining proof records -- rather than identity resolution. Selector work stays blocked; the S0/S5 gate needs a frozen pool first. c2_cal_holdout untouched; V4 immutable.",
   "ood_taxonomy": {
     "REFERENTIAL_OOD": {
       "mechanism": "identity resolution + multi-hop retrieval",
@@ -355,6 +355,49 @@
         "bm25": 25,
         "minilm": 2
       }
+    },
+    "gate_c2_policy_arms": {
+      "alias_decomposition_overturns_the_prior_hypothesis": "I predicted in advance that alias would fail because no arm traverses an identity record. The decomposition says otherwise: identity_record_recall is 0.96-1.00 on the surface partition, so identity records ARE being retrieved. The shortfall is target_recall_given_identity_found at 0.61-0.80, and complete-set at only 0.21-0.26. The bottleneck is assembling the COMPLETE multi-record proof path after identity is in hand, not finding the identity record. This reframes C2-I from 'identity resolution' toward chain completion.",
+      "claim": "On frozen calibration, judged against rules predeclared before the run: P1_bge passes description (+0.14) but destroys canonical (-0.30). P2_rrf_bm25_bge holds canonical (-0.02, exactly at threshold) and abbreviation (+0.04) but misses the description bar at +0.08 against a required +0.10. Neither is promotable.",
+      "complete_set_at_50": {
+        "c2_cal_id": {
+          "P0_bm25": 0.7,
+          "P1_bge": 0.54,
+          "P2_rrf_bm25_bge": 0.71
+        },
+        "c2_cal_surface": {
+          "P0_bm25": 0.21,
+          "P1_bge": 0.23,
+          "P2_rrf_bm25_bge": 0.26
+        }
+      },
+      "deltas_vs_reference_bm25": {
+        "P1_bge": {
+          "abbreviation": -0.02,
+          "alias": -0.1,
+          "canonical": -0.3,
+          "description": 0.14
+        },
+        "P2_rrf_bm25_bge": {
+          "abbreviation": 0.04,
+          "alias": 0.02,
+          "canonical": -0.02,
+          "description": 0.08
+        }
+      },
+      "not_a_claim_about": [
+        "the holdout partition, which was not evaluated",
+        "downstream HRM quality, not measured here",
+        "any threshold revision; the bar was frozen and is not being moved"
+      ],
+      "receipts": [
+        "evidence/gate_c2/policy_arms/policy_arms.json",
+        "evidence/gate_c2/policy_arms/RESULTS.sha256"
+      ],
+      "replication": "BGE's description advantage REPLICATES on a fresh corpus with fully disjoint vocabulary (+0.14 alone, +0.08 in fusion), so it is a real property of the regime rather than a V4 artifact. That is the strongest positive result here, even though the arm fails.",
+      "report": "configs/gate_c2_protocol.json",
+      "status": "MEASURED_RECEIPTED",
+      "verdict": "FAIL_CANDIDATE_COVERAGE for both P1_bge and P2_rrf_bm25_bge"
     },
     "gate_c2_protocol": {
       "claim": "Gate C2 promotion rules, reference arm, and selection threshold are predeclared in configs/gate_c2_protocol.json before any calibration measurement. Reference arm is P0_bm25 and marked immutable; primary metric is complete_set@50; per-regime rules are canonical >= -0.02, abbreviation >= -0.02, description >= +0.10, alias report-only; tau_selection = 0.05 for the S0/S5 gate.",
