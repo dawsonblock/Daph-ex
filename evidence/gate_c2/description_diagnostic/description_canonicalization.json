@@ -1,0 +1,139 @@
+{
+  "corpora": {
+    "cal_v1": {
+      "ResolutionPrecision": 0.12,
+      "ResolutionRate": 1.0,
+      "TargetRecallGivenCorrectResolution": 1.0,
+      "TargetRecallGivenFailedResolution": 0.6818,
+      "failure_classes": {
+        "AMBIGUOUS_MATCH": 36,
+        "CORRECT_CANONICAL_BAD_QUERY": 0,
+        "CORRECT_QUERY_RETRIEVAL_FAILURE": 1,
+        "NO_DESCRIPTION_MATCH": 0,
+        "SUCCESS": 13,
+        "WRONG_CANONICAL_ENTITY": 0
+      },
+      "funnel": {
+        "canonical_correct": 0.12,
+        "complete_proof_recovered": 0.26,
+        "correct_query_formed": 0.12,
+        "identity_record_retrieved": 1.0,
+        "mention_recognized": 1.0,
+        "resolver_returned": 1.0,
+        "target_evidence_retrieved": 0.72
+      },
+      "n": 50
+    },
+    "chain_v2": {
+      "ResolutionPrecision": 0.0,
+      "ResolutionRate": 1.0,
+      "TargetRecallGivenCorrectResolution": null,
+      "TargetRecallGivenFailedResolution": 0.74,
+      "failure_classes": {
+        "AMBIGUOUS_MATCH": 40,
+        "CORRECT_CANONICAL_BAD_QUERY": 0,
+        "CORRECT_QUERY_RETRIEVAL_FAILURE": 0,
+        "NO_DESCRIPTION_MATCH": 0,
+        "SUCCESS": 10,
+        "WRONG_CANONICAL_ENTITY": 0
+      },
+      "funnel": {
+        "canonical_correct": 0.0,
+        "complete_proof_recovered": 0.2,
+        "correct_query_formed": 0.0,
+        "identity_record_retrieved": 1.0,
+        "mention_recognized": 1.0,
+        "resolver_returned": 1.0,
+        "target_evidence_retrieved": 0.74
+      },
+      "n": 50
+    },
+    "chain_v3": {
+      "ResolutionPrecision": 0.04,
+      "ResolutionRate": 1.0,
+      "TargetRecallGivenCorrectResolution": 1.0,
+      "TargetRecallGivenFailedResolution": 0.7708,
+      "failure_classes": {
+        "AMBIGUOUS_MATCH": 39,
+        "CORRECT_CANONICAL_BAD_QUERY": 0,
+        "CORRECT_QUERY_RETRIEVAL_FAILURE": 0,
+        "NO_DESCRIPTION_MATCH": 0,
+        "SUCCESS": 11,
+        "WRONG_CANONICAL_ENTITY": 0
+      },
+      "funnel": {
+        "canonical_correct": 0.04,
+        "complete_proof_recovered": 0.22,
+        "correct_query_formed": 0.04,
+        "identity_record_retrieved": 1.0,
+        "mention_recognized": 1.0,
+        "resolver_returned": 1.0,
+        "target_evidence_retrieved": 0.78
+      },
+      "n": 50
+    }
+  },
+  "diagnostic": "description_canonicalization",
+  "examples": [
+    {
+      "class": "AMBIGUOUS_MATCH",
+      "corpus": "cal_v1",
+      "identity_record_retrieved": true,
+      "identity_record_text": "The transfer ledger names Olivine intake valve as the backup unit entered in the transfer ledger.",
+      "question_subject": "the backup unit entered in the transfer ledger",
+      "resolver_returned": "Nephrite ballast tank",
+      "task_id": "c2cal-description-entity_attribute-0000",
+      "truth_canonical": "Olivine intake valve"
+    },
+    {
+      "class": "AMBIGUOUS_MATCH",
+      "corpus": "cal_v1",
+      "identity_record_retrieved": true,
+      "identity_record_text": "The transfer ledger names Magnetite diagnostic bay as the spare unit noted on the dispatch sheet.",
+      "question_subject": "the spare unit noted on the dispatch sheet",
+      "resolver_returned": "Magnetite intake valve",
+      "task_id": "c2cal-description-ownership_chain-0001",
+      "truth_canonical": "Magnetite diagnostic bay"
+    },
+    {
+      "class": "AMBIGUOUS_MATCH",
+      "corpus": "cal_v1",
+      "identity_record_retrieved": true,
+      "identity_record_text": "the tertiary unit catalogued during retrofit is Kyanite diagnostic bay, per the survey report.",
+      "question_subject": "the tertiary unit catalogued during retrofit",
+      "resolver_returned": "Serpentine ballast tank",
+      "task_id": "c2cal-description-configuration_chain-0002",
+      "truth_canonical": "Kyanite diagnostic bay"
+    },
+    {
+      "class": "CORRECT_QUERY_RETRIEVAL_FAILURE",
+      "corpus": "cal_v1",
+      "identity_record_retrieved": true,
+      "identity_record_text": "the spare unit noted on the dispatch sheet is Magnetite intake valve, per the survey report.",
+      "question_subject": "the spare unit noted on the dispatch sheet",
+      "resolver_returned": "Magnetite intake valve",
+      "task_id": "c2cal-description-location_chain-0004",
+      "truth_canonical": "Magnetite intake valve"
+    },
+    {
+      "class": "AMBIGUOUS_MATCH",
+      "corpus": "cal_v1",
+      "identity_record_retrieved": true,
+      "identity_record_text": "Retrofit records describe Serpentine ballast tank as the tertiary unit catalogued during retrofit.",
+      "question_subject": "the tertiary unit catalogued during retrofit",
+      "resolver_returned": "Dolomite diagnostic bay",
+      "task_id": "c2cal-description-numeric_chain-0006",
+      "truth_canonical": "Serpentine ballast tank"
+    },
+    {
+      "class": "AMBIGUOUS_MATCH",
+      "corpus": "cal_v1",
+      "identity_record_retrieved": true,
+      "identity_record_text": "Retrofit records describe Dolomite diagnostic bay as the backup unit entered in the transfer ledger.",
+      "question_subject": "the backup unit entered in the transfer ledger",
+      "resolver_returned": "Calcite actuator ring",
+      "task_id": "c2cal-description-procedural_chain-0007",
+      "truth_canonical": "Dolomite diagnostic bay"
+    }
+  ]
+}

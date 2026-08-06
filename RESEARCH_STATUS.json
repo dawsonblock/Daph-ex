@@ -71,7 +71,7 @@
     "slot_label_echo": "99 -> 0 under precision packing; was an evidence-confusability artefact, not a prompt-interface or reasoning limit",
     "slot_label_echoes": "Track evidence quality, not packet format: 85 -> 28 under precision packing, -> 3 under oracle evidence. F-arms would measure a symptom; implemented but unrun."
   },
-  "next_work": "Chain completion now has a precise, replicated boundary: it recovers 0.82-0.96 of oracle-recoverable gap for abbreviation and alias, and 0.03 for description. The isolated defect is description canonicalization -- prose references that the runtime parser resolves unreliably -- and C5=1.000 shows the evidence is retrievable once the subject is resolved. Next is to measure description canonicalization coverage directly, before any further protocol. Holdout untouched; pools unfrozen; selector and executive blocked.",
+  "next_work": "Do NOT build a canonicalization ladder yet: the diagnostic shows the resolver resolves at rate 1.000 and fails on precision because the references are not uniquely referring. Fix the corpus first -- descriptors must identify exactly one entity, asserted by audit -- then re-run the fixed C4 under the existing v3 OGC protocol on a fresh corpus. Holdout untouched; pools unfrozen; selector and executive blocked.",
   "ood_taxonomy": {
     "REFERENTIAL_OOD": {
       "mechanism": "identity resolution + multi-hop retrieval",
@@ -319,6 +319,37 @@
       "report": "GATE_C1_V4_REPORT.md",
       "supersedes": "Gate B's finding that BM25 dominates the tested dense stack. That held on the identifier-heavy v2 corpus and does not survive v4."
     },
+    "gate_c2_description_diagnostic": {
+      "ambiguity": {
+        "contrast_alias_distinct_surfaces_per_50": "40-42",
+        "distinct_description_strings_per_50_tasks": 4,
+        "entities_per_description_string_max": 13
+      },
+      "claim": "Staged funnel over all 150 description tasks. Identity retrieval, mention recognition, and resolver response are all 1.000; canonical correctness is 0.00-0.12. ResolutionRate 1.000 with ResolutionPrecision 0.00-0.12, dominant class AMBIGUOUS_MATCH. Root cause: only 4 descriptor phrases exist per corpus, so one description string refers to up to 13 different entities and the question does not identify a unique referent.",
+      "consequence": "The v3 description verdict measured an ill-posed regime, not a mechanism limitation. The oracle arm reached 1.000 only by reading true canonical identity from _oracle_metadata, bypassing an ambiguity no runtime resolver can resolve. All description-regime figures in C2-C-v1/v2/v3 and the description component of the BGE policy comparison are VOIDED as mechanism measurements. Canonical, abbreviation, and alias are unaffected.",
+      "funnel": {
+        "canonical_correct": {
+          "cal_v1": 0.12,
+          "chain_v2": 0.0,
+          "chain_v3": 0.04
+        },
+        "identity_record_retrieved": 1.0,
+        "mention_recognized": 1.0,
+        "resolver_returned": 1.0
+      },
+      "not_a_claim_about": [
+        "the resolver's capability on well-posed references",
+        "canonical, abbreviation, or alias regimes, which are unaffected",
+        "any promotion decision"
+      ],
+      "receipts": [
+        "evidence/gate_c2/description_diagnostic/description_canonicalization.json",
+        "evidence/gate_c2/description_diagnostic/RESULTS.sha256"
+      ],
+      "report": "data/hrm/DESCRIPTION_REGIME_ERRATUM.md",
+      "status": "MEASURED_RECEIPTED",
+      "why_prior_protocols_missed_it": "Absolute deltas made a near-zero gain look like a near-miss (+0.08 vs +0.10). Oracle-gap normalisation exposed the magnitude; only separating resolution RATE from resolution PRECISION found the cause. The resolver was always answering, and always wrong."
+    },
     "gate_c2_dev_sweep": {
       "CRITICAL_CONFOUND": "The development split contains ONLY the canonical and abbreviation regimes -- it has no description regime at all, because description and alias are held out for OOD. BGE's entire measured value was the description regime (0.083 -> 0.242 OOD). Development therefore CANNOT select for the capability BGE provides, and freezing the retriever on development alone would discard it for the wrong reason. The retriever freeze must not be decided on development complete-set alone.",
       "claim": "Development-only sweep. Q3 formulation matters enormously: keeping the SUBJECT in the query alongside bridge and relation lifts complete-set@50 from 0.625 (bridge+relation) to 0.900 (subject+bridge+relation). RRF k is flat across {10,30,60,100} at 0.767. On development BM25 dominates both dense arms and contributes 25 unique gold records against 2 each for MiniLM and BGE.",
@@ -525,6 +556,7 @@
       "what_failed_and_why_it_is_not_the_mechanism": "description +0.08 vs required +0.10. Chain completion helps description least because a description question already resolves through one identity record; it has the shortest residual chain, so there is least for a follow-up to recover. The +0.10 bar was carried over from the policy-arm protocol where it measured a DIFFERENT intervention (a stronger encoder). Reusing an encoder-calibrated threshold for a chain-completion endpoint is a second protocol-specification error, distinct from v1's."
     },
     "gate_c2c_v3_chain_validation": {
+      "amended": "The description FAIL measured an ambiguous-by-construction regime. See data/hrm/DESCRIPTION_REGIME_ERRATUM.md. The FAIL verdict is preserved unchanged; the description figure is voided as a mechanism measurement. Abbreviation (0.960) and alias (0.815) oracle-gap closure stand.",
       "claim": "Fourth disjoint corpus (river vocabulary), fixed C4, oracle-gap-closure protocol with uniform tau=0.25. Three of four regimes pass decisively: abbreviation OGC=0.960, alias OGC=0.815, canonical saturated-and-held. Description fails at OGC=0.025 against an oracle gap of 0.800 -- the largest headroom of any regime and almost none of it recovered.",
       "experiment_verdict": "FAIL_CHAIN_COMPLETION",
       "failure_reason": "PROMOTION_CRITERION_NOT_MET_description_regime",
