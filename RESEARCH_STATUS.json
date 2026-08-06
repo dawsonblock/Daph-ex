@@ -25,8 +25,8 @@
     "gate_a1_structural_generalization": "PENDING_AWAITING_V4",
     "gate_b_single_pass_retrieval": "PASS",
     "gate_c0_controlled_iterative_retrieval": "MECHANISM_SUCCESS_PROMOTION_BLOCKED_BY_BENCHMARK_STRUCTURE",
-    "gate_c1_structural_generalization_iterative_retrieval": "FAIL_QUALITATIVE_ONLY_OOD_MEASUREMENT_VOIDED",
-    "gate_c2_semantic_information_gap_retrieval": "PENDING",
+    "gate_c1_structural_generalization_iterative_retrieval": "FAIL_MEASURED_ON_V4",
+    "gate_c2_semantic_information_gap_retrieval": "IN_PROGRESS_COVERAGE_MEASURED",
     "gate_d_conditional_retrieval_opportunity": "PENDING_ACTION_TOO_WEAK_TO_MEASURE",
     "gate_e_learned_retrieval_control": "BLOCKED",
     "gate_f_recurrence_opportunity": "BLOCKED",
@@ -37,6 +37,17 @@
     "gate_k_consolidation": "BLOCKED",
     "gate_l_latent_memory": "BLOCKED",
     "gate_n1_natural_external_memory": "PENDING"
+  },
+  "hypothesis_only_not_measured": {
+    "_note": "Proposals from exploratory Colab analysis that were simulated or projected rather than measured. None may enter a canonical claim.",
+    "adaptive_router": "BLOCKED",
+    "batch_size_4_or_8": "UNQUALIFIED",
+    "bge_base": "HYPOTHESIS_ONLY",
+    "bge_micro": "HYPOTHESIS_ONLY",
+    "deberta_reranker": "HYPOTHESIS_ONLY",
+    "efficiency_gain_36_6_percent": "SIMULATED_ONLY",
+    "k_60": "UNQUALIFIED",
+    "rrf_on_synthetic_rankings": "HYPOTHESIS_ONLY_superseded_by_real_measurement_above"
   },
   "known_instrument_limitations": {
     "oracle_bridge_arm": "RESOLVED for v4: hrm_adaptive_memory/experiments/oracle_ladder.py reads latent identity from the task proof graph and raises OracleMetadataMissing rather than falling back to surface derivation. R2 (bridge identity, current query style) and R3 (bridge + target relation) are separate arms, so bridge identification and query formulation no longer conflate. The v3 oracle_bridge arm remains invalid and its numbers stay voided.",
@@ -50,7 +61,7 @@
     "slot_label_echo": "99 -> 0 under precision packing; was an evidence-confusability artefact, not a prompt-interface or reasoning limit",
     "slot_label_echoes": "Track evidence quality, not packet format: 85 -> 28 under precision packing, -> 3 under oracle evidence. F-arms would measure a symptom; implemented but unrun."
   },
-  "next_work": "Run the 3260ce0 mechanism UNCHANGED against frozen controlled_gate_a_v4 (qualification + OOD) through the independent R0-R5 oracle ladder to establish the real bottleneck decomposition. Mechanism improvement is prohibited until that baseline exists.",
+  "next_work": "Gate C2 selection arms on frozen candidate pools (S0-S5), then the R1/R2/R3 failure diagnostic and the Q0-Q3 query-only coverage ladder. Executive, adaptive recurrence, Graphiti, and learned routing stay blocked.",
   "qualified_claims": {
     "gate_a0": {
       "claim": "HRM-Text-1B can use correctly supplied external evidence on the controlled synthetic Gate A benchmark.",
@@ -146,6 +157,90 @@
         "ENTITY_PATTERN is lexical identifier chaining, not semantic bridge inference",
         "HRM performs substantially better when supplied correct evidence"
       ]
+    },
+    "gate_c1_v4_ladder": {
+      "arms_complete_set_qualification": {
+        "R0": 0.162,
+        "R1": 0.134,
+        "R2": 0.134,
+        "R3": 0.134,
+        "R4": 0.168,
+        "R5": 1.0
+      },
+      "arms_quality": {
+        "R0": {
+          "ood": 0.004,
+          "qual": 0.074
+        },
+        "R1": {
+          "ood": 0.016,
+          "qual": 0.062
+        },
+        "R2": {
+          "ood": 0.008,
+          "qual": 0.054
+        },
+        "R3": {
+          "ood": 0.008,
+          "qual": 0.054
+        },
+        "R4": {
+          "ood": 0.404,
+          "qual": 0.462
+        },
+        "R5": {
+          "ood": 0.908,
+          "qual": 0.88
+        }
+      },
+      "claim": "On frozen controlled_gate_a_v4 with the mechanism pinned at 3260ce0, the current retrieval path is near-inert: R1 two-pass reaches 0.062 qualification / 0.016 OOD against an oracle-evidence ceiling of 0.880 / 0.908.",
+      "critical_reading_of_R3_to_R4": "R4's complete-set success is only 0.168 while its quality is 0.462, so R4 answers many tasks from PARTIAL gold evidence. The +0.408 gain is therefore not 'better ranking' -- it is the effect of removing every non-gold record. Any distractor in the packet is close to catastrophic, and the reader can often work from an incomplete but clean packet. Do not read R3->R4 as a pure selection-ranking term.",
+      "not_a_claim_about": [
+        "any receipt-verified figure: the run's receipts were not pushed to this repository",
+        "selection ranking, since R4's gain comes from removing all non-gold records, not from ranking",
+        "the reader, which reaches 0.880/0.908 given the required evidence"
+      ],
+      "provenance": "Measured on Colab T4 at pinned commit 3b1fbd5, sequential generation (batch_equivalence_passed=false, batch_size=1). Values transcribed from the run output; the receipt files were not pushed back to this repository, so they are NOT independently re-verifiable here.",
+      "report": "GATE_C1_V4_REPORT.md"
+    },
+    "gate_c2_coverage": {
+      "claim": "Retrieval coverage measured without the reader on frozen V4. Dense beats BM25 on BOTH splits, reversing the Gate B ordering, and rank fusion beats either alone. Coverage remains the dominant constraint.",
+      "complete_set_at_10": {
+        "ood": {
+          "bm25": 0.0,
+          "dense": 0.004,
+          "rrf": 0.004,
+          "union": 0.008
+        },
+        "qualification": {
+          "bm25": 0.16,
+          "dense": 0.214,
+          "rrf": 0.222,
+          "union": 0.198
+        }
+      },
+      "complete_set_at_50": {
+        "ood": {
+          "bm25": 0.048,
+          "dense": 0.072,
+          "rrf": 0.128,
+          "union": 0.128
+        },
+        "qualification": {
+          "bm25": 0.35,
+          "dense": 0.364,
+          "rrf": 0.426,
+          "union": 0.422
+        }
+      },
+      "not_a_claim_about": [
+        "downstream answer quality, which was not measured in the coverage harness",
+        "any dense stack other than the pinned MiniLM encoder",
+        "reranking or selection, which are measured separately on frozen candidate pools"
+      ],
+      "receipts": "evidence/gate_c2/{qualification,ood}_coverage/",
+      "report": "GATE_C1_V4_REPORT.md",
+      "supersedes": "Gate B's finding that BM25 dominates the tested dense stack. That held on the identifier-heavy v2 corpus and does not survive v4."
     }
   },
   "version": "3.7.1"
